@@ -1,6 +1,6 @@
 import {createBrowserRouter} from 'react-router';
 import App from '../App';
-import RestaurantsListPage from '../pages/public/RestaurantListPage/RestaurantsListPage';
+import RestaurantsListPage from '../pages/public/RestaurantsListPage/RestaurantsListPage';
 
 import AuthenticatedRoute from '../routes/AuthenticatedRoute';
 import UnauthenticatedRoute from '../routes/UnauthenticatedRoute';
@@ -26,8 +26,9 @@ export const router = createBrowserRouter([
             // Landing page: /public
 
             {path: "/public", element: <RestaurantsListPage />},
-
+            
             // Restaurants list page : /public/restaurants
+            {path: "/public/restaurants", element: <RestaurantsListPage />},
 
             // Restaurant menu page : /public/restaurants/:id
             
