@@ -23,5 +23,8 @@ namespace Honse.Resources.Interfaces.Entities
         public Guid CategoryId { get; set; }
 
         public bool IsEnabled { get; set; } = true;
+
+        [ForeignKey("Restaurant")]
+        public Guid RestaurantId { get; set; }
     }
 }

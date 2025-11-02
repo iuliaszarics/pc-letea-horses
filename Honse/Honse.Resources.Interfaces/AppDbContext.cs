@@ -9,6 +9,8 @@ namespace Honse.Resources.Interfaces
         public DbSet<Entities.Product> Product { get; set; }
         public DbSet<Entities.ProductCategory> ProductCategory { get; set; }
 
+        public DbSet<Entities.Restaurant> Restaurant { get; set; }
+
         public AppDbContext(DbContextOptions<AppDbContext> context) : base(context)
         {
         }
