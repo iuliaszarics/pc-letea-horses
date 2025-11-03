@@ -1,6 +1,6 @@
 ﻿namespace Honse.Resources.Interfaces
 {
-    public interface IRestaurantResource : IResource<Entities.Restaurant>
+    public interface IRestaurantResource : IFilterResource<Entities.Restaurant>
     {
     }
 }

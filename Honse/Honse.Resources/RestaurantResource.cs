@@ -8,7 +8,6 @@ namespace Honse.Resources
         public RestaurantResource(AppDbContext dbContext)  : base(dbContext) {
             dbSet = dbContext.Restaurant;
 
-            includeProperties = [(Restaurant restaurant) => restaurant.]
         }
     }
 }
