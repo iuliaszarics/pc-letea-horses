@@ -28,7 +28,7 @@ CREATE TABLE [Restaurant](
     [IsOpen] BIT NOT NULL DEFAULT 0, -- Calculated field or updated via trigger
     [IsEnabled] BIT NOT NULL,
     -- Operating Hours (stored as JSON for flexibility)
-    [OpenìngTime] TIME NOT NULL,
+    [OpeningTime] TIME NOT NULL,
     [ClosingTime] TIME NOT NULL,
     -- Ownership
     [UserId] UNIQUEIDENTIFIER NOT NULL REFERENCES [AspNetUsers],
