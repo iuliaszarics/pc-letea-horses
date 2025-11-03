@@ -18,9 +18,6 @@ namespace Honse.Engines.Filtering.Restaurant
             if (filter.City != null)
                 specification = specification.And(new SpecificationRestaurantCity(filter.City));
 
-            if (filter.IsOpen.HasValue)
-                specification = specification.And(new SpecificationRestaurantIsOpen(filter.IsOpen.Value));
-
             if (filter.IsEnabled.HasValue)
                 specification = specification.And(new SpecificationRestaurantIsEnabled(filter.IsEnabled.Value));
 

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Honse.Global;
+﻿using Honse.Global;
 using Honse.Global.Extensions;
 using Honse.Managers.Interfaces;
 
@@ -32,9 +27,6 @@ namespace Honse.Managers
             var restaurant = request.DeepCopyTo<Resources.Interfaces.Entities.Restaurant>();
 
             restaurant.Id = Guid.NewGuid();
-            restaurant.AverageRating = 0;
-            restaurant.TotalReviews = 0;
-            restaurant.IsOpen = false;
             restaurant.IsEnabled = true;
 
             restaurant = await restaurantResource.Add(restaurant);

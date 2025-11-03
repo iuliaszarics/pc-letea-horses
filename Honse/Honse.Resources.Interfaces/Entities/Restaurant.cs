@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace Honse.Resources.Interfaces.Entities
 {
     public class Restaurant : Entity
@@ -28,11 +23,9 @@ namespace Honse.Resources.Interfaces.Entities
 
         public string CuisineType {  get; set; } = string.Empty;
 
-        public float AverageRating { get; set; } 
+        public float AverageRating { get; set; } = 0;
 
-        public int TotalReviews { get; set; }
-
-        public bool IsOpen { get; set; } 
+        public int TotalReviews { get; set; } = 0;
 
         public bool IsEnabled { get; set; } = true;
 
@@ -42,10 +35,6 @@ namespace Honse.Resources.Interfaces.Entities
         public TimeOnly ClosingTime { get; set; }
         
         // UserID is inherited from EntityClass
-
-
-
-
     }
 
 }

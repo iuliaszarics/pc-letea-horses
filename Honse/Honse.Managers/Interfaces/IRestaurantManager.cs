@@ -1,5 +1,4 @@
-﻿using Honse.Resources.Interfaces.Entities;
-
+﻿
 namespace Honse.Managers.Interfaces
 {
     public interface IRestaurantManager
@@ -46,8 +45,6 @@ namespace Honse.Managers.Interfaces
         public float AverageRating { get; set; }
 
         public int TotalReviews { get; set; }
-
-        public bool IsOpen { get; set; }
 
         public bool IsEnabled { get; set; }
 
@@ -111,8 +108,6 @@ namespace Honse.Managers.Interfaces
 
         public string CuisineType { get; set; } = string.Empty;
 
-        public bool IsOpen { get; set; }
-
         public bool IsEnabled { get; set; }
 
         public TimeOnly OpeningTime { get; set; }
@@ -129,8 +124,6 @@ namespace Honse.Managers.Interfaces
         public string? CuisineType { get; set; }
 
         public string? City { get; set; }
-
-        public bool? IsOpen { get; set; }
 
         public bool? IsEnabled { get; set; }
 
