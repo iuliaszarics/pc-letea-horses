@@ -7,7 +7,8 @@ import UnauthenticatedRoute from '../routes/UnauthenticatedRoute';
 
 import LoginPage from '../pages/public/Auth/LoginPage';
 import RegisterPage from '../pages/public/Auth/RegisterPage';
-
+import AllProductsPage from '../pages/private/products/AllProductsPage';
+import AddProductPage from '../pages/private/products/AddProductPage';
 export const router = createBrowserRouter([
     {
         path: "/",
@@ -45,15 +46,37 @@ export const router = createBrowserRouter([
                         <RegisterPage />
                     </UnauthenticatedRoute>
                 )
-            }
+            },
 
             // PRIVATE PAGES - you can access them only if you are logged in
 
-            // Products page: /products
 
-            // Products add page: /products/add
+             {
+                path: "/products",
+                element: (
+                    <AuthenticatedRoute redirectPage="/public/login">
+                        <AllProductsPage />
+                    </AuthenticatedRoute>
+                ),
+            },
 
-            // Products edit page: /products/edit
+            {
+            path: "/products/add",
+            element: (
+                <AuthenticatedRoute redirectPage="/public/login">
+                <AddProductPage />
+                </AuthenticatedRoute>
+            ),
+            },
+            {
+            path: "/products/edit/:id",
+            element: (
+                <AuthenticatedRoute redirectPage="/public/login">
+                <AddProductPage />
+                </AuthenticatedRoute>
+            ),
+            },
+
 
             // Restaurants page: /restaurants
 

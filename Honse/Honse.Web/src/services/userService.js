@@ -3,18 +3,18 @@ import axios from "axios";
 const RAW_BASE = process.env.REACT_APP_API_URL || "https://localhost:2000";
 const BASE_URL = RAW_BASE.replace(/\/+$/, "");
 
-const api = axios.create({
+export const api = axios.create({
     baseURL: BASE_URL,
     headers: { "Content-Type": "application/json" },
 });
 
-function success(token, username, extra = {}) {
+export function success(token, username, extra = {}) {
     return { succeeded: true, token, username, ...extra };
 }
-function failure(message) {
+export function failure(message) {
     return { succeeded: false, errorMessage: message || "Unexpected error." };
 }
-function parseError(err, fallback) {
+export function parseError(err, fallback) {
     const data = err?.response?.data;
     if (typeof data === "string") return data;
     if (data?.errorMessage) return data.errorMessage;
