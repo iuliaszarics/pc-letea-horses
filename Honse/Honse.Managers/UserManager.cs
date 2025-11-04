@@ -92,6 +92,7 @@ namespace Honse.Managers
             {
                 new(JwtRegisteredClaimNames.Email, user.Email),
                 new(JwtRegisteredClaimNames.GivenName, user.UserName),
+                new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             };
 
             SigningCredentials credentials = new SigningCredentials(
