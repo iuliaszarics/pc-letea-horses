@@ -36,18 +36,16 @@ namespace Honse.API.Controllers
                 return BadRequest((new { errorMessage }));
             }
 
-            //string? userName = User.FindFirstValue(ClaimTypes.GivenName);
+            string? userName = User.FindFirstValue(ClaimTypes.GivenName);
 
-            //var userResponse = await userManager.GetUserByName(userName).WithTryCatch();
+            var userResponse = await userManager.GetUserByName(userName).WithTryCatch();
 
-            //if (!userResponse.IsSuccessfull)
-            //{
-            //    return BadRequest(userResponse.Exception.Message);
-            //}
+            if (!userResponse.IsSuccessfull)
+            {
+                return BadRequest(userResponse.Exception.Message);
+            }
 
-            //Global.User user = userResponse.Result;
-            Global.User user = new Global.User();
-            user.Id = new System.Guid("7469C4A2 - F8C2 - 4A6D - AE61 - 08DE1B0E8F53");
+            Global.User user = userResponse.Result;
             var restaurantResponse = await restaurantManager.GetRestaurantById(id, user.Id).WithTryCatch();
 
 
@@ -73,20 +71,18 @@ namespace Honse.API.Controllers
                 return BadRequest((new { errorMessage }));
             }
 
-            //string? userName = User.FindFirstValue(ClaimTypes.GivenName);
+            string? userName = User.FindFirstValue(ClaimTypes.GivenName);
 
-            //var userResponse = await userManager.GetUserByName(userName).WithTryCatch();
+            var userResponse = await userManager.GetUserByName(userName).WithTryCatch();
 
-            //if (!userResponse.IsSuccessfull)
-            //{
-            //    return BadRequest(userResponse.Exception.Message);
-            //}
+            if (!userResponse.IsSuccessfull)
+            {
+                return BadRequest(userResponse.Exception.Message);
+            }
 
-            //Global.User user = userResponse.Result;
+            Global.User user = userResponse.Result;
 
-            //request.UserId = user.Id;
-            Global.User user = new Global.User();
-            user.Id = new System.Guid("7469C4A2 - F8C2 - 4A6D - AE61 - 08DE1B0E8F53");
+            request.UserId = user.Id;
             var restaurantResponse = await restaurantManager.FilterRestaurants(request).WithTryCatch();
 
             if (!restaurantResponse.IsSuccessfull)
@@ -146,20 +142,18 @@ namespace Honse.API.Controllers
                 return BadRequest((new { errorMessage }));
             }
 
-            //string? userName = User.FindFirstValue(ClaimTypes.GivenName);
+            string? userName = User.FindFirstValue(ClaimTypes.GivenName);
 
-            //var userResponse = await userManager.GetUserByName(userName).WithTryCatch();
+            var userResponse = await userManager.GetUserByName(userName).WithTryCatch();
 
-            //if (!userResponse.IsSuccessfull)
-            //{
-            //    return BadRequest(userResponse.Exception.Message);
-            //}
+            if (!userResponse.IsSuccessfull)
+            {
+                return BadRequest(userResponse.Exception.Message);
+            }
 
-            //Global.User user = userResponse.Result;
+            Global.User user = userResponse.Result;
 
-            //request.UserId = user.Id;
-            Global.User user = new Global.User();
-            user.Id = new System.Guid("7469C4A2 - F8C2 - 4A6D - AE61 - 08DE1B0E8F53");
+            request.UserId = user.Id;
 
             var restaurantResponse = await restaurantManager.AddRestaurant(request).WithTryCatch();
 
@@ -186,19 +180,17 @@ namespace Honse.API.Controllers
                 return BadRequest((new { errorMessage }));
             }
 
-            //string? userName = User.FindFirstValue(ClaimTypes.GivenName);
+            string? userName = User.FindFirstValue(ClaimTypes.GivenName);
 
-            //var userResponse = await userManager.GetUserByName(userName).WithTryCatch();
+            var userResponse = await userManager.GetUserByName(userName).WithTryCatch();
 
-            //if (!userResponse.IsSuccessfull)
-            //{
-            //    return BadRequest(userResponse.Exception.Message);
-            //}
+            if (!userResponse.IsSuccessfull)
+            {
+                return BadRequest(userResponse.Exception.Message);
+            }
 
-            //Global.User user = userResponse.Result;
-
-            Global.User user = new Global.User();
-            user.Id = new System.Guid("7469C4A2 - F8C2 - 4A6D - AE61 - 08DE1B0E8F53");
+            Global.User user = userResponse.Result;
+            
             request.UserId = user.Id;
 
 
@@ -230,19 +222,16 @@ namespace Honse.API.Controllers
                 return BadRequest((new { errorMessage }));
             }
 
-            //string? userName = User.FindFirstValue(ClaimTypes.GivenName);
+            string? userName = User.FindFirstValue(ClaimTypes.GivenName);
 
-            //var userResponse = await userManager.GetUserByName(userName).WithTryCatch();
+            var userResponse = await userManager.GetUserByName(userName).WithTryCatch();
 
-            //if (!userResponse.IsSuccessfull)
-            //{
-            //    return BadRequest(userResponse.Exception.Message);
-            //}
+            if (!userResponse.IsSuccessfull)
+            {
+                return BadRequest(userResponse.Exception.Message);
+            }
 
-            //Global.User user = userResponse.Result;
-
-            Global.User user = new Global.User();
-            user.Id = new System.Guid("7469C4A2 - F8C2 - 4A6D - AE61 - 08DE1B0E8F53");
+            Global.User user = userResponse.Result;
 
             var restaurantResponse = await restaurantManager.DeleteRestaurant(id, user.Id).WithTryCatch();
 

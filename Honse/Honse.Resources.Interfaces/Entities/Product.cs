@@ -22,7 +22,5 @@ namespace Honse.Resources.Interfaces.Entities
 
         public bool IsEnabled { get; set; } = true;
 
-        [ForeignKey("Restaurant")]
-        public Guid RestaurantId { get; set; }
     }
 }

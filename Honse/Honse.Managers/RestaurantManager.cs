@@ -70,10 +70,14 @@ namespace Honse.Managers
 
         public async Task<Interfaces.Restaurant> UpdateRestaurant(UpdateRestaurantRequest request)
         {
+            // Get existing restaurant (tracked by default)
             var existingRestaurant = await restaurantResource.GetById(request.Id, request.UserId);
 
             if (existingRestaurant == null)
                 throw new Exception("Restaurant not found!");
+
+            // Manually detach it from tracking
+            restaurantResource.Detach(existingRestaurant);
 
             var restaurant = request.DeepCopyTo<Resources.Interfaces.Entities.Restaurant>();
 

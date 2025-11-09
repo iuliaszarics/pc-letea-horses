@@ -21,8 +21,6 @@ namespace Honse.Engines.Common
         [EmailAddress]
         public string Email { get; set; } = string.Empty;
 
-        public string Website { get; set; } = string.Empty;
-
         public string Image { get; set; } = string.Empty;
 
         public string CuisineType { get; set; } = string.Empty;

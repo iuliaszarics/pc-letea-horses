@@ -5,6 +5,7 @@ CREATE TABLE [ProductCategory](
 	[Name] VARCHAR(MAX) NOT NULL,
 	
 	[UserId] UNIQUEIDENTIFIER NOT NULL REFERENCES [AspNetUsers]
+	--[RestaurantId] UNIQUEIDENTIFIER NOT NULL REFERENCES [Restaurant]
 )
 
 CREATE TABLE [Product](
