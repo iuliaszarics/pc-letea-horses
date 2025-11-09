@@ -56,6 +56,14 @@ namespace Honse.Resources.Interfaces
             return await query.FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
         }
 
+        public async Task<T?> GetByIdNoTracking(Guid id, Guid userId)
+        {
+            var query = dbSet.AsNoTracking().AsQueryable();
+            query = ApplyIncludes(query);
+
+            return await query.FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
+        }
+
         public async Task<T?> Update(Guid id, Guid userId, T t)
         {
             T? existingT = await dbSet.AsNoTracking().FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);

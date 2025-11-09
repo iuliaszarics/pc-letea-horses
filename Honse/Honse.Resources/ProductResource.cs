@@ -10,6 +10,7 @@ namespace Honse.Resources
             dbSet = dbContext.Product;
 
             includeProperties = [(Product product) => product.Category];
+
         }
     }
 }

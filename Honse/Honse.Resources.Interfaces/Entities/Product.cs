@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Honse.Resources.Interfaces.Entities
 {
@@ -23,5 +21,6 @@ namespace Honse.Resources.Interfaces.Entities
         public Guid CategoryId { get; set; }
 
         public bool IsEnabled { get; set; } = true;
+
     }
 }

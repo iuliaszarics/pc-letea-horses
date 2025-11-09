@@ -1,11 +1,12 @@
-﻿
-namespace Honse.Resources.Interfaces
+﻿namespace Honse.Resources.Interfaces
 {
     public interface IResource<T> where T : Entities.Entity
     {
         public Task<IEnumerable<T>> GetAll(Guid userId);
 
         public Task<T?> GetById(Guid id, Guid userId);
+
+        public Task<T?> GetByIdNoTracking(Guid id, Guid userId);
 
         public Task<T> Add(T t);
 

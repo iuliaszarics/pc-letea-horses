@@ -4,7 +4,7 @@ if not defined in_subprocess (cmd /k set in_subprocess=y ^& %0 %*) & exit )
 setlocal enabledelayedexpansion
 
 REM Configuration
-set "SERVER_NAME=DESKTOP-SRIGMAH\SQLEXPRESS"
+set "SERVER_NAME=RAZVAN\SQLEXPRESS01"
 set "DATABASE_NAME=Honse"
 set "SQL_SCRIPTS_DIR=.\"
 
@@ -25,7 +25,7 @@ REM Execute all .sql files in the directory
 for %%f in ("%SQL_SCRIPTS_DIR%\*.sql") do (
     echo Executing: %%~nxf
     
-    sqlcmd -S %SERVER_NAME% -d %DATABASE_NAME% -i "%%f" -b
+    sqlcmd -S %SERVER_NAME% -d %DATABASE_NAME% -i "%%f" -b -I
     
     if !errorlevel! equ 0 (
         echo SUCCESS: %%~nxf
