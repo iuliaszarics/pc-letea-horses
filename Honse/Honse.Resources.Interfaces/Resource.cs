@@ -77,11 +77,6 @@ namespace Honse.Resources.Interfaces
             return t;
         }
 
-        public void Detach(T t)
-        {
-            dbContext.Entry(t).State = EntityState.Detached;
-        }
-
         protected IQueryable<T> ApplyIncludes(IQueryable<T> query)
         {
             if (includeProperties.Any())
