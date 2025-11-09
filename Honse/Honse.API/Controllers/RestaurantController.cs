@@ -21,7 +21,7 @@ namespace Honse.API.Controllers
             this.userManager = userManager;
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpGet]
         [Route("{id}")]
         public async Task<IActionResult> GetRestaurant([FromRoute] Guid id)
@@ -57,7 +57,7 @@ namespace Honse.API.Controllers
             return Ok(restaurantResponse.Result);
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetFilteredRestaurants([FromQuery] RestaurantFilterRequest request)
         {
@@ -93,7 +93,7 @@ namespace Honse.API.Controllers
             return Ok(restaurantResponse.Result);
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpGet]
         [Route("all")]
         public async Task<IActionResult> GetAllRestaurants()
@@ -128,7 +128,7 @@ namespace Honse.API.Controllers
             return Ok(restaurantResponse.Result);
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateRestaurant([FromBody] CreateRestaurantRequest request)
         {
@@ -165,7 +165,7 @@ namespace Honse.API.Controllers
             return Created();
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpPut]
         [Route("{id}")]
         public async Task<IActionResult> UpdateRestaurant([FromRoute] Guid id, [FromBody] UpdateRestaurantRequest request)
@@ -207,7 +207,7 @@ namespace Honse.API.Controllers
             return Ok(restaurantResponse.Result);
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpDelete]
         [Route("{id}")]
         public async Task<IActionResult> DeleteRestaurant([FromRoute] Guid id)
