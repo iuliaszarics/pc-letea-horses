@@ -30,13 +30,24 @@ namespace Honse.Managers
 
             var productCategory = await productCategoryResource.GetById(request.CategoryId, request.UserId);
 
-            if (productCategory == null)
-                throw new Exception("Product category not found!");
-
             var product = request.DeepCopyTo<Resources.Interfaces.Entities.Product>();
 
             product.Id = Guid.NewGuid();
-            //product.Category = productCategory;
+
+            if (productCategory == null)
+            {
+                Guid categoryId = Guid.NewGuid();
+
+                await productCategoryResource.Add(new Resources.Interfaces.Entities.ProductCategory
+                {
+                    Id = categoryId,
+                    Name = request.CategoryName,
+                    UserId = request.UserId,
+                    RestaurantId = request.RestaurantId
+                });
+
+                product.CategoryId = categoryId;
+            }
 
             product = await productResource.Add(product);
 
@@ -77,10 +88,34 @@ namespace Honse.Managers
             return products.DeepCopyTo<PaginatedResult<Product>>();
         }
 
-        public Task<Interfaces.Product> UpdateProduct(UpdateProductRequest request)
+        public async Task<Interfaces.Product> UpdateProduct(UpdateProductRequest request)
         {
-            // Similar to add
-            throw new NotImplementedException();
+            productValidationEngine.ValidateUpdateProduct(request.DeepCopyTo<Engines.Common.UpdateProduct>());
+
+            var productCategory = await productCategoryResource.GetById(request.CategoryId, request.UserId); 
+
+            var product = request.DeepCopyTo<Resources.Interfaces.Entities.Product>();
+
+            product.Id = request.Id;
+
+            if (productCategory == null)
+            {
+                Guid categoryId = Guid.NewGuid();
+
+                await productCategoryResource.Add(new Resources.Interfaces.Entities.ProductCategory
+                {
+                    Id = categoryId,
+                    Name = request.CategoryName,
+                    UserId = request.UserId,
+                    RestaurantId = request.RestaurantId
+                });
+
+                product.CategoryId = categoryId;
+            }
+
+            product = await productResource.Update(request.Id, request.UserId, product);
+
+            return product.DeepCopyTo<Interfaces.Product>();
         }
     }
 }
