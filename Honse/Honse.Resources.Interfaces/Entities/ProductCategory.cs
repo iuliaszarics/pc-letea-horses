@@ -7,7 +7,8 @@ namespace Honse.Resources.Interfaces.Entities
         public string Name { get; set; } = string.Empty;
 
         [ForeignKey("Restaurant")]
-        //[NotMapped]
         public Guid RestaurantId { get; set; }
+
+        public Restaurant Restaurant { get; set; }
     }
 }

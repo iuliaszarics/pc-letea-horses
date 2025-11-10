@@ -1,4 +1,5 @@
 ﻿using Honse.Resources.Interfaces;
+using Honse.Resources.Interfaces.Entities;
 
 namespace Honse.Resources
 {
@@ -7,6 +8,8 @@ namespace Honse.Resources
         public ProductCategoryResource(AppDbContext dbContext) : base(dbContext)
         {
             dbSet = dbContext.ProductCategory;
+
+            includeProperties = [(ProductCategory category) => category.Restaurant];
         }
     }
 }
