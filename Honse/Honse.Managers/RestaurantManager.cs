@@ -68,6 +68,74 @@ namespace Honse.Managers
             return restaurants.DeepCopyTo<PaginatedResult<Interfaces.Restaurant>>();
         }
 
+        public async Task<PaginatedResult<Interfaces.RestaurantCard>> GetPublicRestaurants(int pageSize, int pageNumber)
+        {
+            var restaurants = await restaurantResource.GetAllEnabled(pageSize, pageNumber);
+
+            // compute IsOpen and MinutesUntilClose
+            var now = TimeOnly.FromDateTime(DateTime.Now);
+
+            var cards = restaurants.Result.Select(r =>
+            {
+                bool isOpen;
+                int? minutesUntilClose = null;
+
+                // Handle normal and overnight hours
+                if (r.OpeningTime < r.ClosingTime)
+                {
+                    isOpen = r.IsEnabled && r.OpeningTime <= now && now < r.ClosingTime;
+                }
+                else if (r.OpeningTime > r.ClosingTime)
+                {
+                    // Overnight (e.g., 18:00 -> 02:00): open if now >= opening OR now < closing
+                    isOpen = r.IsEnabled && (now >= r.OpeningTime || now < r.ClosingTime);
+                }
+                else
+                {
+                    // opening == closing: interpret as closed all day
+                    isOpen = false;
+                }
+
+                if (isOpen)
+                {
+                    // Compute minutes until close, accounting for overnight wrap
+                    var nowSpan = now.ToTimeSpan();
+                    var openingSpan = r.OpeningTime.ToTimeSpan();
+                    var closingSpan = r.ClosingTime.ToTimeSpan();
+
+                    TimeSpan untilClose;
+                    if (r.OpeningTime < r.ClosingTime)
+                    {
+                        untilClose = closingSpan - nowSpan;
+                    }
+                    else
+                    {
+                        // Overnight: closing is next day
+                        untilClose = (TimeSpan.FromHours(24) - nowSpan) + closingSpan;
+                    }
+
+                    minutesUntilClose = (int)Math.Max(0, untilClose.TotalMinutes);
+                }
+
+                return new Interfaces.RestaurantCard
+                {
+                    Id = r.Id,
+                    Name = r.Name,
+                    Image = r.Image,
+                    IsOpen = isOpen,
+                    AverageRating = r.AverageRating,
+                    MinutesUntilClose = minutesUntilClose
+                };
+            }).ToList();
+
+            return new PaginatedResult<Interfaces.RestaurantCard>
+            {
+                Result = cards,
+                PageNumber = restaurants.PageNumber,
+                TotalCount = restaurants.TotalCount
+            };
+        }
+
         public async Task<Interfaces.Restaurant> UpdateRestaurant(UpdateRestaurantRequest request)
         {
             // Get existing restaurant without tracking to preserve rating fields
