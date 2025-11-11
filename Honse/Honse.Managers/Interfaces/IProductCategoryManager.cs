@@ -22,9 +22,9 @@ namespace Honse.Managers.Interfaces
 
         public string Name { get; set; } = string.Empty;
 
-        public Guid RestaurantId { get; set; }
+        public Guid? RestaurantId { get; set; }
 
-        public Restaurant Restaurant { get; set; }
+        public Restaurant? Restaurant { get; set; }
     }
 
     public class CreateProductCategoryRequest
@@ -42,7 +42,7 @@ namespace Honse.Managers.Interfaces
 
         public string Name { get; set; } = string.Empty;
 
-        public Guid RestaurantId { get; set; }
+        public Guid? RestaurantId { get; set; }
 
         public Guid UserId { get; set; }
     }

@@ -6,9 +6,8 @@ namespace Honse.Resources.Interfaces.Entities
     {
         public string Name { get; set; } = string.Empty;
 
-        public Restaurant Restaurant { get; set; }
+        public Restaurant? Restaurant { get; set; }
 
-        [ForeignKey("Restaurant")]
-        public Guid RestaurantId { get; set; }
+        public Guid? RestaurantId { get; set; }
     }
 }

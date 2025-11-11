@@ -80,6 +80,8 @@ namespace Honse.Managers.Interfaces
         public TimeOnly OpeningTime { get; set; }
 
         public TimeOnly ClosingTime { get; set; }
+
+        public List<Guid> CategoryIds { get; set; } = new List<Guid>();
     }
 
     public class UpdateRestaurantRequest
@@ -111,6 +113,9 @@ namespace Honse.Managers.Interfaces
         public TimeOnly OpeningTime { get; set; }
 
         public TimeOnly ClosingTime { get; set; }
+
+        public List<Guid> CategoryIds { get; set; } = new List<Guid>();
+
     }
 
     public class RestaurantFilterRequest

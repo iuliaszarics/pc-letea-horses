@@ -72,10 +72,13 @@ namespace Honse.Managers
             // Validate
             productCategoryValidationEngine.ValidateUpdateProductCategory(request.DeepCopyTo<Engines.Common.UpdateProductCategoryRequest>());
 
-            var restaurant = await restaurantResource.GetById(request.RestaurantId, request.UserId);
+            if (request.RestaurantId != null)
+            {
+                var restaurant = await restaurantResource.GetById(request.RestaurantId.Value, request.UserId);
 
-            if (restaurant == null)
-                throw new Exception("Restaurant not found!");
+                if (restaurant == null)
+                    throw new Exception("Restaurant not found!");
+            }
 
             var category = request.DeepCopyTo<Resources.Interfaces.Entities.ProductCategory>();
 

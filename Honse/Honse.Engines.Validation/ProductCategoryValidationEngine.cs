@@ -38,8 +38,8 @@ namespace Honse.Engines.Validation
             if (productCategory.UserId == Guid.Empty)
                 errorMessage += "UserId is required!\n";
 
-            if (productCategory.RestaurantId == Guid.Empty)
-                errorMessage += "RestaurantId is required!\n";
+            //if (productCategory.RestaurantId == Guid.Empty)
+            //    errorMessage += "RestaurantId is required!\n";
 
             if (string.IsNullOrEmpty(productCategory.Name))
                 errorMessage += "Category name is required!\n";

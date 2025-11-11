@@ -40,7 +40,9 @@ CREATE INDEX [IX_Restaurant_IsEnabled] ON [Restaurant]([IsEnabled]) WHERE [IsEna
 
 -- Add RestaurantId to Product table
 ALTER TABLE [ProductCategory]
-ADD [RestaurantId] UNIQUEIDENTIFIER NOT NULL REFERENCES [Restaurant]([Id])
+ADD [RestaurantId] UNIQUEIDENTIFIER 
+-- NOT NULL 
+-- REFERENCES [Restaurant]([Id])
 
 -- Create index for faster queries
 CREATE INDEX [IX_ProductCategory_RestaurantId] ON [ProductCategory]([RestaurantId])

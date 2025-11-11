@@ -18,7 +18,7 @@ namespace Honse.Engines.Common
 
         public string Name { get; set; } = string.Empty;
 
-        public Guid RestaurantId { get; set; }
+        public Guid? RestaurantId { get; set; }
 
         public Guid UserId { get; set; }
     }
