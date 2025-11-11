@@ -45,6 +45,15 @@ export default function Filters({
 
           {showCategoryDropdown && (
             <ul className="absolute mt-1 bg-white dark:bg-gray-800 border border-border-light dark:border-border-dark rounded shadow z-10 w-full">
+              <li
+                className="px-4 py-2 cursor-pointer hover:bg-blue-200"
+                onClick={() => {
+                  setCategoryName("");       // empty string means no filter
+                  setShowCategoryDropdown(false);
+                }}
+              >
+                All
+              </li>
               {categories.map((cat) => (
                 <li
                   key={cat}

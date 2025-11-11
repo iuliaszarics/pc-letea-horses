@@ -19,7 +19,9 @@ export default function AllProductsPage() {
   const [totalCount, setTotalCount] = useState(0);
   useEffect(() => {
     async function loadCategories() {
-      const result = await getAllCategoriesAPI();
+      const restaurantId = localStorage.getItem("restaurantId");
+      
+      const result = await getAllCategoriesAPI(restaurantId);
       if (result.succeeded) {
         setCategories(result.data);
       }

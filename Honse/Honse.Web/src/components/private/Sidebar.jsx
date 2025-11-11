@@ -1,26 +1,60 @@
 import { NavLink } from "react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { jwtDecode } from "jwt-decode";
+import { getRestaurantsByUserAPI } from "../../services/productService";
 
 export default function Sidebar() {
   const [menuOpen, setMenuOpen] = useState(true);
+  const [restaurants, setRestaurants] = useState([]);
+  const [selectedRestaurant, setSelectedRestaurant] = useState("");
+
+   useEffect(() => {
+    async function loadRestaurants() {
+      const token = localStorage.getItem("token");
+      const userId = jwtDecode(token).sub;
+
+      const result = await getRestaurantsByUserAPI(userId);
+      if (result.succeeded) {
+        setRestaurants(result.data);
+
+        const stored = localStorage.getItem("restaurantId");
+        const defaultRestaurant = stored || result.data[0].id;
+
+        setSelectedRestaurant(defaultRestaurant);
+        localStorage.setItem("restaurantId", defaultRestaurant);
+      }
+    }
+
+    loadRestaurants();
+  }, []);
+
+  function handleRestaurantChange(e) {
+    const value = e.target.value;
+    setSelectedRestaurant(value);
+    localStorage.setItem("restaurantId", value);
+  }
 
   return (
     <aside className="w-64 flex-shrink-0 bg-white dark:bg-surface-dark p-4 flex flex-col justify-between">
-      <div>
-        <div className="flex items-center gap-3 mb-8">
-          <div
-            className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
-            style={{
-              backgroundImage: `url("https://lh3.googleusercontent.com/aida-public/AB6AXuBmZI0COl-kteeAUKrPxiZ4vPgGbJtkhKSKTiy4oiwkTSXC1GwuOjVU0u0ZJcl4wjIEHONKYFgHriyBBh9oiK7Ioy6S0E_qk3CnQ5vxloxPss7YjxheaH-TPG1P-jFeE-_JDzZfXYEFYI9gvyoxtAmToK4GS7lXrLF6cTxynpUcBvr61KqjeUJb3EW12Xlg4GhL9oaN-0dRpX7Txuf-ZbWyMrQ6svYsyGAxVG16BWlhLDMaxiMb6m3Pt-J7pgJa0C_u3eCAoPnuGmmc")`,
-            }}
-          />
-          <div>
-            <h1 className="text-base font-bold">The Burger Place</h1>
-            <p className="text-text-secondary-light dark:text-text-secondary-dark text-sm">
-              Restaurant
-            </p>
-          </div>
+       <div>
+        <div className="mb-6">
+          <label className="text-sm font-semibold text-gray-600 dark:text-gray-300">
+            Restaurant
+          </label>
+
+          <select
+            className="w-full mt-1 p-2 rounded-lg border dark:border-gray-700 dark:bg-gray-800 dark:text-white text-sm"
+            value={selectedRestaurant}
+            onChange={handleRestaurantChange}
+          >
+            {restaurants.map((r) => (
+              <option key={r.id} value={r.id}>
+                {r.name}
+              </option>
+            ))}
+          </select>
         </div>
+
 
         <nav className="flex flex-col gap-2">
 
