@@ -21,8 +21,8 @@ namespace Honse.Engines.Filtering.Product
             if (filter.RestaurantId.HasValue)
                 specification = specification.And(new SpecificationProductByRestaurantId(filter.RestaurantId.Value));
 
-            if (filter.IsActive.HasValue)
-                specification = specification.And(new SpecificationProductIsEnabled(filter.IsActive.Value));
+            if (filter.IsEnabled.HasValue)
+                specification = specification.And(new SpecificationProductIsEnabled(filter.IsEnabled.Value));
 
             if (filter.MinPrice.HasValue || filter.MaxPrice.HasValue)
                 specification = specification.And(new SpecificationProductPriceRange(filter.MinPrice, filter.MaxPrice));
