@@ -102,7 +102,7 @@ namespace Honse.Managers
             {
                 Guid categoryId = Guid.NewGuid();
 
-                await productCategoryResource.Add(new Resources.Interfaces.Entities.ProductCategory
+                productCategory = await productCategoryResource.Add(new Resources.Interfaces.Entities.ProductCategory
                 {
                     Id = categoryId,
                     Name = request.CategoryName,
@@ -114,7 +114,7 @@ namespace Honse.Managers
             }
 
             product = await productResource.Update(request.Id, request.UserId, product);
-
+            product.Category = productCategory;
             return product.DeepCopyTo<Interfaces.Product>();
         }
     }

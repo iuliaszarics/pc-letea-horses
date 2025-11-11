@@ -80,7 +80,8 @@ namespace Honse.Managers.Interfaces
 
         public string CategoryName { get; set; } = string.Empty;
 
-        public bool? IsEnabled { get; set; }
+        public bool IsEnabled { get; set; }
+
     }
 
     public class ProductFilterRequest
