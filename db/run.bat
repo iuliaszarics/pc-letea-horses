@@ -4,7 +4,9 @@ if not defined in_subprocess (cmd /k set in_subprocess=y ^& %0 %*) & exit )
 setlocal enabledelayedexpansion
 
 REM Configuration
-set "SERVER_NAME=RAZVAN\SQLEXPRESS01"
+
+
+set /p SERVER_NAME=<db_name.txt
 set "DATABASE_NAME=Honse"
 set "SQL_SCRIPTS_DIR=.\"
 

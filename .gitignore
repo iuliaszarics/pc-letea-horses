@@ -408,4 +408,6 @@ obj/
 /node_modules
 /wwwroot/node_modules
 
+/db/db_name.txt
+
 # End of https://www.toptal.com/developers/gitignore/api/csharp,dotnetcore
