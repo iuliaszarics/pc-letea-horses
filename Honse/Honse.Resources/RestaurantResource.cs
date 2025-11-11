@@ -1,6 +1,5 @@
 ﻿using Honse.Resources.Interfaces;
 using Honse.Resources.Interfaces.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace Honse.Resources
 {

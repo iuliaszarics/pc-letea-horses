@@ -93,7 +93,6 @@ namespace Honse.API.Controllers
             return Ok(restaurantResponse.Result);
         }
 
-
         [Authorize]
         [HttpGet]
         [Route("all")]
