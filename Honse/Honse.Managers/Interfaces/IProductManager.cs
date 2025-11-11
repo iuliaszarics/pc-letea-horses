@@ -96,7 +96,7 @@ namespace Honse.Managers.Interfaces
 
         public Guid? RestaurantId { get; set; }
 
-        public bool? IsActive { get; set; }
+        public bool? IsEnabled { get; set; }
 
         public decimal? MinPrice { get; set; }
 
