@@ -5,6 +5,8 @@ namespace Honse.Engines.Filtering.Interfaces
     public interface IRestaurantFilteringEngine
     {
         Specification<Resources.Interfaces.Entities.Restaurant> GetSpecification(RestaurantFilterRequest filter);
+
+        Specification<Resources.Interfaces.Entities.Restaurant> GetSpecification(PublicRestaurantFilterRequest filter);
     }
 
     public class RestaurantFilterRequest
@@ -20,6 +22,19 @@ namespace Honse.Engines.Filtering.Interfaces
         public bool? IsOpen { get; set; }
 
         public bool? IsEnabled { get; set; }
+
+        public float? MinRating { get; set; }
+    }
+
+    public class PublicRestaurantFilterRequest
+    {
+        public string? SearchKey { get; set; }
+
+        public string? CuisineType { get; set; }
+
+        public string? City { get; set; }
+
+        public bool? IsOpen { get; set; }
 
         public float? MinRating { get; set; }
     }

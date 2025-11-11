@@ -68,6 +68,26 @@ namespace Honse.Managers
             return restaurants.DeepCopyTo<PaginatedResult<Interfaces.Restaurant>>();
         }
 
+        public async Task<PaginatedResult<Interfaces.Restaurant>> FilterPublicRestaurants(PublicRestaurantFilterRequest request)
+        {
+            var specification = restaurantFilteringEngine.GetSpecification(request.DeepCopyTo<Engines.Filtering.Interfaces.PublicRestaurantFilterRequest>());
+
+            var restaurants = await restaurantResource.Filter(specification, request.PageSize, request.PageNumber);
+
+            var result = restaurants.DeepCopyTo<PaginatedResult<Interfaces.Restaurant>>();
+
+            // Calculate IsOpen for each restaurant
+            var now = TimeOnly.FromDateTime(DateTime.Now);
+            foreach (var restaurant in result.Result)
+            {
+                // Simple calculation: openingTime < closingTime (no overnight hours)
+                restaurant.IsOpen = restaurant.OpeningTime <= now && 
+                                   now < restaurant.ClosingTime;
+            }
+
+            return result;
+        }
+
         public async Task<Interfaces.Restaurant> UpdateRestaurant(UpdateRestaurantRequest request)
         {
             // Get existing restaurant without tracking to preserve rating fields

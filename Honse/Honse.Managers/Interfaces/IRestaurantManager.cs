@@ -14,6 +14,8 @@ namespace Honse.Managers.Interfaces
         Task<List<Restaurant>> GetAllRestaurants(Guid userId);
 
         Task<Global.PaginatedResult<Restaurant>> FilterRestaurants(RestaurantFilterRequest request);
+
+        Task<Global.PaginatedResult<Restaurant>> FilterPublicRestaurants(PublicRestaurantFilterRequest request);
     }
 
     public class Restaurant
@@ -49,6 +51,8 @@ namespace Honse.Managers.Interfaces
         public TimeOnly OpeningTime { get; set; }
 
         public TimeOnly ClosingTime { get; set; }
+
+        public bool IsOpen { get; set; }
     }
 
     public class CreateRestaurantRequest
@@ -120,6 +124,23 @@ namespace Honse.Managers.Interfaces
         public string? City { get; set; }
 
         public bool? IsEnabled { get; set; }
+
+        public float? MinRating { get; set; }
+
+        public int PageSize { get; set; }
+
+        public int PageNumber { get; set; }
+    }
+
+    public class PublicRestaurantFilterRequest
+    {
+        public string? SearchKey { get; set; }
+
+        public string? CuisineType { get; set; }
+
+        public string? City { get; set; }
+
+        public bool? IsOpen { get; set; }
 
         public float? MinRating { get; set; }
 
