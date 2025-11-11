@@ -1,5 +1,4 @@
-﻿
-using Honse.Engines.Filtering.Interfaces;
+﻿using Honse.Engines.Filtering.Interfaces;
 using Honse.Global.Specification;
 
 namespace Honse.Engines.Filtering.Product
@@ -13,7 +12,20 @@ namespace Honse.Engines.Filtering.Product
             if (filter.SearchKey != null)
                 specification = specification.And(new SpecificationProductSearchKey(filter.SearchKey));
 
-            //TODO: Add more filters
+            if (filter.CategoryName != null)
+                specification = specification.And(new SpecificationProductByCategory(filter.CategoryName));
+
+            if (filter.CategoryId.HasValue)
+                specification = specification.And(new SpecificationProductByCategoryId(filter.CategoryId.Value));
+
+            if (filter.RestaurantId.HasValue)
+                specification = specification.And(new SpecificationProductByRestaurantId(filter.RestaurantId.Value));
+
+            if (filter.IsActive.HasValue)
+                specification = specification.And(new SpecificationProductIsEnabled(filter.IsActive.Value));
+
+            if (filter.MinPrice.HasValue || filter.MaxPrice.HasValue)
+                specification = specification.And(new SpecificationProductPriceRange(filter.MinPrice, filter.MaxPrice));
 
             return specification;
         }
