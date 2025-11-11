@@ -46,39 +46,7 @@ namespace Honse.Managers
         {
             var restaurants = await restaurantResource.GetAll(userId);
 
-            var result = restaurants.DeepCopyTo<List<Interfaces.Restaurant>>();
-
-            // Calculate IsOpen for each restaurant
-            var now = TimeOnly.FromDateTime(DateTime.Now);
-            foreach (var restaurant in result)
-            {
-                restaurant.IsOpen = CalculateIsOpen(restaurant, now);
-            }
-
-            return result;
-        }
-
-        private bool CalculateIsOpen(Interfaces.Restaurant restaurant, TimeOnly now)
-        {
-            if (!restaurant.IsEnabled)
-                return false;
-
-            // Handle normal and overnight hours
-            if (restaurant.OpeningTime < restaurant.ClosingTime)
-            {
-                // Normal hours (e.g., 09:00 - 22:00)
-                return restaurant.OpeningTime <= now && now < restaurant.ClosingTime;
-            }
-            else if (restaurant.OpeningTime > restaurant.ClosingTime)
-            {
-                // Overnight (e.g., 18:00 - 02:00): open if now >= opening OR now < closing
-                return now >= restaurant.OpeningTime || now < restaurant.ClosingTime;
-            }
-            else
-            {
-                // Opening == closing: interpret as closed all day
-                return false;
-            }
+            return restaurants.DeepCopyTo<List<Interfaces.Restaurant>>();
         }
 
         public async Task<Interfaces.Restaurant> GetRestaurantById(Guid id, Guid userId)
@@ -113,8 +81,7 @@ namespace Honse.Managers
             foreach (var restaurant in result.Result)
             {
                 // Simple calculation: openingTime < closingTime (no overnight hours)
-                restaurant.IsOpen = restaurant.IsEnabled && 
-                                   restaurant.OpeningTime <= now && 
+                restaurant.IsOpen = restaurant.OpeningTime <= now && 
                                    now < restaurant.ClosingTime;
             }
 
