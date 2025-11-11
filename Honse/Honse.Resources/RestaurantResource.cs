@@ -11,27 +11,19 @@ namespace Honse.Resources
             dbSet = dbContext.Restaurant;
         }
 
-        public async Task<Honse.Global.PaginatedResult<Restaurant>> GetAllEnabled(int pageSize, int pageNumber)
+        public async Task<IEnumerable<Restaurant>> GetAll(Guid userId)
         {
             var query = dbSet.AsNoTracking().AsQueryable();
             query = ApplyIncludes(query);
 
-            var filtered = query.Where(r => r.IsEnabled);
-
-            var result = await filtered
-                .OrderBy(r => r.Name)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            int count = await filtered.CountAsync();
-
-            return new Honse.Global.PaginatedResult<Restaurant>
+            // If userId is empty (public access), return all enabled restaurants
+            if (userId == Guid.Empty)
             {
-                Result = result,
-                PageNumber = pageNumber,
-                TotalCount = count
-            };
+                return await query.Where(r => r.IsEnabled).ToListAsync();
+            }
+
+            // Otherwise, filter by userId
+            return await query.Where(t => t.UserId == userId).ToListAsync();
         }
     }
 }

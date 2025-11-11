@@ -93,10 +93,9 @@ namespace Honse.API.Controllers
             return Ok(restaurantResponse.Result);
         }
 
-        [Authorize]
         [HttpGet]
         [Route("all")]
-        public async Task<IActionResult> GetAllRestaurants()
+        public async Task<IActionResult> GetAllRestaurants([FromQuery] PublicRestaurantFilterRequest request)
         {
             if (!ModelState.IsValid)
             {
@@ -108,17 +107,14 @@ namespace Honse.API.Controllers
                 return BadRequest((new { errorMessage }));
             }
 
-            string? userName = User.FindFirstValue(ClaimTypes.GivenName);
-
-            var userResponse = await userManager.GetUserByName(userName).WithTryCatch();
-
-            if (!userResponse.IsSuccessfull)
+            // Validate pagination
+            if (request.PageSize < 1 || request.PageSize > 100 || request.PageNumber < 1)
             {
-                return BadRequest(userResponse.Exception.Message);
+                request.PageSize = 20; // default
+                request.PageNumber = 1;
             }
 
-            Global.User user = userResponse.Result;
-            var restaurantResponse = await restaurantManager.GetAllRestaurants(user.Id).WithTryCatch();
+            var restaurantResponse = await restaurantManager.FilterPublicRestaurants(request).WithTryCatch();
 
             if (!restaurantResponse.IsSuccessfull)
             {

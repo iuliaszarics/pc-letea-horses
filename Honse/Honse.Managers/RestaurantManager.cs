@@ -46,7 +46,39 @@ namespace Honse.Managers
         {
             var restaurants = await restaurantResource.GetAll(userId);
 
-            return restaurants.DeepCopyTo<List<Interfaces.Restaurant>>();
+            var result = restaurants.DeepCopyTo<List<Interfaces.Restaurant>>();
+
+            // Calculate IsOpen for each restaurant
+            var now = TimeOnly.FromDateTime(DateTime.Now);
+            foreach (var restaurant in result)
+            {
+                restaurant.IsOpen = CalculateIsOpen(restaurant, now);
+            }
+
+            return result;
+        }
+
+        private bool CalculateIsOpen(Interfaces.Restaurant restaurant, TimeOnly now)
+        {
+            if (!restaurant.IsEnabled)
+                return false;
+
+            // Handle normal and overnight hours
+            if (restaurant.OpeningTime < restaurant.ClosingTime)
+            {
+                // Normal hours (e.g., 09:00 - 22:00)
+                return restaurant.OpeningTime <= now && now < restaurant.ClosingTime;
+            }
+            else if (restaurant.OpeningTime > restaurant.ClosingTime)
+            {
+                // Overnight (e.g., 18:00 - 02:00): open if now >= opening OR now < closing
+                return now >= restaurant.OpeningTime || now < restaurant.ClosingTime;
+            }
+            else
+            {
+                // Opening == closing: interpret as closed all day
+                return false;
+            }
         }
 
         public async Task<Interfaces.Restaurant> GetRestaurantById(Guid id, Guid userId)
@@ -68,72 +100,25 @@ namespace Honse.Managers
             return restaurants.DeepCopyTo<PaginatedResult<Interfaces.Restaurant>>();
         }
 
-        public async Task<PaginatedResult<Interfaces.RestaurantCard>> GetPublicRestaurants(int pageSize, int pageNumber)
+        public async Task<PaginatedResult<Interfaces.Restaurant>> FilterPublicRestaurants(PublicRestaurantFilterRequest request)
         {
-            var restaurants = await restaurantResource.GetAllEnabled(pageSize, pageNumber);
+            var specification = restaurantFilteringEngine.GetSpecification(request.DeepCopyTo<Engines.Filtering.Interfaces.PublicRestaurantFilterRequest>());
 
-            // compute IsOpen and MinutesUntilClose
+            var restaurants = await restaurantResource.Filter(specification, request.PageSize, request.PageNumber);
+
+            var result = restaurants.DeepCopyTo<PaginatedResult<Interfaces.Restaurant>>();
+
+            // Calculate IsOpen for each restaurant
             var now = TimeOnly.FromDateTime(DateTime.Now);
-
-            var cards = restaurants.Result.Select(r =>
+            foreach (var restaurant in result.Result)
             {
-                bool isOpen;
-                int? minutesUntilClose = null;
+                // Simple calculation: openingTime < closingTime (no overnight hours)
+                restaurant.IsOpen = restaurant.IsEnabled && 
+                                   restaurant.OpeningTime <= now && 
+                                   now < restaurant.ClosingTime;
+            }
 
-                // Handle normal and overnight hours
-                if (r.OpeningTime < r.ClosingTime)
-                {
-                    isOpen = r.IsEnabled && r.OpeningTime <= now && now < r.ClosingTime;
-                }
-                else if (r.OpeningTime > r.ClosingTime)
-                {
-                    // Overnight (e.g., 18:00 -> 02:00): open if now >= opening OR now < closing
-                    isOpen = r.IsEnabled && (now >= r.OpeningTime || now < r.ClosingTime);
-                }
-                else
-                {
-                    // opening == closing: interpret as closed all day
-                    isOpen = false;
-                }
-
-                if (isOpen)
-                {
-                    // Compute minutes until close, accounting for overnight wrap
-                    var nowSpan = now.ToTimeSpan();
-                    var openingSpan = r.OpeningTime.ToTimeSpan();
-                    var closingSpan = r.ClosingTime.ToTimeSpan();
-
-                    TimeSpan untilClose;
-                    if (r.OpeningTime < r.ClosingTime)
-                    {
-                        untilClose = closingSpan - nowSpan;
-                    }
-                    else
-                    {
-                        // Overnight: closing is next day
-                        untilClose = (TimeSpan.FromHours(24) - nowSpan) + closingSpan;
-                    }
-
-                    minutesUntilClose = (int)Math.Max(0, untilClose.TotalMinutes);
-                }
-
-                return new Interfaces.RestaurantCard
-                {
-                    Id = r.Id,
-                    Name = r.Name,
-                    Image = r.Image,
-                    IsOpen = isOpen,
-                    AverageRating = r.AverageRating,
-                    MinutesUntilClose = minutesUntilClose
-                };
-            }).ToList();
-
-            return new PaginatedResult<Interfaces.RestaurantCard>
-            {
-                Result = cards,
-                PageNumber = restaurants.PageNumber,
-                TotalCount = restaurants.TotalCount
-            };
+            return result;
         }
 
         public async Task<Interfaces.Restaurant> UpdateRestaurant(UpdateRestaurantRequest request)
