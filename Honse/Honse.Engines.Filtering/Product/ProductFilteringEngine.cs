@@ -12,9 +12,6 @@ namespace Honse.Engines.Filtering.Product
             if (filter.SearchKey != null)
                 specification = specification.And(new SpecificationProductSearchKey(filter.SearchKey));
 
-            if (filter.CategoryName != null)
-                specification = specification.And(new SpecificationProductByCategory(filter.CategoryName));
-
             if (filter.CategoryId.HasValue)
                 specification = specification.And(new SpecificationProductByCategoryId(filter.CategoryId.Value));
 
