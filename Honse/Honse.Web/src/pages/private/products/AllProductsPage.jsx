@@ -17,10 +17,12 @@ export default function AllProductsPage() {
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize] = useState(4);
   const [totalCount, setTotalCount] = useState(0);
+  const [categoryId, setCategoryId] = useState("");
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const [restaurantId, setRestaurantId] = useState(localStorage.getItem("restaurantId"));
   useEffect(() => {
     async function loadCategories() {
-      const restaurantId = localStorage.getItem("restaurantId");
-      
       const result = await getAllCategoriesAPI(restaurantId);
       if (result.succeeded) {
         setCategories(result.data);
@@ -31,12 +33,14 @@ export default function AllProductsPage() {
       if (!token) return;
 
       const userId = jwtDecode(token).sub;
-
       const result = await getProductsAPI({
         userId,
-        categoryName,
+        restaurantId,
+        categoryId,
         isActive,
         searchKey,
+        minPrice,
+        maxPrice,
         pageSize,
         pageNumber,
       });
@@ -51,21 +55,26 @@ export default function AllProductsPage() {
     loadCategories();
     loadProducts();
 
-  }, [userId, categoryName, searchKey, isActive, pageNumber]);
+  }, [userId, restaurantId, categoryId, searchKey, isActive, pageNumber, minPrice, maxPrice]);
   return (
     <div className="flex h-screen bg-gray-50">
-      <Sidebar />
+      <Sidebar onRestaurantChange={setRestaurantId}/>
       <main className="flex-1 overflow-y-auto p-8">
         <div className="max-w-7xl mx-auto">
           <Header />
           <Filters
             categoryName={categoryName}
             setCategoryName={setCategoryName}
+            setCategoryId={setCategoryId}
             searchKey={searchKey}
             setSearchKey={setSearchKey}
+            minPrice={minPrice}
+            setMinPrice={setMinPrice}
+            maxPrice={maxPrice}
+            setMaxPrice={setMaxPrice}
             isActive={isActive}
             setIsActive={setIsActive}
-            categories={categories.map((cat) => cat.name)}
+            categories={categories}
           />
           {error && <p className="text-red-500 mb-4">{error}</p>}
           <ProductsTable products={products} setProducts={setProducts} />

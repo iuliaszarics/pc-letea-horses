@@ -38,17 +38,23 @@ function successData(data, extra = {}) {
 export async function getProductsAPI({
 
   userId,
-  categoryName,
+  restaurantId,
+  categoryId,
   isActive,       
-  searchKey, 
-  pageSize = 6,
-  pageNumber = 1,
+  searchKey,
+  minPrice,
+  maxPrice,
+  pageSize,
+  pageNumber,
 }) {
   try {
     const params = new URLSearchParams();
     if (userId) params.append("UserId", userId);
-    if (categoryName) params.append("CategoryName", categoryName);
-    if (isActive !== undefined) params.append("IsActive", isActive); 
+    if(restaurantId) params.append("RestaurantId", restaurantId);
+    if (categoryId) params.append("CategoryId", categoryId);
+    if (isActive !== undefined) params.append("IsEnabled", isActive); 
+    if(minPrice) params.append("MinPrice", minPrice);
+    if(maxPrice) params.append("MaxPrice", maxPrice);
     if (searchKey) params.append("SearchKey", searchKey);
     params.append("PageSize", pageSize);
     params.append("PageNumber", pageNumber);
@@ -75,9 +81,9 @@ export async function addProductAPI(product) {
     }
 }
 
-export async function updateProductAPI(id, product) {
+export async function updateProductAPI( product) {
     try {
-        const res = await api.put(`/api/products/${id}`, product);
+        const res = await api.put(`/api/products`, product);
         return successData(res.data);
     } catch (err) {
         return failure(parseError(err, "Failed to update product."));

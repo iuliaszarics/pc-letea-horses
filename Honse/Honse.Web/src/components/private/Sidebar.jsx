@@ -3,12 +3,13 @@ import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import { getRestaurantsByUserAPI } from "../../services/productService";
 
-export default function Sidebar() {
+export default function Sidebar({ onRestaurantChange }) {
   const [menuOpen, setMenuOpen] = useState(true);
   const [restaurants, setRestaurants] = useState([]);
   const [selectedRestaurant, setSelectedRestaurant] = useState("");
+  const [showRestaurantDropdown, setShowRestaurantDropdown] = useState(false);
 
-   useEffect(() => {
+  useEffect(() => {
     async function loadRestaurants() {
       const token = localStorage.getItem("token");
       const userId = jwtDecode(token).sub;
@@ -32,28 +33,46 @@ export default function Sidebar() {
     const value = e.target.value;
     setSelectedRestaurant(value);
     localStorage.setItem("restaurantId", value);
+    onRestaurantChange(value);
   }
 
   return (
-    <aside className="w-64 flex-shrink-0 bg-white dark:bg-surface-dark p-4 flex flex-col justify-between">
-       <div>
-        <div className="mb-6">
-          <label className="text-sm font-semibold text-gray-600 dark:text-gray-300">
-            Restaurant
-          </label>
+    <aside className="w-64 flex-shrink-0 bg-white p-4 flex flex-col justify-between">
+      <div>
+        <div className="mb-6 relative">
+          <label className="text-sm font-semibold text-gray-600">Restaurant</label>
 
-          <select
-            className="w-full mt-1 p-2 rounded-lg border dark:border-gray-700 dark:bg-gray-800 dark:text-white text-sm"
-            value={selectedRestaurant}
-            onChange={handleRestaurantChange}
+          <button
+            type="button"
+            onClick={() => setShowRestaurantDropdown(!showRestaurantDropdown)}
+            className="flex justify-between items-center w-full h-12 mt-1 px-4 rounded-lg border bg-white"
           >
-            {restaurants.map((r) => (
-              <option key={r.id} value={r.id}>
-                {r.name}
-              </option>
-            ))}
-          </select>
+            <span className="font-medium text-gray-700">
+              {restaurants.find((r) => r.id === selectedRestaurant)?.name || "Select restaurant"}
+            </span>
+            <span className="material-symbols-outlined">arrow_drop_down</span>
+          </button>
+
+          {showRestaurantDropdown && (
+            <ul className="absolute mt-1 bg-white border rounded shadow z-10 w-full max-h-60 overflow-auto">
+              {restaurants.map((r) => (
+                <li
+                  key={r.id}
+                  className="px-4 py-2 cursor-pointer hover:bg-blue-200"
+                  onClick={() => {
+                    setSelectedRestaurant(r.id);
+                    localStorage.setItem("restaurantId", r.id);
+                    onRestaurantChange(r.id);
+                    setShowRestaurantDropdown(false);
+                  }}
+                >
+                  {r.name}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
+
 
 
         <nav className="flex flex-col gap-2">
@@ -111,7 +130,7 @@ export default function Sidebar() {
                   }`
                 }
               >
-                Restaurants
+                Manage Restaurants
               </NavLink>
             </div>
           )}

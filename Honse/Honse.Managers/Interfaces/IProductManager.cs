@@ -80,6 +80,7 @@ namespace Honse.Managers.Interfaces
 
         public string CategoryName { get; set; } = string.Empty;
 
+        public bool? IsEnabled { get; set; }
     }
 
     public class ProductFilterRequest
@@ -94,7 +95,7 @@ namespace Honse.Managers.Interfaces
 
         public Guid? RestaurantId { get; set; }
 
-        public bool? IsActive { get; set; }
+        public bool? IsEnabled { get; set; }
 
         public decimal? MinPrice { get; set; }
 
