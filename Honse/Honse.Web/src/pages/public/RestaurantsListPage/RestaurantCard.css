@@ -66,16 +66,24 @@
 .restaurant-rating {
     display: flex;
     align-items: center;
-    gap: 4px;
-    color: #6b7280;
+    gap: 6px;
     font-size: 14px;
 }
 
 .restaurant-rating .star {
-    font-size: 16px;
+    font-size: 18px;
+    line-height: 1;
+    display: inline-block;
+}
+
+.restaurant-rating .rating-value {
+    color: #111827;
+    font-weight: 600;
+    line-height: 1;
 }
 
 .restaurant-rating .review-count {
     color: #9ca3af;
     font-size: 13px;
+    line-height: 1;
 }

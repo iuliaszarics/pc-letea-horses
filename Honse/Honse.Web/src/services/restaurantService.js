@@ -3,6 +3,13 @@ import axios from "axios";
 const RAW_BASE = process.env.REACT_APP_API_URL || "https://localhost:2000";
 const BASE_URL = RAW_BASE.replace(/\/+$/, "");
 
+// Create a separate axios instance for public endpoints (no auth required)
+export const publicApi = axios.create({
+    baseURL: BASE_URL,
+    headers: { "Content-Type": "application/json" },
+});
+
+// Keep the authenticated API for private endpoints
 export const api = axios.create({
     baseURL: BASE_URL,
     headers: { "Content-Type": "application/json" },
@@ -35,7 +42,44 @@ function successData(data, extra = {}) {
     return { succeeded: true, data, ...extra };
 }
 
-// Get all restaurants with filtering
+// PUBLIC ENDPOINTS - No authentication required
+
+// Get all restaurants with filtering (PUBLIC)
+export async function getPublicRestaurantsAPI({
+    searchKey,
+    cuisineType,
+    city,
+    isOpen,
+    minRating,
+    pageSize = 12,
+    pageNumber = 1,
+}) {
+    try {
+        const params = new URLSearchParams();
+        if (searchKey) params.append("SearchKey", searchKey);
+        if (cuisineType) params.append("CuisineType", cuisineType);
+        if (city) params.append("City", city);
+        if (isOpen !== undefined) params.append("IsOpen", isOpen);
+        if (minRating) params.append("MinRating", minRating);
+        params.append("PageSize", pageSize);
+        params.append("PageNumber", pageNumber);
+
+        const res = await publicApi.get(`/api/public/restaurants?${params.toString()}`);
+        
+        return {
+            succeeded: true,
+            restaurants: res.data.result,
+            totalCount: res.data.totalCount,
+            pageNumber: res.data.pageNumber,
+        };
+    } catch (err) {
+        return failure(parseError(err, "Failed to fetch restaurants"));
+    }
+}
+
+// AUTHENTICATED ENDPOINTS - Require authentication
+
+// Get all restaurants with filtering (AUTHENTICATED - for restaurant owner)
 export async function getRestaurantsAPI({
     searchKey,
     cuisineType,
@@ -68,7 +112,7 @@ export async function getRestaurantsAPI({
     }
 }
 
-// Get all restaurants without pagination
+// Get all restaurants without pagination (AUTHENTICATED)
 export async function getAllRestaurantsAPI() {
     try {
         const res = await api.get("/api/restaurants/all");
@@ -78,7 +122,7 @@ export async function getAllRestaurantsAPI() {
     }
 }
 
-// Get restaurant by ID
+// Get restaurant by ID (AUTHENTICATED)
 export async function getRestaurantByIdAPI(id) {
     try {
         const res = await api.get(`/api/restaurants/${id}`);
@@ -88,7 +132,7 @@ export async function getRestaurantByIdAPI(id) {
     }
 }
 
-// Add new restaurant
+// Add new restaurant (AUTHENTICATED)
 export async function addRestaurantAPI(restaurant) {
     try {
         const res = await api.post("/api/restaurants", restaurant);
@@ -98,7 +142,7 @@ export async function addRestaurantAPI(restaurant) {
     }
 }
 
-// Update restaurant
+// Update restaurant (AUTHENTICATED)
 export async function updateRestaurantAPI(id, restaurant) {
     try {
         const res = await api.put(`/api/restaurants/${id}`, restaurant);
@@ -108,7 +152,7 @@ export async function updateRestaurantAPI(id, restaurant) {
     }
 }
 
-// Delete restaurant
+// Delete restaurant (AUTHENTICATED)
 export async function deleteRestaurantAPI(id) {
     try {
         const res = await api.delete(`/api/restaurants/${id}`);

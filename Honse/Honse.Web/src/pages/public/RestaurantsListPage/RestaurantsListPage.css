@@ -54,6 +54,17 @@
     color: var(--muted);
     width: 20px;
     height: 20px;
+    pointer-events: none;
+}
+
+.search-loading {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 500;
 }
 
 .search-input {

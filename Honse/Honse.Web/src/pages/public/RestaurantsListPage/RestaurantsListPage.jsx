@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import RestaurantCard from "./RestaurantCard";
 import "./RestaurantsListPage.css";
-import { getRestaurantsAPI } from "../../../services/restaurantService";
+import { getPublicRestaurantsAPI } from "../../../services/restaurantService";
 
 export default function RestaurantsListPage() {
     const [restaurants, setRestaurants] = useState([]);
@@ -12,18 +12,23 @@ export default function RestaurantsListPage() {
     const [pageNumber, setPageNumber] = useState(1);
     const [pageSize] = useState(12);
     const [totalCount, setTotalCount] = useState(0);
+    const searchInputRef = useRef(null);
 
+    // Debounce search - only fetch after user stops typing for 500ms
     useEffect(() => {
-        fetchRestaurants();
-    }, [pageNumber, searchQuery]);
+        const timeoutId = setTimeout(() => {
+            fetchRestaurants();
+        }, 500);
+
+        return () => clearTimeout(timeoutId);
+    }, [searchQuery, pageNumber]);
 
     const fetchRestaurants = async () => {
         try {
             setLoading(true);
             
-            const result = await getRestaurantsAPI({
-                searchKey: searchQuery || undefined,
-                isEnabled: true, // Only show enabled restaurants on public page
+            const result = await getPublicRestaurantsAPI({
+                searchKey: searchQuery.trim() || undefined,
                 pageSize,
                 pageNumber,
             });
@@ -33,6 +38,13 @@ export default function RestaurantsListPage() {
                 setFilteredRestaurants(result.restaurants || []);
                 setTotalCount(result.totalCount || 0);
                 setError("");
+                
+                // Restore focus to search input after fetch
+                if (searchInputRef.current && document.activeElement !== searchInputRef.current) {
+                    setTimeout(() => {
+                        searchInputRef.current?.focus();
+                    }, 0);
+                }
             } else {
                 setError(result.errorMessage || "Failed to load restaurants");
                 setRestaurants([]);
@@ -53,12 +65,7 @@ export default function RestaurantsListPage() {
         setPageNumber(1); // Reset to first page on search
     };
 
-    const handleSearchSubmit = (e) => {
-        e.preventDefault();
-        fetchRestaurants();
-    };
-
-    if (loading) {
+    if (loading && restaurants.length === 0) {
         return (
             <div className="restaurants-page">
                 <div className="loading">Loading restaurants...</div>
@@ -66,7 +73,7 @@ export default function RestaurantsListPage() {
         );
     }
 
-    if (error) {
+    if (error && restaurants.length === 0) {
         return (
             <div className="restaurants-page">
                 <div className="error">{error}</div>
@@ -83,7 +90,7 @@ export default function RestaurantsListPage() {
                 </div>
 
                 <div className="search-section">
-                    <form onSubmit={handleSearchSubmit} className="search-bar">
+                    <div className="search-bar">
                         <svg
                             className="search-icon"
                             xmlns="http://www.w3.org/2000/svg"
@@ -99,13 +106,18 @@ export default function RestaurantsListPage() {
                             />
                         </svg>
                         <input
+                            ref={searchInputRef}
                             type="text"
                             className="search-input"
                             placeholder="Search by name or cuisine"
                             value={searchQuery}
                             onChange={handleSearchChange}
+                            autoFocus
                         />
-                    </form>
+                        {loading && restaurants.length > 0 && (
+                            <div className="search-loading">Searching...</div>
+                        )}
+                    </div>
                 </div>
 
                 {filteredRestaurants.length === 0 ? (
