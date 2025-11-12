@@ -9,17 +9,20 @@ namespace Honse.Managers
     {
         private readonly Resources.Interfaces.IRestaurantResource restaurantResource;
         private readonly IProductCategoryResource productCategoryResource;
+        private readonly IProductResource productResource;
         private readonly Engines.Filtering.Interfaces.IRestaurantFilteringEngine restaurantFilteringEngine;
         private readonly Engines.Validation.Interfaces.IRestaurantValidationEngine restaurantValidationEngine;
 
         public RestaurantManager(
             Resources.Interfaces.IRestaurantResource restaurantResource,
             Resources.Interfaces.IProductCategoryResource productCategoryResource,
+            IProductResource productResource,
             Engines.Filtering.Interfaces.IRestaurantFilteringEngine restaurantFilteringEngine,
             Engines.Validation.Interfaces.IRestaurantValidationEngine restaurantValidationEngine)
         {
             this.restaurantResource = restaurantResource;
             this.productCategoryResource = productCategoryResource;
+            this.productResource = productResource;
             this.restaurantFilteringEngine = restaurantFilteringEngine;
             this.restaurantValidationEngine = restaurantValidationEngine;
         }
@@ -150,6 +153,71 @@ namespace Honse.Managers
             }
 
             return updatedRestaurant.DeepCopyTo<Interfaces.Restaurant>();
+        }
+
+        public async Task<Interfaces.RestaurantMenu> GetPublicRestaurantMenu(Guid restaurantId)
+        {
+            // Get restaurant without userId check (public access)
+            var restaurant = await restaurantResource.GetByIdPublic(restaurantId);
+
+            if (restaurant == null)
+                throw new Exception("Restaurant not found!");
+
+            if (!restaurant.IsEnabled)
+                throw new Exception("Restaurant is not available!");
+
+            // Get all categories for this restaurant
+            var categories = await productCategoryResource.GetPublicRestaurantCategories(restaurantId);
+
+            // Get all enabled products for this restaurant
+            var products = await productResource.GetPublicRestaurantProducts(restaurantId);
+
+            // Build the menu structure
+            var menu = new Interfaces.RestaurantMenu
+            {
+                Id = restaurant.Id,
+                Name = restaurant.Name,
+                Description = restaurant.Description,
+                Image = restaurant.Image,
+                CuisineType = restaurant.CuisineType,
+                OpeningTime = restaurant.OpeningTime,
+                ClosingTime = restaurant.ClosingTime,
+                AverageRating = restaurant.AverageRating,
+                TotalReviews = restaurant.TotalReviews,
+                IsOpen = restaurant.OpeningTime <= TimeOnly.FromDateTime(DateTime.Now) && 
+                         TimeOnly.FromDateTime(DateTime.Now) < restaurant.ClosingTime
+            };
+
+            // Group products by category
+            foreach (var category in categories)
+            {
+                var categoryProducts = products
+                    .Where(p => p.CategoryId == category.Id && p.IsEnabled)
+                    .Select(p => new Interfaces.MenuItem
+                    {
+                        Id = p.Id,
+                        Name = p.Name,
+                        Description = p.Description,
+                        Price = p.Price,
+                        VAT = p.VAT,
+                        Image = p.Image,
+                        IsEnabled = p.IsEnabled
+                    })
+                    .ToList();
+
+                // Only include categories that have products
+                if (categoryProducts.Any())
+                {
+                    menu.Categories.Add(new Interfaces.MenuCategory
+                    {
+                        Id = category.Id,
+                        Name = category.Name,
+                        Products = categoryProducts
+                    });
+                }
+            }
+
+            return menu;
         }
     }
 }
