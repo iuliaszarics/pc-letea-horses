@@ -54,6 +54,12 @@
     font-size: 18px;
     font-weight: 700;
     color: #111827;
+    margin: 0 0 6px 0;
+}
+
+.restaurant-cuisine {
+    font-size: 14px;
+    color: #6b7280;
     margin: 0 0 8px 0;
 }
 
@@ -67,4 +73,9 @@
 
 .restaurant-rating .star {
     font-size: 16px;
+}
+
+.restaurant-rating .review-count {
+    color: #9ca3af;
+    font-size: 13px;
 }

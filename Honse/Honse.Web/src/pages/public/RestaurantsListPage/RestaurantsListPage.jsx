@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import RestaurantCard from "./RestaurantCard";
 import "./RestaurantsListPage.css";
+import { getRestaurantsAPI } from "../../../services/restaurantService";
 
 export default function RestaurantsListPage() {
     const [restaurants, setRestaurants] = useState([]);
@@ -8,94 +9,53 @@ export default function RestaurantsListPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [pageNumber, setPageNumber] = useState(1);
+    const [pageSize] = useState(12);
+    const [totalCount, setTotalCount] = useState(0);
 
     useEffect(() => {
         fetchRestaurants();
-    }, []);
-
-    useEffect(() => {
-        filterRestaurants();
-    }, [searchQuery, restaurants]);
+    }, [pageNumber, searchQuery]);
 
     const fetchRestaurants = async () => {
         try {
             setLoading(true);
-            // TODO: Replace with actual API call
-            // const response = await fetch('/api/restaurants');
-            // const data = await response.json();
             
-            // Mock data for now
-            const mockData = [
-                {
-                    id: "1",
-                    name: "Burger Barn",
-                    image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400",
-                    isOpen: true,
-                    rating: 4.5
-                },
-                {
-                    id: "2",
-                    name: "Sushi Central",
-                    image: "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400",
-                    isOpen: true,
-                    rating: 4.8
-                },
-                {
-                    id: "3",
-                    name: "Pizza Palace",
-                    image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400",
-                    isOpen: false,
-                    rating: 4.2
-                },
-                {
-                    id: "4",
-                    name: "Taco Town",
-                    image: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400",
-                    isOpen: false,
-                    rating: 4.6
-                },
-                {
-                    id: "5",
-                    name: "The Golden Spoon",
-                    image: "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=400",
-                    isOpen: true,
-                    rating: 4.5
-                },
-                {
-                    id: "6",
-                    name: "Noodle House",
-                    image: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=400",
-                    isOpen: true,
-                    rating: 4.3
-                }
-            ];
-            
-            setRestaurants(mockData);
-            setFilteredRestaurants(mockData);
-            setError("");
+            const result = await getRestaurantsAPI({
+                searchKey: searchQuery || undefined,
+                isEnabled: true, // Only show enabled restaurants on public page
+                pageSize,
+                pageNumber,
+            });
+
+            if (result.succeeded) {
+                setRestaurants(result.restaurants || []);
+                setFilteredRestaurants(result.restaurants || []);
+                setTotalCount(result.totalCount || 0);
+                setError("");
+            } else {
+                setError(result.errorMessage || "Failed to load restaurants");
+                setRestaurants([]);
+                setFilteredRestaurants([]);
+            }
         } catch (err) {
             setError("Failed to load restaurants. Please try again later.");
             console.error("Error fetching restaurants:", err);
+            setRestaurants([]);
+            setFilteredRestaurants([]);
         } finally {
             setLoading(false);
         }
     };
 
-    const filterRestaurants = () => {
-        if (!searchQuery.trim()) {
-            setFilteredRestaurants(restaurants);
-            return;
-        }
-
-        const query = searchQuery.toLowerCase();
-        const filtered = restaurants.filter(restaurant =>
-            restaurant.name.toLowerCase().includes(query)
-        );
-        setFilteredRestaurants(filtered);
-    };
-
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
+        setPageNumber(1); // Reset to first page on search
+    };
+
+    const handleSearchSubmit = (e) => {
+        e.preventDefault();
+        fetchRestaurants();
     };
 
     if (loading) {
@@ -123,7 +83,7 @@ export default function RestaurantsListPage() {
                 </div>
 
                 <div className="search-section">
-                    <div className="search-bar">
+                    <form onSubmit={handleSearchSubmit} className="search-bar">
                         <svg
                             className="search-icon"
                             xmlns="http://www.w3.org/2000/svg"
@@ -145,7 +105,7 @@ export default function RestaurantsListPage() {
                             value={searchQuery}
                             onChange={handleSearchChange}
                         />
-                    </div>
+                    </form>
                 </div>
 
                 {filteredRestaurants.length === 0 ? (
@@ -157,11 +117,39 @@ export default function RestaurantsListPage() {
                         </p>
                     </div>
                 ) : (
-                    <div className="restaurants-grid">
-                        {filteredRestaurants.map(restaurant => (
-                            <RestaurantCard key={restaurant.id} restaurant={restaurant} />
-                        ))}
-                    </div>
+                    <>
+                        <div className="restaurants-grid">
+                            {filteredRestaurants.map(restaurant => (
+                                <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+                            ))}
+                        </div>
+
+                        {totalCount > pageSize && (
+                            <div className="pagination">
+                                <button
+                                    onClick={() => setPageNumber(prev => Math.max(prev - 1, 1))}
+                                    disabled={pageNumber === 1}
+                                    className="pagination-btn"
+                                >
+                                    Previous
+                                </button>
+                                
+                                <span className="pagination-info">
+                                    Page {pageNumber} of {Math.ceil(totalCount / pageSize)}
+                                </span>
+
+                                <button
+                                    onClick={() => setPageNumber(prev => 
+                                        prev < Math.ceil(totalCount / pageSize) ? prev + 1 : prev
+                                    )}
+                                    disabled={pageNumber >= Math.ceil(totalCount / pageSize)}
+                                    className="pagination-btn"
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </div>
