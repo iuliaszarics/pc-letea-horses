@@ -16,24 +16,31 @@ export default function AddProductPage() {
     name: "",
     description: "",
     price: "",
-    vat: "",
+    vat: "0",
     image: "",
     categoryId: "",
+    newCategoryName: "",
+    isNewCategory: false,
     isEnabled: true,
   });
   const [loading, setLoading] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
   const [generalError, setGeneralError] = useState(""); 
+
   useEffect(() => {
-    async function loadCategories() {
-      const result = await getAllCategoriesAPI();
-      if (result.succeeded) setCategories(result.data);
+   async function loadCategories() {
+      const restaurantId = localStorage.getItem("restaurantId");
+      const result = await getAllCategoriesAPI(restaurantId);
+      if (result.succeeded) {
+        setCategories(result.data);
+      }
     }
 
     async function loadProduct() {
       if (!id) return;
 
       setLoading(true);
+
       try {
         const result = await getProductByIdAPI(id);
         if (result.succeeded) {
@@ -42,10 +49,12 @@ export default function AddProductPage() {
             name: product.name || "",
             description: product.description || "",
             price: product.price || "",
-            vat: product.vat || "",
+            vat: product.vat?.toString() || "0",
             image: product.image || "",
             categoryId: product.category?.id || "",
-            isEnabled: product.isEnabled ?? true,
+            newCategoryName: "",
+            isNewCategory: false,
+            isEnabled: product.isEnabled,
           });
         } else {
           setGeneralError(result.errorMessage || "Failed to load product data.");
@@ -83,13 +92,10 @@ export default function AddProductPage() {
     if (!productData.price || parseFloat(productData.price) <= 0)
       errors.price = "Price must be greater than 0.";
 
-    if (parseFloat(productData.vat) < 0 || parseFloat(productData.vat) > 100)
-      errors.vat = "VAT must be between 0 and 100.";
+    if (!["0", "5", "11", "21"].includes(productData.vat))
+      errors.vat = "Invalid VAT selection.";
 
-    if (productData.image && !/\.(jpg|jpeg|png|webp)$/i.test(productData.image))
-      errors.image = "Image URL must end with .jpg, .jpeg, .png, or .webp.";
-
-    if (!productData.categoryId)
+    if (!productData.isNewCategory && !productData.categoryId)
       errors.categoryId = "Please choose a category.";
 
     return errors;
@@ -108,21 +114,28 @@ export default function AddProductPage() {
 
     try {
       const token = localStorage.getItem("token");
+      const restaurantId = localStorage.getItem("restaurantId");
+      const categoryName = productData.isNewCategory
+      ? productData.newCategoryName
+      : categories.find(c => c.id === productData.categoryId)?.name || "";
       const payload = {
+        ...(id && { id }),
         name: productData.name,
         userId: jwtDecode(token).sub,
+        restaurantId: restaurantId,
         description: productData.description,
         price: parseFloat(productData.price),
         vat: parseFloat(productData.vat),
         image: productData.image,
-        categoryId: productData.categoryId,
+        ...(!productData.isNewCategory && { categoryId: productData.categoryId }),
+        categoryName,
         isEnabled: productData.isEnabled,
       };
 
       if (!id) {
         await addProductAPI(payload);
       } else {
-        await updateProductAPI(id, payload);
+        await updateProductAPI(payload);
       }
 
       navigate("/products");
@@ -133,90 +146,111 @@ export default function AddProductPage() {
     }
   }
 
-  return (
-    <div className="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md mt-6">
-      <h1 className="text-2xl font-bold mb-6">{id ? "Edit Product" : "Add New Product"}</h1>
+ return (
+  <div className="max-w-4xl mx-auto p-6 bg-white rounded-xl shadow-md mt-6">
+    <h1 className="text-2xl font-bold mb-6">{id ? "Edit Product" : "Add New Product"}</h1>
 
-      {generalError && <p className="text-red-500 mb-4">{generalError}</p>}
+    {generalError && <p className="text-red-500 mb-4">{generalError}</p>}
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-5">
+      <div>
+        <label className="block mb-1 font-medium text-gray-700">Product Name</label>
+        <input
+          name="name"
+          value={productData.name}
+          onChange={handleChange}
+          className="form-input w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          placeholder="Enter product name"
+          required
+        />
+      </div>
+
+      <div>
+        <label className="block mb-1 font-medium text-gray-700">Description</label>
+        <textarea
+          name="description"
+          value={productData.description}
+          onChange={handleChange}
+          className="form-textarea w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          rows={4}
+          placeholder="Enter product description"
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block mb-1 font-medium text-gray-700 dark:text-gray-300">Product Name</label>
+          <label className="block mb-1 font-medium text-gray-700">Price</label>
           <input
-            name="name"
-            value={productData.name}
+            name="price"
+            type="number"
+            step="0.5"
+            value={productData.price}
             onChange={handleChange}
-            className="form-input w-full rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white"
-            placeholder="Enter product name"
+            className="form-input w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            placeholder="0.00"
             required
           />
-          {validationErrors?.name && <p className="text-red-500 text-sm">{validationErrors.name}</p>}
         </div>
 
         <div>
-          <label className="block mb-1 font-medium text-gray-700 dark:text-gray-300">Description</label>
-          <textarea
-            name="description"
-            value={productData.description}
+          <label className="block mb-1 font-medium text-gray-700">VAT</label>
+          <select
+            name="vat"
+            value={productData.vat}
             onChange={handleChange}
-            className="form-textarea w-full rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white"
-            rows={4}
-            placeholder="Enter product description"
-          />
-          {validationErrors?.description && <p className="text-red-500 text-sm">{validationErrors.description}</p>}
+            className="form-select w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            required
+          >
+            {["0", "5", "11", "21"].map((v) => (
+              <option key={v} value={v}>
+                {v}%
+              </option>
+            ))}
+          </select>
         </div>
+      </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block mb-1 font-medium text-gray-700 dark:text-gray-300">Price</label>
-            <input
-              name="price"
-              type="number"
-              step="0.5"
-              value={productData.price}
-              onChange={handleChange}
-              className="form-input w-full rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white"
-              placeholder="0.00"
-              required
-            />
-            {validationErrors?.price && <p className="text-red-500 text-sm">{validationErrors.price}</p>}
-          </div>
+      <div>
+        <label className="block mb-1 font-medium text-gray-700">Image URL</label>
+        <input
+          name="image"
+          value={productData.image}
+          onChange={handleChange}
+          className="form-input w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          placeholder="https://example.com/image.jpg"
+        />
+      </div>
 
-          <div>
-            <label className="block mb-1 font-medium text-gray-700 dark:text-gray-300">VAT</label>
-            <input
-              name="vat"
-              type="number"
-              step="0.5"
-              value={productData.vat}
-              onChange={handleChange}
-              className="form-input w-full rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white"
-              placeholder="0.00"
-              required
-            />
-            {validationErrors?.vat && <p className="text-red-500 text-sm">{validationErrors.vat}</p>}
-          </div>
-        </div>
+      <div className="flex items-center gap-3 mb-3">
+        <input
+          type="checkbox"
+          name="isNewCategory"
+          checked={productData.isNewCategory}
+          onChange={handleChange}
+          className="form-checkbox h-5 w-5 text-blue-600"
+        />
+        <label className="text-gray-700">New Category</label>
+      </div>
 
+      {productData.isNewCategory ? (
         <div>
-          <label className="block mb-1 font-medium text-gray-700 dark:text-gray-300">Image URL</label>
+          <label className="block mb-1 font-medium text-gray-700">Category Name</label>
           <input
-            name="image"
-            value={productData.image}
+            name="newCategoryName"
+            value={productData.newCategoryName}
             onChange={handleChange}
-            className="form-input w-full rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white"
-            placeholder="https://example.com/image.jpg"
+            className="form-input w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            placeholder="Enter category name"
           />
-          {validationErrors?.image && <p className="text-red-500 text-sm">{validationErrors.image}</p>}
         </div>
-
+      ) : (
         <div>
-          <label className="block mb-1 font-medium text-gray-700 dark:text-gray-300">Category</label>
+          <label className="block mb-1 font-medium text-gray-700">Category</label>
           <select
             name="categoryId"
             value={productData.categoryId}
             onChange={handleChange}
-            className="form-select w-full rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white"
+            className="form-select w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
             required
           >
             <option value="">-- Choose Category --</option>
@@ -226,30 +260,20 @@ export default function AddProductPage() {
               </option>
             ))}
           </select>
-          {validationErrors?.categoryId && <p className="text-red-500 text-sm">{validationErrors.categoryId}</p>}
         </div>
+      )}
 
-        <div className="flex items-center gap-3">
-          <input
-            type="checkbox"
-            name="isEnabled"
-            checked={productData.isEnabled}
-            onChange={handleChange}
-            className="form-checkbox h-5 w-5 text-blue-600"
-          />
-          <label className="text-gray-700 dark:text-gray-300">Available</label>
-        </div>
+      <div>
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition"
+        >
+          {loading ? "Saving..." : id ? "Update Product" : "Add Product"}
+        </button>
+      </div>
+    </form>
+  </div>
+);
 
-        <div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition"
-          >
-            {loading ? "Saving..." : id ? "Update Product" : "Add Product"}
-          </button>
-        </div>
-      </form>
-    </div>
-  );
 }

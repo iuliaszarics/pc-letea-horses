@@ -2,19 +2,33 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { deleteProductAPI, updateProductAPI } from "../../services/productService";
 
-export default function ProductsTable({products = [], setProducts }) {
-   const [deleteTarget, setDeleteTarget] = useState(null);
-   const navigate = useNavigate();
+export default function ProductsTable({ products = [], setProducts }) {
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const navigate = useNavigate();
 
-   async function handleAvailabilityToggle(productId) {
-     const product = products.find(p => p.id === productId);
+  async function handleAvailabilityToggle(productId) {
+    const product = products.find(p => p.id === productId);
     if (!product) return;
 
-    const updatedProduct = { ...product, available: !product.isEnabled };
-    setProducts(products.map(p => p.id === productId ? updatedProduct : p));
+    const updatedProduct = {
+      id: product.id,
+      userId: product.userId,
+      restaurantId: product.restaurantId,
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      vat: product.vat,
+      image: product.image,
+      categoryId: product.category.id,
+      categoryName: product.category.name,
+      isEnabled: !product.isEnabled
+    };
+
+    product.isEnabled = !product.isEnabled
+    setProducts(products.map(p => p.id === productId ? product : p));
 
 
-    const result = await updateProductAPI(productId, { available: updatedProduct.isEnabled });
+    const result = await updateProductAPI(updatedProduct);
     if (!result.succeeded) {
       alert(result.errorMessage || "Failed to update availability");
       setProducts(products);
@@ -24,20 +38,20 @@ export default function ProductsTable({products = [], setProducts }) {
   async function confirmDelete() {
     if (!deleteTarget) return;
 
-  const result =  await deleteProductAPI(deleteTarget.id);
-  if (result.succeeded) {
-    setProducts((prev) => prev.filter(p => p.id !== deleteTarget.id));
-  } else {
-    alert(result.errorMessage || "Failed to delete product");
+    const result = await deleteProductAPI(deleteTarget.id);
+    if (result.succeeded) {
+      setProducts((prev) => prev.filter(p => p.id !== deleteTarget.id));
+    } else {
+      alert(result.errorMessage || "Failed to delete product");
+    }
+    setDeleteTarget(null);
+
   }
-  setDeleteTarget(null);
-    
-  }
-  return(
-     <div className="bg-white dark:bg-surface-dark rounded-xl shadow-sm overflow-hidden">
+  return (
+    <div className="bg-white  rounded-xl shadow-sm overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full text-sm text-left">
-          <thead className="bg-background-light dark:bg-background-dark text-xs uppercase">
+          <thead className="bg-background-light  text-xs uppercase">
             <tr>
               <th className="p-4 w-12">
               </th>
@@ -61,7 +75,7 @@ export default function ProductsTable({products = [], setProducts }) {
             )}
 
             {products.map((product) => (
-              <tr key={product.id} className="border-b border-border-light dark:border-border-dark">
+              <tr key={product.id} className="border-b border-border-light ">
                 <td className="p-4">
                 </td>
 
@@ -82,16 +96,15 @@ export default function ProductsTable({products = [], setProducts }) {
                 <td className="px-6 py-3 truncate max-w-xs">{product.description}</td>
 
                 <td className="px-6 py-3">
-                  <label className="cursor-pointer">
+                  <label className="cursor-pointer inline-flex items-center">
                     <input
                       type="checkbox"
-                      checked={product.available}
+                      checked={product.isEnabled}
                       onChange={() => handleAvailabilityToggle(product.id)}
                       className="sr-only peer"
                     />
-                    <div className="w-10 h-5 bg-gray-300 rounded-full peer-checked:bg-blue-600 transition relative">
-                      <div className="absolute top-[2px] left-[2px] w-4 h-4 bg-white rounded-full transition peer-checked:translate-x-5" />
-                    </div>
+
+                    <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all  peer-checked:bg-blue-600 "></div>
                   </label>
                 </td>
 
@@ -99,7 +112,7 @@ export default function ProductsTable({products = [], setProducts }) {
                   <button
                     onClick={() => navigate(`/products/edit/${product.id}`)}
                     className="text-blue-600 hover:underline">
-                      <span class="material-symbols-outlined text-lg">edit</span>
+                    <span class="material-symbols-outlined text-lg">edit</span>
                   </button>
 
                   <button
@@ -117,7 +130,7 @@ export default function ProductsTable({products = [], setProducts }) {
 
       {deleteTarget && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-[350px]">
+          <div className="bg-white  p-6 rounded-lg shadow-xl w-[350px]">
             <h2 className="text-lg font-semibold mb-2">Confirm Delete</h2>
             <p className="text-sm text-gray-500 mb-4">
               Are you sure you want to delete <strong>{deleteTarget.name}</strong>?

@@ -38,17 +38,23 @@ function successData(data, extra = {}) {
 export async function getProductsAPI({
 
   userId,
-  categoryName,
+  restaurantId,
+  categoryId,
   isActive,       
-  searchKey, 
-  pageSize = 6,
-  pageNumber = 1,
+  searchKey,
+  minPrice,
+  maxPrice,
+  pageSize,
+  pageNumber,
 }) {
   try {
     const params = new URLSearchParams();
     if (userId) params.append("UserId", userId);
-    if (categoryName) params.append("CategoryName", categoryName);
-    if (isActive !== undefined) params.append("IsActive", isActive); // boolean filter
+    if(restaurantId) params.append("RestaurantId", restaurantId);
+    if (categoryId) params.append("CategoryId", categoryId);
+    if (isActive !== undefined) params.append("IsEnabled", isActive); 
+    if(minPrice) params.append("MinPrice", minPrice);
+    if(maxPrice) params.append("MaxPrice", maxPrice);
     if (searchKey) params.append("SearchKey", searchKey);
     params.append("PageSize", pageSize);
     params.append("PageNumber", pageNumber);
@@ -75,9 +81,9 @@ export async function addProductAPI(product) {
     }
 }
 
-export async function updateProductAPI(id, product) {
+export async function updateProductAPI( product) {
     try {
-        const res = await api.put(`/api/products/${id}`, product);
+        const res = await api.put(`/api/products`, product);
         return successData(res.data);
     } catch (err) {
         return failure(parseError(err, "Failed to update product."));
@@ -98,30 +104,52 @@ export async function deleteProductAPI(id) {
 export async function getProductByIdAPI(id) {
   try {
     const res = await api.get(`/api/products/${id}`);
-    return successData(res.data); // returns { succeeded: true, data: ... }
+    return successData(res.data); 
   } catch (err) {
     return failure(parseError(err, "Failed to fetch product."));
   }
 }
 
-export async function getAllCategoriesAPI() {
-//   try {
-//     const res = await api.get("/api/categories");
-//     return { succeeded: true, data: res.data };
-//   } catch (err) {
-//     return { succeeded: false, errorMessage: parseError(err, "Failed to fetch categories.") };
-//   }
-     return {
-    succeeded: true,
-    data: [
-      {
-        id: "4f2b8864-90e5-433c-7aa3-08de1a1833ff",
-        name: "Category1"
-      },
-      {
-        id: "4f2b8864-90e5-433c-7aa3-08de1a1833aa", // optional 2nd dummy category
-        name: "Category2"
-      }
-    ]
-  };
+export async function getAllCategoriesAPI(restaurantId) {
+  try {
+    const res = await api.get(`/api/ProductCategory/restaurant/${restaurantId}`);
+    return { succeeded: true, data: res.data };
+  } catch (err) {
+    return { succeeded: false, errorMessage: parseError(err, "Failed to fetch categories.") };
+  }
+  //    return {
+  //   succeeded: true,
+  //   data: [
+  //     {
+  //       id: "4f2b8864-90e5-433c-7aa3-08de1a1833ff",
+  //       name: "Category1"
+  //     },
+  //     {
+  //       id: "4f2b8864-90e5-433c-7aa3-08de1a1833aa", // optional 2nd dummy category
+  //       name: "Category2"
+  //     }
+  //   ]
+  // };
+}
+
+export async function getRestaurantsByUserAPI(userId) {
+  try {
+    const params = new URLSearchParams();
+    params.append("UserId", userId);
+    params.append("PageSize", 50); 
+    params.append("PageNumber", 1);
+
+    const res = await api.get(`/api/restaurants?${params.toString()}`);
+    const restaurants = res.data.result || [];
+
+    const formatted = restaurants.map(r => ({
+      id: r.id,
+      name: r.name,
+    }));
+
+    return successData(formatted);
+
+  } catch (err) {
+    return failure(parseError(err, "Failed to fetch restaurants"));
+  }
 }
