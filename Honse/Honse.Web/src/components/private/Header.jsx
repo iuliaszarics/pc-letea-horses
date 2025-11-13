@@ -9,7 +9,7 @@ export default function Header({ title = "Menu Management", addPath = "/products
       <h1 className="text-4xl font-black tracking-tight">{title}</h1>
 
       {addPath && (
-        <button
+        <button>
           onClick={() => !isDisabled && navigate(addPath)}
            disabled={isDisabled}
           className={`flex items-center gap-2 rounded-lg h-10 px-4 text-white text-sm font-bold transition
