@@ -1,6 +1,7 @@
 import {createBrowserRouter} from 'react-router';
 import App from '../App';
 import RestaurantsListPage from '../pages/public/RestaurantsListPage/RestaurantsListPage';
+import RestaurantMenuPage from '../pages/public/RestaurantMenuPage/RestaurantMenuPage';
 
 import AuthenticatedRoute from '../routes/AuthenticatedRoute';
 import UnauthenticatedRoute from '../routes/UnauthenticatedRoute';
@@ -31,7 +32,8 @@ export const router = createBrowserRouter([
             {path: "/public/restaurants", element: <RestaurantsListPage />},
 
             // Restaurant menu page : /public/restaurants/:id
-            
+            {path: "/public/restaurants/:restaurantId", element: <RestaurantMenuPage />},
+
             // UNAUTHENTICATED PAGES - you can access them only if you aren't logged in
 
             { path: "/public/login",
