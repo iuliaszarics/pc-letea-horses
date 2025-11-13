@@ -122,17 +122,6 @@ useEffect(() => {
               >
                 All Products
               </NavLink>
-
-              <NavLink
-                to="/modifiers"
-                className={({ isActive }) =>
-                  `px-3 py-2 rounded-lg text-sm ${isActive ? "bg-blue-200 text-blue-800 font-bold" : "hover:bg-blue-100"
-                  }`
-                }
-              >
-                Modifiers
-              </NavLink>
-
               <NavLink
                 to="/restaurants"
                 className={({ isActive }) =>
