@@ -16,6 +16,8 @@ namespace Honse.Managers.Interfaces
         Task<Global.PaginatedResult<Restaurant>> FilterRestaurants(RestaurantFilterRequest request);
 
         Task<Global.PaginatedResult<Restaurant>> FilterPublicRestaurants(PublicRestaurantFilterRequest request);
+
+        Task<RestaurantMenu> GetPublicRestaurantMenu(Guid restaurantId);
     }
 
     public class Restaurant
@@ -152,5 +154,33 @@ namespace Honse.Managers.Interfaces
         public int PageSize { get; set; }
 
         public int PageNumber { get; set; }
+    }
+
+    public class RestaurantMenu
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string Image { get; set; } = string.Empty;
+        public string CuisineType { get; set; } = string.Empty;
+        public List<MenuCategory> Categories { get; set; } = new List<MenuCategory>();
+    }
+
+    public class MenuCategory
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public List<MenuItem> Products { get; set; } = new List<MenuItem>();
+    }
+
+    public class MenuItem
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public decimal Price { get; set; }
+        public decimal VAT { get; set; }
+        public string Image { get; set; } = string.Empty;
+        public bool IsEnabled { get; set; }
     }
 }

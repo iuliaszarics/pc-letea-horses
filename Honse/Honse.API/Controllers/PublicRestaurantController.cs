@@ -13,10 +13,12 @@ namespace Honse.API.Controllers
     public class PublicRestaurantController : ControllerBase
     {
         private readonly IRestaurantManager restaurantManager;
+        private readonly IProductManager productManager;
 
-        public PublicRestaurantController(IRestaurantManager restaurantManager)
+        public PublicRestaurantController(IRestaurantManager restaurantManager, IProductManager productManager)
         {
             this.restaurantManager = restaurantManager;
+            this.productManager = productManager;
         }
 
         [HttpGet]
@@ -47,6 +49,30 @@ namespace Honse.API.Controllers
             }
 
             return Ok(restaurantResponse.Result);
+        }
+
+        [HttpGet]
+        [Route("{id}/menu")]
+        public async Task<IActionResult> GetRestaurantMenu([FromRoute] Guid id)
+        {
+            if (!ModelState.IsValid)
+            {
+                string errorMessage = ModelState.Values
+                    .SelectMany(x => x.Errors)
+                    .First()
+                    .ErrorMessage;
+
+                return BadRequest(new { errorMessage });
+            }
+
+            var menuResponse = await restaurantManager.GetPublicRestaurantMenu(id).WithTryCatch();
+
+            if (!menuResponse.IsSuccessfull)
+            {
+                return BadRequest(menuResponse.Exception.Message);
+            }
+
+            return Ok(menuResponse.Result);
         }
     }
 }

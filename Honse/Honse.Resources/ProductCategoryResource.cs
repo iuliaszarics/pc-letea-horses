@@ -20,5 +20,13 @@ namespace Honse.Resources
 
             return await query.Where(t => t.UserId == userId && t.RestaurantId == restaurantId).ToListAsync();
         }
+
+        public async Task<IEnumerable<ProductCategory>> GetPublicRestaurantCategories(Guid restaurantId)
+        {
+            var query = dbSet.AsQueryable();
+            query = ApplyIncludes(query);
+
+            return await query.Where(t => t.RestaurantId == restaurantId).ToListAsync();
+        }
     }
 }
