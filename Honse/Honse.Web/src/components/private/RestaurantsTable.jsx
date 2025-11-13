@@ -121,8 +121,8 @@ export default function RestaurantsTable({ restaurants = [], setRestaurants }) {
       </div>
 
       {deleteTarget && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
-          <div className="bg-white  p-6 rounded-lg shadow-xl w-[350px]">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-xl w-[350px] z-60">
             <h2 className="text-lg font-semibold mb-2">Confirm Delete</h2>
             <p className="text-sm text-gray-500 mb-4">Are you sure you want to delete <strong>{deleteTarget.name}</strong>?</p>
 
