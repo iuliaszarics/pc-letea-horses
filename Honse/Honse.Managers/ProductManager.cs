@@ -28,7 +28,7 @@ namespace Honse.Managers
         {
             productValidationEngine.ValidateCreateProduct(request.DeepCopyTo<Engines.Common.CreateProduct>());
 
-            var productCategory = await productCategoryResource.GetById(request.CategoryId, request.UserId);
+            var productCategory = await productCategoryResource.GetByIdNoTracking(request.CategoryId, request.UserId);
 
             var product = request.DeepCopyTo<Resources.Interfaces.Entities.Product>();
 
@@ -48,8 +48,14 @@ namespace Honse.Managers
 
                 product.CategoryId = categoryId;
             }
+            else if (productCategory.RestaurantId == null)
+            {
+                productCategory.RestaurantId = request.RestaurantId;
 
-            product = await productResource.Add(product);
+                await productCategoryResource.Update(productCategory.Id, request.UserId, productCategory);
+            }
+
+                product = await productResource.Add(product);
 
             return product.DeepCopyTo<Interfaces.Product>();
         }
@@ -92,7 +98,7 @@ namespace Honse.Managers
         {
             productValidationEngine.ValidateUpdateProduct(request.DeepCopyTo<Engines.Common.UpdateProduct>());
 
-            var productCategory = await productCategoryResource.GetById(request.CategoryId, request.UserId); 
+            var productCategory = await productCategoryResource.GetByIdNoTracking(request.CategoryId, request.UserId); 
 
             var product = request.DeepCopyTo<Resources.Interfaces.Entities.Product>();
 
@@ -111,6 +117,12 @@ namespace Honse.Managers
                 });
 
                 product.CategoryId = categoryId;
+            }
+            else if (productCategory.RestaurantId == null)
+            {
+                productCategory.RestaurantId = request.RestaurantId;
+
+                await productCategoryResource.Update(productCategory.Id, request.UserId, productCategory);
             }
 
             product = await productResource.Update(request.Id, request.UserId, product);
