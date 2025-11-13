@@ -163,11 +163,6 @@ namespace Honse.Managers.Interfaces
         public string Description { get; set; } = string.Empty;
         public string Image { get; set; } = string.Empty;
         public string CuisineType { get; set; } = string.Empty;
-        public TimeOnly OpeningTime { get; set; }
-        public TimeOnly ClosingTime { get; set; }
-        public bool IsOpen { get; set; }
-        public float AverageRating { get; set; }
-        public int TotalReviews { get; set; }
         public List<MenuCategory> Categories { get; set; } = new List<MenuCategory>();
     }
 

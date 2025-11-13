@@ -179,13 +179,7 @@ namespace Honse.Managers
                 Name = restaurant.Name,
                 Description = restaurant.Description,
                 Image = restaurant.Image,
-                CuisineType = restaurant.CuisineType,
-                OpeningTime = restaurant.OpeningTime,
-                ClosingTime = restaurant.ClosingTime,
-                AverageRating = restaurant.AverageRating,
-                TotalReviews = restaurant.TotalReviews,
-                IsOpen = restaurant.OpeningTime <= TimeOnly.FromDateTime(DateTime.Now) && 
-                         TimeOnly.FromDateTime(DateTime.Now) < restaurant.ClosingTime
+                CuisineType = restaurant.CuisineType
             };
 
             // Group products by category
