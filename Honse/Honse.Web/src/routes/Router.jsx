@@ -10,6 +10,8 @@ import LoginPage from '../pages/public/Auth/LoginPage';
 import RegisterPage from '../pages/public/Auth/RegisterPage';
 import AllProductsPage from '../pages/private/products/AllProductsPage';
 import AddProductPage from '../pages/private/products/AddProductPage';
+import AllRestaurantsPage from '../pages/private/restaurants/AllRestaurantsPage';
+import AddRestaurantPage from '../pages/private/restaurants/AddRestaurantPage';
 export const router = createBrowserRouter([
     {
         path: "/",
@@ -26,8 +28,9 @@ export const router = createBrowserRouter([
 
             // Landing page: /public
 
+            { path: "/", element: <RestaurantsListPage /> },
             {path: "/public", element: <RestaurantsListPage />},
-            
+
             // Restaurants list page : /public/restaurants
             {path: "/public/restaurants", element: <RestaurantsListPage />},
 
@@ -78,6 +81,34 @@ export const router = createBrowserRouter([
                 <AddProductPage />
                 </AuthenticatedRoute>
             ),
+            },
+
+            // Restaurants management routes
+            {
+                path: "/restaurants",
+                element: (
+                    <AuthenticatedRoute redirectPage="/public/login">
+                        <AllRestaurantsPage />
+                    </AuthenticatedRoute>
+                ),
+            },
+
+            {
+                path: "/restaurants/add",
+                element: (
+                    <AuthenticatedRoute redirectPage="/public/login">
+                        <AddRestaurantPage />
+                    </AuthenticatedRoute>
+                ),
+            },
+
+            {
+                path: "/restaurants/edit/:id",
+                element: (
+                    <AuthenticatedRoute redirectPage="/public/login">
+                        <AddRestaurantPage />
+                    </AuthenticatedRoute>
+                ),
             },
 
 

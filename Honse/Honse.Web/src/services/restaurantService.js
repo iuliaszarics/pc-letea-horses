@@ -171,10 +171,29 @@ export async function updateRestaurantAPI(id, restaurant) {
 
 // Delete restaurant (AUTHENTICATED)
 export async function deleteRestaurantAPI(id) {
-  try {
-    const res = await api.delete(`/api/restaurants/${id}`);
-    return successData(res.data);
-  } catch (err) {
-    return failure(parseError(err, "Failed to delete restaurant"));
-  }
+    try {
+        const res = await api.delete(`/api/restaurants/${id}`);
+        return successData(res.data);
+    } catch (err) {
+        return failure(parseError(err, "Failed to delete restaurant"));
+    }
+}
+
+export async function getAllCategoriesAPI() {
+    try {
+        const res = await api.get(`/api/ProductCategory/all`);
+        return { succeeded: true, data: res.data };
+    } catch (err) {
+        return failure(parseError(err, "Failed to fetch categories."));
+    }
+}
+
+
+export async function getCategoriesByRestaurantAPI(restaurantId) {
+    try {
+        const res = await api.get(`/api/ProductCategory/restaurant/${restaurantId}`);
+        return { succeeded: true, data: res.data };
+    } catch (err) {
+        return failure(parseError(err, "Failed to fetch restaurant categories."));
+    }
 }
