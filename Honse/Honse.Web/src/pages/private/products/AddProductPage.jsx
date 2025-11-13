@@ -3,8 +3,9 @@ import { useNavigate, useParams } from "react-router";
 import {
   addProductAPI,
   updateProductAPI,
-  getAllCategoriesAPI,
+  getCategoriesByRestaurantAPI,
   getProductByIdAPI,
+  getAllCategoriesAPI,
 } from "../../../services/productService";
 import { jwtDecode } from "jwt-decode";
 
@@ -29,8 +30,8 @@ export default function AddProductPage() {
 
   useEffect(() => {
    async function loadCategories() {
-      const restaurantId = localStorage.getItem("restaurantId");
-      const result = await getAllCategoriesAPI(restaurantId);
+      //const restaurantId = localStorage.getItem("restaurantId");
+      const result = await getAllCategoriesAPI();
       if (result.succeeded) {
         setCategories(result.data);
       }
@@ -114,10 +115,13 @@ export default function AddProductPage() {
 
     try {
       const token = localStorage.getItem("token");
-      const restaurantId = localStorage.getItem("restaurantId");
+      //const restaurantId = localStorage.getItem("restaurantId");
       const categoryName = productData.isNewCategory
       ? productData.newCategoryName
       : categories.find(c => c.id === productData.categoryId)?.name || "";
+      const restaurantId = productData.isNewCategory ? localStorage.getItem("restaurantId") : categories.find(c => c.id === productData.categoryId)?.restaurant.id;
+      if(restaurantId == null)
+        restaurantId = localStorage.getItem("restaurantId");
       const payload = {
         ...(id && { id }),
         name: productData.name,
@@ -256,7 +260,7 @@ export default function AddProductPage() {
             <option value="">-- Choose Category --</option>
             {categories.map((c) => (
               <option key={c.id} value={c.id}>
-                {c.name}
+                {c.name} - {c.restaurant.name}
               </option>
             ))}
           </select>

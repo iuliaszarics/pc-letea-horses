@@ -2,7 +2,7 @@ import Sidebar from "../../../components/private/Sidebar"
 import Header from "../../../components/private/Header"
 import Filters from "../../../components/private/Filters"
 import ProductsTable from "../../../components/private/ProductsTable"
-import { getProductsAPI, getAllCategoriesAPI } from "../../../services/productService";
+import { getProductsAPI, getCategoriesByRestaurantAPI } from "../../../services/productService";
 import { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 
@@ -23,11 +23,12 @@ export default function AllProductsPage() {
   const [restaurantId, setRestaurantId] = useState(localStorage.getItem("restaurantId"));
   useEffect(() => {
     async function loadCategories() {
-      const result = await getAllCategoriesAPI(restaurantId);
+      const result = await getCategoriesByRestaurantAPI(restaurantId);
       if (result.succeeded) {
         setCategories(result.data);
       }
     }
+
     async function loadProducts() {
       const token = localStorage.getItem("token");
       if (!token) return;
@@ -61,7 +62,7 @@ export default function AllProductsPage() {
       <Sidebar onRestaurantChange={setRestaurantId}/>
       <main className="flex-1 overflow-y-auto p-8">
         <div className="max-w-7xl mx-auto">
-          <Header />
+          <Header selectedRestaurant={restaurantId} />
           <Filters
             categoryName={categoryName}
             setCategoryName={setCategoryName}
