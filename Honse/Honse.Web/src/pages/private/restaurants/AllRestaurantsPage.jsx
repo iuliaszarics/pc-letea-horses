@@ -68,6 +68,7 @@ export default function AllRestaurantsPage() {
 
             <button
               onClick={() => setPageNumber((prev) => prev + 1)}
+              disabled={pageNumber >= Math.ceil(totalCount / pageSize)}
               className="px-3 py-1 rounded  bg-orange-500 hover:bg-orange-600 text-white disabled:opacity-70"
             >
               Next
