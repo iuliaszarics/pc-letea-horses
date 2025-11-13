@@ -13,8 +13,9 @@ namespace Honse.Engines.Filtering.Restaurant
         }
 
         public override Expression<Func<Resources.Interfaces.Entities.Restaurant, bool>> Expression =>
-            (Resources.Interfaces.Entities.Restaurant restaurant) => 
-                restaurant.Name.Contains(searchKey) || 
+            (Resources.Interfaces.Entities.Restaurant restaurant) =>
+                restaurant.Name.Contains(searchKey) ||
+                restaurant.CuisineType.Contains(searchKey) ||
                 restaurant.Description.Contains(searchKey) ||
                 restaurant.Address.Contains(searchKey) ||
                 restaurant.City.Contains(searchKey);

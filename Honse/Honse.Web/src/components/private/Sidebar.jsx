@@ -1,26 +1,79 @@
 import { NavLink } from "react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { jwtDecode } from "jwt-decode";
+import { getRestaurantsByUserAPI } from "../../services/productService";
 
-export default function Sidebar() {
+export default function Sidebar({ onRestaurantChange }) {
   const [menuOpen, setMenuOpen] = useState(true);
+  const [restaurants, setRestaurants] = useState([]);
+  const [selectedRestaurant, setSelectedRestaurant] = useState("");
+  const [showRestaurantDropdown, setShowRestaurantDropdown] = useState(false);
+
+  useEffect(() => {
+    async function loadRestaurants() {
+      const token = localStorage.getItem("token");
+      const userId = jwtDecode(token).sub;
+
+      const result = await getRestaurantsByUserAPI(userId);
+      if (result.succeeded) {
+        setRestaurants(result.data);
+
+        const stored = localStorage.getItem("restaurantId");
+        const defaultRestaurant = stored || result.data[0].id;
+
+        setSelectedRestaurant(defaultRestaurant);
+        localStorage.setItem("restaurantId", defaultRestaurant);
+      }
+    }
+
+    loadRestaurants();
+  }, []);
+
+  function handleRestaurantChange(e) {
+    const value = e.target.value;
+    setSelectedRestaurant(value);
+    localStorage.setItem("restaurantId", value);
+    onRestaurantChange(value);
+  }
 
   return (
-    <aside className="w-64 flex-shrink-0 bg-white dark:bg-surface-dark p-4 flex flex-col justify-between">
+    <aside className="w-64 flex-shrink-0 bg-white p-4 flex flex-col justify-between">
       <div>
-        <div className="flex items-center gap-3 mb-8">
-          <div
-            className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
-            style={{
-              backgroundImage: `url("https://lh3.googleusercontent.com/aida-public/AB6AXuBmZI0COl-kteeAUKrPxiZ4vPgGbJtkhKSKTiy4oiwkTSXC1GwuOjVU0u0ZJcl4wjIEHONKYFgHriyBBh9oiK7Ioy6S0E_qk3CnQ5vxloxPss7YjxheaH-TPG1P-jFeE-_JDzZfXYEFYI9gvyoxtAmToK4GS7lXrLF6cTxynpUcBvr61KqjeUJb3EW12Xlg4GhL9oaN-0dRpX7Txuf-ZbWyMrQ6svYsyGAxVG16BWlhLDMaxiMb6m3Pt-J7pgJa0C_u3eCAoPnuGmmc")`,
-            }}
-          />
-          <div>
-            <h1 className="text-base font-bold">The Burger Place</h1>
-            <p className="text-text-secondary-light dark:text-text-secondary-dark text-sm">
-              Restaurant
-            </p>
-          </div>
+        <div className="mb-6 relative">
+          <label className="text-sm font-semibold text-gray-600">Restaurant</label>
+
+          <button
+            type="button"
+            onClick={() => setShowRestaurantDropdown(!showRestaurantDropdown)}
+            className="flex justify-between items-center w-full h-12 mt-1 px-4 rounded-lg border bg-white"
+          >
+            <span className="font-medium text-gray-700">
+              {restaurants.find((r) => r.id === selectedRestaurant)?.name || "Select restaurant"}
+            </span>
+            <span className="material-symbols-outlined">arrow_drop_down</span>
+          </button>
+
+          {showRestaurantDropdown && (
+            <ul className="absolute mt-1 bg-white border rounded shadow z-10 w-full max-h-60 overflow-auto">
+              {restaurants.map((r) => (
+                <li
+                  key={r.id}
+                  className="px-4 py-2 cursor-pointer hover:bg-blue-200"
+                  onClick={() => {
+                    setSelectedRestaurant(r.id);
+                    localStorage.setItem("restaurantId", r.id);
+                    onRestaurantChange(r.id);
+                    setShowRestaurantDropdown(false);
+                  }}
+                >
+                  {r.name}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
+
+
 
         <nav className="flex flex-col gap-2">
 
@@ -77,7 +130,7 @@ export default function Sidebar() {
                   }`
                 }
               >
-                Restaurants
+                Manage Restaurants
               </NavLink>
             </div>
           )}
