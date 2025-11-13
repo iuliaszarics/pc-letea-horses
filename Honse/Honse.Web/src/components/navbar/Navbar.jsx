@@ -13,7 +13,7 @@ export default function Navbar() {
         <header className="nav-header">
             <div className="nav-container">
                 <Link to="/" className="brand" onClick={close}>
-                    {/*<img src="/logo.png" alt="Honse logo" className="brand-logo" />*/}
+                    <img src="/horse_logo.ico" alt="Honse logo" className="brand-logo" />
                     <span className="brand-name">Honse</span>
                 </Link>
 
