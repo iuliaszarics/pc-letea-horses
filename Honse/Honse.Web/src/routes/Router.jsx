@@ -5,6 +5,7 @@ import RestaurantMenuPage from '../pages/public/RestaurantMenuPage/RestaurantMen
 
 import AuthenticatedRoute from '../routes/AuthenticatedRoute';
 import UnauthenticatedRoute from '../routes/UnauthenticatedRoute';
+import RedirectRoute from '../routes/RedirectRoute';
 
 import LoginPage from '../pages/public/Auth/LoginPage';
 import RegisterPage from '../pages/public/Auth/RegisterPage';
@@ -67,20 +68,21 @@ export const router = createBrowserRouter([
             },
 
             {
-            path: "/products/add",
-            element: (
-                <AuthenticatedRoute redirectPage="/public/login">
-                <AddProductPage />
-                </AuthenticatedRoute>
-            ),
+                path: "/products/add",
+                element: (
+                    <AuthenticatedRoute redirectPage="/public/login">
+                    <AddProductPage />
+                    </AuthenticatedRoute>
+                ),
+
             },
             {
-            path: "/products/edit/:id",
-            element: (
-                <AuthenticatedRoute redirectPage="/public/login">
-                <AddProductPage />
-                </AuthenticatedRoute>
-            ),
+                path: "/products/edit/:id",
+                element: (
+                    <AuthenticatedRoute redirectPage="/public/login">
+                    <AddProductPage />
+                    </AuthenticatedRoute>
+                ),
             },
 
             // Restaurants management routes

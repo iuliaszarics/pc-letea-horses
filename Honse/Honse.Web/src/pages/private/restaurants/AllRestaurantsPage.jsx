@@ -40,8 +40,10 @@ export default function AllRestaurantsPage() {
           <div className="flex mb-6">
             <label className="flex flex-col min-w-40 h-12 w-full">
               <div className="flex w-full items-stretch rounded-lg h-full">
-                <div className="flex items-center justify-center pl-4 rounded-l-lg border border-border-light  border-r-0 bg-surface-light ">
-                  <span className="material-symbols-outlined text-text-secondary-light ">search</span>
+                <div className="flex items-center justify-center aspect-square h-12 rounded-l-lg border border-border-light border-r-0 bg-surface-light">
+                  <span className="material-symbols-outlined text-text-secondary-light leading-none text-[20px]">
+                    search
+                  </span>
                 </div>
                 <input
                   className="form-input flex flex-1 rounded-r-lg border border-border-light  bg-surface-light  px-4 text-base focus:outline-0 focus:ring-2 focus:ring-secondary"

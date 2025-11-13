@@ -87,7 +87,7 @@ useEffect(() => {
 
         <nav className="flex flex-col gap-2">
 
-          <NavLink
+          {/* <NavLink
             to="/orders"
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2 rounded-lg ${isActive ? "bg-blue-200 text-blue-800 font-bold" : "hover:bg-blue-100"
@@ -96,7 +96,14 @@ useEffect(() => {
           >
             <span className="material-symbols-outlined">receipt_long</span>
             <p className="text-sm">Orders</p>
-          </NavLink>
+          </NavLink> */}
+
+          <div
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-100`}
+          >
+            <span className="material-symbols-outlined">receipt_long</span>
+            <p className="text-sm">Orders</p>
+          </div>
 
           <button
             onClick={() => setMenuOpen(!menuOpen)}
@@ -134,7 +141,7 @@ useEffect(() => {
             </div>
           )}
 
-          <NavLink
+          {/* <NavLink
             to="/sales"
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2 rounded-lg ${isActive ? "bg-blue-200 text-blue-800 font-bold" : "hover:bg-blue-100"
@@ -154,7 +161,21 @@ useEffect(() => {
           >
             <span className="material-symbols-outlined">settings</span>
             <p className="text-sm">Settings</p>
-          </NavLink>
+          </NavLink> */}
+
+          <div
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-100`}
+          >
+            <span className="material-symbols-outlined">bar_chart</span>
+            <p className="text-sm">Sales</p>
+          </div>
+
+          <div
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-100`}
+          >
+            <span className="material-symbols-outlined">settings</span>
+            <p className="text-sm">Settings</p>
+          </div>
         </nav>
       </div>
 
