@@ -188,7 +188,6 @@ export async function getAllCategoriesAPI() {
     }
 }
 
-
 export async function getCategoriesByRestaurantAPI(restaurantId) {
     try {
         const res = await api.get(`/api/ProductCategory/restaurant/${restaurantId}`);
