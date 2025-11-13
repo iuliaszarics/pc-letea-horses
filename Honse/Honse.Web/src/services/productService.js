@@ -110,27 +110,24 @@ export async function getProductByIdAPI(id) {
   }
 }
 
-export async function getAllCategoriesAPI(restaurantId) {
+export async function getCategoriesByRestaurantAPI(restaurantId) {
   try {
     const res = await api.get(`/api/ProductCategory/restaurant/${restaurantId}`);
     return { succeeded: true, data: res.data };
   } catch (err) {
     return { succeeded: false, errorMessage: parseError(err, "Failed to fetch categories.") };
   }
-  //    return {
-  //   succeeded: true,
-  //   data: [
-  //     {
-  //       id: "4f2b8864-90e5-433c-7aa3-08de1a1833ff",
-  //       name: "Category1"
-  //     },
-  //     {
-  //       id: "4f2b8864-90e5-433c-7aa3-08de1a1833aa", // optional 2nd dummy category
-  //       name: "Category2"
-  //     }
-  //   ]
-  // };
 }
+
+export async function getAllCategoriesAPI() {
+  try {
+    const res = await api.get(`/api/ProductCategory/all`);
+    return { succeeded: true, data: res.data };
+  } catch (err) {
+    return { succeeded: false, errorMessage: parseError(err, "Failed to fetch categories.") };
+  }
+}
+
 
 export async function getRestaurantsByUserAPI(userId) {
   try {

@@ -9,25 +9,35 @@ export default function Sidebar({ onRestaurantChange }) {
   const [selectedRestaurant, setSelectedRestaurant] = useState("");
   const [showRestaurantDropdown, setShowRestaurantDropdown] = useState(false);
 
-  useEffect(() => {
-    async function loadRestaurants() {
-      const token = localStorage.getItem("token");
-      const userId = jwtDecode(token).sub;
+useEffect(() => {
+  async function loadRestaurants() {
+    const token = localStorage.getItem("token");
+    const userId = jwtDecode(token).sub;
 
-      const result = await getRestaurantsByUserAPI(userId);
-      if (result.succeeded) {
-        setRestaurants(result.data);
+    const result = await getRestaurantsByUserAPI(userId);
+    if (result.succeeded) {
+      const fetched = result.data;
+      setRestaurants(fetched);
+      const stored = localStorage.getItem("restaurantId");
+      const validStored = fetched.find(r => r.id === stored);
 
-        const stored = localStorage.getItem("restaurantId");
-        const defaultRestaurant = stored || result.data[0].id;
+      const defaultRestaurant =
+        validStored?.id || (fetched.length > 0 ? fetched[0].id : null);
 
+      if (defaultRestaurant) {
         setSelectedRestaurant(defaultRestaurant);
         localStorage.setItem("restaurantId", defaultRestaurant);
+        onRestaurantChange(defaultRestaurant);
+      } else {
+        setSelectedRestaurant(null);
+        localStorage.removeItem("restaurantId");
+        onRestaurantChange(null);
       }
     }
+  }
 
-    loadRestaurants();
-  }, []);
+  loadRestaurants();
+}, []);
 
   function handleRestaurantChange(e) {
     const value = e.target.value;
