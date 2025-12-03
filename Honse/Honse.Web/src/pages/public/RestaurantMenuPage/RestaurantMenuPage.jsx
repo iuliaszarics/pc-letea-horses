@@ -81,6 +81,7 @@ const RestaurantMenu = () => {
         <div className="header-content">
           <h1>{restaurant.name}</h1>
           <p>Cuisine: {restaurant.cuisineType}</p>
+          <p>{restaurant.description}</p>
           <div className="header-info">
             <span>⭐ 4.5 stars</span>
             <span>💵 ${deliveryFee} delivery fee</span>
@@ -103,7 +104,7 @@ const RestaurantMenu = () => {
                       <img src={p.image} alt={p.name} className="menu-image" />
                       <div className="menu-info">
                         <h3>{p.name}</h3>
-                        <p>{p.desc}</p>
+                        <p>{p.description}</p>
                         <div className="menu-bottom">
                           <span>${p.price.toFixed(2)}</span>
                           <button onClick={() => handleAdd(p)}>Add</button>

@@ -16,11 +16,18 @@ namespace Honse.Engines.Validation
             if (string.IsNullOrEmpty(restaurant.Name))
                 errorMessage += "Restaurant name is required!\n";
 
-            if (string.IsNullOrEmpty(restaurant.Address))
+            if (restaurant.Address == null)
+            {
                 errorMessage += "Address is required!\n";
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(restaurant.Address.Street))
+                    errorMessage += "Street is required!\n";
 
-            if (string.IsNullOrEmpty(restaurant.City))
-                errorMessage += "City is required!\n";
+                if (string.IsNullOrEmpty(restaurant.Address.City))
+                    errorMessage += "City is required!\n";
+            }
 
             if (string.IsNullOrEmpty(restaurant.Phone))
                 errorMessage += "Phone is required!\n";

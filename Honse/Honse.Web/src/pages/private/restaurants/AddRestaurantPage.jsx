@@ -9,7 +9,7 @@ export default function AddRestaurantPage() {
   const [restaurant, setRestaurant] = useState({
     name: "",
     description: "",
-    address: "",
+    street: "",
     city: "",
     postalCode: "",
     phone: "",
@@ -64,7 +64,13 @@ export default function AddRestaurantPage() {
 
       const result = await getRestaurantByIdAPI(id);
       if (result.succeeded) {
+
+        if (result.data) {
+          result.data = {...result.data, "city": result.data.address.city, "postalCode": result.data.address.postalCode, "street": result.data.address.street}
+        }
+
         const data = result.data || {};
+
         setRestaurant(data);
 
         // If we didn't get assigned categories from the productCategory endpoint, try older shapes
@@ -104,9 +110,11 @@ export default function AddRestaurantPage() {
       const payload = {
         name: restaurant.name,
         description: restaurant.description,
-        address: restaurant.address,
-        city: restaurant.city,
-        postalCode: restaurant.postalCode,
+        address: {
+          "city": restaurant.city,
+          "postalCode": restaurant.postalCode,
+          "street": restaurant.street,
+        },
         phone: restaurant.phone,
         email: restaurant.email,
         image: restaurant.image,
@@ -117,8 +125,9 @@ export default function AddRestaurantPage() {
         userId,
       };
 
-      if (selectedCategoryIds && selectedCategoryIds.length > 0) payload.categoryIds = selectedCategoryIds;
-
+      payload.categoryIds = selectedCategoryIds && selectedCategoryIds.length > 0 ? selectedCategoryIds : [];
+      console.log(payload);
+      
       if (!id) {
         await addRestaurantAPI(payload);
       } else {
@@ -175,8 +184,8 @@ export default function AddRestaurantPage() {
         </div>
 
         <div>
-          <label className="block mb-1 font-medium text-gray-700">Address</label>
-          <input name="address" value={restaurant.address || ""} onChange={handleChange} className="form-input w-full rounded-lg border border-gray-300 px-4 py-2" />
+          <label className="block mb-1 font-medium text-gray-700">Street</label>
+          <input name="street" value={restaurant.street || ""} onChange={handleChange} className="form-input w-full rounded-lg border border-gray-300 px-4 py-2" />
         </div>
 
         <div className="grid grid-cols-2 gap-4">

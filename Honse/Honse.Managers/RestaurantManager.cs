@@ -110,6 +110,8 @@ namespace Honse.Managers
 
         public async Task<Interfaces.Restaurant> UpdateRestaurant(UpdateRestaurantRequest request)
         {
+            restaurantValidationEngine.ValidateCreateRestaurant(request.DeepCopyTo<Engines.Common.CreateRestaurant>());
+
             // Get existing restaurant without tracking to preserve rating fields
             var existingRestaurant = await restaurantResource.GetByIdNoTracking(request.Id, request.UserId);
 

@@ -46,7 +46,7 @@ export default function RestaurantsTable({ restaurants = [], setRestaurants }) {
               <th className="px-6 py-3">Image</th>
               <th className="px-6 py-3">Name</th>
               <th className="px-6 py-3">City</th>
-              <th className="px-6 py-3">Address</th>
+              <th className="px-6 py-3">Street</th>
               <th className="px-6 py-3">Phone</th>
               <th className="px-6 py-3">Availability</th>
               <th className="px-6 py-3">Actions</th>
@@ -86,9 +86,9 @@ export default function RestaurantsTable({ restaurants = [], setRestaurants }) {
 
                 <td className="px-6 py-3 font-medium">{r.name}</td>
 
-                <td className="px-6 py-3">{r.city}</td>
+                <td className="px-6 py-3">{r.address.city}</td>
 
-                <td className="px-6 py-3 truncate max-w-xs">{r.address}</td>
+                <td className="px-6 py-3 truncate max-w-xs">{r.address.street}</td>
 
                 <td className="px-6 py-3">{r.phone}</td>
 

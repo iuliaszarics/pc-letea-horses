@@ -30,11 +30,7 @@ namespace Honse.Managers.Interfaces
 
         public string Description { get; set; } = string.Empty;
 
-        public string Address { get; set; } = string.Empty;
-
-        public string City { get; set; } = string.Empty;
-
-        public string PostalCode { get; set; } = string.Empty;
+        public required Global.Address Address { get; set; }
 
         public string Phone { get; set; } = string.Empty;
 
@@ -65,11 +61,7 @@ namespace Honse.Managers.Interfaces
 
         public string Description { get; set; } = string.Empty;
 
-        public string Address { get; set; } = string.Empty;
-
-        public string City { get; set; } = string.Empty;
-
-        public string PostalCode { get; set; } = string.Empty;
+        public Global.Address Address { get; set; }
 
         public string Phone { get; set; } = string.Empty;
 
@@ -96,11 +88,7 @@ namespace Honse.Managers.Interfaces
 
         public string Description { get; set; } = string.Empty;
 
-        public string Address { get; set; } = string.Empty;
-
-        public string City { get; set; } = string.Empty;
-
-        public string PostalCode { get; set; } = string.Empty;
+        public Global.Address Address { get; set; }
 
         public string Phone { get; set; } = string.Empty;
 
