@@ -1,6 +1,198 @@
-@Honse.Web_HostAddress = http://localhost:5143
+@Honse.Web_HostAddress = https://localhost:2001
+@token = YOUR_JWT_TOKEN_HERE
 
+###############################################
+# TESTING INSTRUCTIONS
+###############################################
+# 1. Start the API (F5 in Visual Studio or 'dotnet run')
+# 2. Register a new user (or use existing credentials)
+# 3. Login to get JWT token
+# 4. Copy the token from login response
+# 5. Replace YOUR_JWT_TOKEN_HERE above with the actual token
+# 6. Create a restaurant first (if needed)
+# 7. Use the restaurant ID to create orders
+# 8. Test all CRUD operations for orders and order products
+###############################################
+
+### Weather Forecast Test (no auth needed)
 GET {{Honse.Web_HostAddress}}/weatherforecast/
 Accept: application/json
+
+###############################################
+# AUTHENTICATION ENDPOINTS
+###############################################
+
+### Register a new user (if needed)
+POST {{Honse.Web_HostAddress}}/api/users/register
+Content-Type: application/json
+
+{
+  "userName": "testuser",
+  "email": "test@example.com",
+  "password": "Test1234",
+  "confirmPassword": "Test1234"
+}
+
+### Login to get JWT token (copy the token from response and paste above)
+POST {{Honse.Web_HostAddress}}/api/users/login
+Content-Type: application/json
+
+{
+  "userName": "testuser",
+  "password": "Test1234"
+}
+
+###############################################
+# RESTAURANT ENDPOINTS (Setup)
+###############################################
+
+### Get all restaurants
+GET {{Honse.Web_HostAddress}}/api/restaurants/all
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Create a restaurant (if needed for testing)
+POST {{Honse.Web_HostAddress}}/api/restaurants
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Test Restaurant",
+  "address": "456 Restaurant Ave",
+  "phoneNumber": "+1234567890",
+  "email": "restaurant@example.com",
+  "description": "A test restaurant for orders"
+}
+
+### Save the restaurant ID from the response above and use it below
+@restaurantId = 00000000-0000-0000-0000-000000000000
+
+###############################################
+# ORDER ENDPOINTS
+###############################################
+
+### Get all orders
+GET {{Honse.Web_HostAddress}}/api/orders/all
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Get order by ID (update orderId after creating an order)
+@orderId = 00000000-0000-0000-0000-000000000000
+GET {{Honse.Web_HostAddress}}/api/orders/{{orderId}}
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Get filtered orders (with query parameters)
+GET {{Honse.Web_HostAddress}}/api/orders?RestaurantId={{restaurantId}}&PageSize=10&PageNumber=1
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Create a new order (save the order ID from response)
+POST {{Honse.Web_HostAddress}}/api/orders
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "restaurantId": "{{restaurantId}}",
+  "clientName": "John Doe",
+  "clientEmail": "john.doe@example.com",
+  "deliveryAddress": "123 Main Street, City, Country",
+  "products": [
+    {
+      "name": "Pizza Margherita",
+      "quantity": 2,
+      "price": 15.99,
+      "vat": 0.19
+    },
+    {
+      "name": "Coca Cola",
+      "quantity": 2,
+      "price": 2.50,
+      "vat": 0.19
+    }
+  ]
+}
+
+### Update an order (use actual order ID)
+PUT {{Honse.Web_HostAddress}}/api/orders
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "id": "{{orderId}}",
+  "orderStatus": "InProgress",
+  "preparationTime": "2025-12-08T14:30:00Z",
+  "deliveryTime": null
+}
+
+### Delete an order
+DELETE {{Honse.Web_HostAddress}}/api/orders/{{orderId}}
+Authorization: Bearer {{token}}
+
+###############################################
+# ORDER PRODUCT ENDPOINTS
+###############################################
+
+### Get order product by ID (update after creating order product)
+@orderProductId = 00000000-0000-0000-0000-000000000000
+GET {{Honse.Web_HostAddress}}/api/orderProducts/{{orderProductId}}
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Get all products for an order
+GET {{Honse.Web_HostAddress}}/api/orderProducts/order/{{orderId}}
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Get filtered order products
+GET {{Honse.Web_HostAddress}}/api/orderProducts?OrderId={{orderId}}&PageSize=10&PageNumber=1
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Create a new order product (add to existing order)
+POST {{Honse.Web_HostAddress}}/api/orderProducts
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "orderId": "{{orderId}}",
+  "name": "Tiramisu",
+  "quantity": 1,
+  "price": 6.50,
+  "vat": 0.19
+}
+
+### Update an order product
+PUT {{Honse.Web_HostAddress}}/api/orderProducts
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "id": "{{orderProductId}}",
+  "orderId": "{{orderId}}",
+  "name": "Tiramisu (Updated)",
+  "quantity": 2,
+  "price": 6.50,
+  "vat": 0.19
+}
+
+### Delete an order product
+DELETE {{Honse.Web_HostAddress}}/api/orderProducts/{{orderProductId}}
+Authorization: Bearer {{token}}
+
+###############################################
+# ADDITIONAL REFERENCE ENDPOINTS
+###############################################
+
+### Get all products
+GET {{Honse.Web_HostAddress}}/api/products/all
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Get product by ID
+@productId = 00000000-0000-0000-0000-000000000000
+GET {{Honse.Web_HostAddress}}/api/products/{{productId}}
+Accept: application/json
+Authorization: Bearer {{token}}
 
 ###

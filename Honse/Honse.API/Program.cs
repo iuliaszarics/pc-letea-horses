@@ -105,6 +105,8 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddScoped<Honse.Resources.Interfaces.IProductResource, Honse.Resources.ProductResource>();
 builder.Services.AddScoped<Honse.Resources.Interfaces.IProductCategoryResource, Honse.Resources.ProductCategoryResource>();
 builder.Services.AddScoped<Honse.Resources.Interfaces.IRestaurantResource, Honse.Resources.RestaurantResource>();
+builder.Services.AddScoped<Honse.Resources.Interfaces.IOrderResource, Honse.Resources.OrderResource>();
+builder.Services.AddScoped<Honse.Resources.Interfaces.IOrderProductResource, Honse.Resources.OrderProductResource>();
 
 // Engines
 builder.Services.AddScoped<Honse.Engines.Filtering.Interfaces.IProductFilteringEngine, Honse.Engines.Filtering.Product.ProductFilteringEngine>();
@@ -113,6 +115,8 @@ builder.Services.AddScoped<Honse.Engines.Validation.Interfaces.IUserValidationEn
 builder.Services.AddScoped<Honse.Engines.Validation.Interfaces.IRestaurantValidationEngine, Honse.Engines.Validation.RestaurantValidationEngine>();
 builder.Services.AddScoped<Honse.Engines.Validation.Interfaces.IProductCategoryValidationEngine, Honse.Engines.Validation.ProductCategoryValidationEngine>();
 builder.Services.AddScoped<Honse.Engines.Filtering.Interfaces.IRestaurantFilteringEngine, Honse.Engines.Filtering.Restaurant.RestaurantFilteringEngine>();
+builder.Services.AddScoped<Honse.Engines.Filtering.Interfaces.IOrderFilteringEngine, Honse.Engines.Filtering.Order.OrderFilteringEngine>();
+builder.Services.AddScoped<Honse.Engines.Filtering.Interfaces.IOrderProductFilteringEngine, Honse.Engines.Filtering.OrderProduct.OrderProductFilteringEngine>();
 
 
 // Managers
@@ -120,6 +124,8 @@ builder.Services.AddScoped<Honse.Managers.Interfaces.IUserManager, Honse.Manager
 builder.Services.AddScoped<Honse.Managers.Interfaces.IProductManager, Honse.Managers.ProductManager>();
 builder.Services.AddScoped<Honse.Managers.Interfaces.IProductCategoryManager, Honse.Managers.ProductCategoryManager>();
 builder.Services.AddScoped<Honse.Managers.Interfaces.IRestaurantManager, Honse.Managers.RestaurantManager>();
+builder.Services.AddScoped<Honse.Managers.Interfaces.IOrderManager, Honse.Managers.OrderManager>();
+builder.Services.AddScoped<Honse.Managers.Interfaces.IOrderProductManager, Honse.Managers.OrderProductManager>();
 
 var app = builder.Build();
 
