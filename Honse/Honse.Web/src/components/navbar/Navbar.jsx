@@ -1,13 +1,32 @@
 import { useState } from "react";
-import {Link, NavLink} from "react-router";
+import { Link, NavLink, useNavigate } from "react-router";
 import { useAuth } from "../../contexts/AuthContext";
+import { useCart } from "../../contexts/CartContext";
 import "./Navbar.css";
 
 export default function Navbar() {
     const { isLoggedIn, logoutUser, username } = useAuth();
     const [open, setOpen] = useState(false);
+    const { cart } = useCart();
+    const navigate = useNavigate();
 
-    function close() { setOpen(false); }
+    function close() {
+        setOpen(false);
+    }
+
+    const itemCount =
+        cart?.reduce((sum, item) => sum + (item.quantity || 0), 0) || 0;
+
+    const cartRestaurantId = cart.length > 0 ? cart[0].restaurantId : null;
+
+    const handleCartClick = () => {
+        close();
+        if (!cartRestaurantId) {
+            return;
+        }
+
+        navigate(`/public/restaurants/${cartRestaurantId}`);
+    };
 
     return (
         <header className="nav-header">
@@ -18,6 +37,16 @@ export default function Navbar() {
                 </Link>
 
                 <nav className={`nav ${open ? "open" : ""}`}>
+                    {itemCount > 0 && (
+                        <button
+                            type="button"
+                            className="btn btn-primary btn-cart"
+                            onClick={handleCartClick}
+                        >
+                            Cart <span>({itemCount})</span>
+                        </button>
+                    )}
+
                     {isLoggedIn() ? (
                         <>
                             <Link to="/products" className="nav-link" onClick={close}>
@@ -30,7 +59,10 @@ export default function Navbar() {
 
                             <button
                                 className="btn btn-ghost"
-                                onClick={() => { close(); logoutUser(); }}
+                                onClick={() => {
+                                    close();
+                                    logoutUser();
+                                }}
                             >
                                 Log out
                             </button>
@@ -40,7 +72,11 @@ export default function Navbar() {
                             <Link to="/public/login" className="btn btn-ghost" onClick={close}>
                                 Log in
                             </Link>
-                            <Link to="/public/register" className="btn btn-primary" onClick={close}>
+                            <Link
+                                to="/public/register"
+                                className="btn btn-primary"
+                                onClick={close}
+                            >
                                 Register
                             </Link>
                         </>
