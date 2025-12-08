@@ -100,7 +100,7 @@ export default function AllOrdersPage() {
 
     if (loading) {
         return (
-            <div className="flex bg-gray-50">
+            <div className="flex min-h-screen bg-gray-50">
                 <Sidebar onRestaurantChange={setRestaurantId} />
                 <main className="flex-1 p-8">
                     <div className="loading">Loading orders...</div>
@@ -110,7 +110,7 @@ export default function AllOrdersPage() {
     }
 
     return (
-        <div className="flex bg-gray-50">
+        <div className="flex min-h-screen bg-gray-50">
             <Sidebar onRestaurantChange={setRestaurantId} />
             <main className="flex-1 p-8">
                 <div className="max-w-7xl mx-auto">

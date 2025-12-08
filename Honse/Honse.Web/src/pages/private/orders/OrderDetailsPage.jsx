@@ -102,7 +102,7 @@ export default function OrderDetailsPage() {
 
     if (loading) {
         return (
-            <div className="flex bg-gray-50">
+            <div className="flex min-h-screen bg-gray-50">
                 <Sidebar onRestaurantChange={setRestaurantId} />
                 <main className="flex-1 p-8">
                     <div className="loading">Loading order details...</div>
@@ -113,7 +113,7 @@ export default function OrderDetailsPage() {
 
     if (error || !order) {
         return (
-            <div className="flex bg-gray-50">
+            <div className="flex min-h-screen bg-gray-50">
                 <Sidebar onRestaurantChange={setRestaurantId} />
                 <main className="flex-1 p-8">
                     <div className="error">{error || "Order not found"}</div>
@@ -126,7 +126,7 @@ export default function OrderDetailsPage() {
     const nextStatus = getNextStatus(order.status);
 
     return (
-        <div className="flex bg-gray-50">
+        <div className="flex min-h-screen bg-gray-50">
             <Sidebar onRestaurantChange={setRestaurantId} />
             <main className="flex-1 p-8">
                 <div className="max-w-6xl mx-auto">
