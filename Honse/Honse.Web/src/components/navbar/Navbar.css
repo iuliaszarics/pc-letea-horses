@@ -101,3 +101,10 @@
     .nav-link, .btn{ padding: 12px 14px; }
     .nav-divider{ display: none; }
 }
+
+.btn-cart {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
