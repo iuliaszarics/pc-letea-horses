@@ -15,8 +15,6 @@ namespace Honse.Resources.Interfaces
 
         public DbSet<Entities.Order> Order { get; set; }
 
-        public DbSet<Entities.OrderProductLight> OrderProductLight { get; set; }
-
         public AppDbContext(DbContextOptions<AppDbContext> context) : base(context)
         {
         }

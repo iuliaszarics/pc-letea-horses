@@ -34,19 +34,6 @@ CREATE TABLE [Order](
     CONSTRAINT [CK_Order_Address_JSON] CHECK (ISJSON([DeliveryAddress]) = 1)
 )
 
--- 2. Create the OrderProductLight Table (Unchanged)
-CREATE TABLE [OrderProductLight](
-    [Id] UNIQUEIDENTIFIER PRIMARY KEY NONCLUSTERED DEFAULT NEWID(),
-    [OrderId] UNIQUEIDENTIFIER NOT NULL REFERENCES [Order]([Id]) ON DELETE CASCADE,
-    [UserId] UNIQUEIDENTIFIER NOT NULL REFERENCES [AspNetUsers]([Id]),
-    [Name] VARCHAR(MAX) NOT NULL,
-    [Quantity] DECIMAL(18, 2) NOT NULL,
-    [Price] DECIMAL(19, 4) NOT NULL,
-    [VAT] DECIMAL(19, 4) NOT NULL,
-    [Total] AS ([Quantity] * [Price]) PERSISTED
-)
-
 -- 3. Indexes
 CREATE INDEX [IX_Order_UserId] ON [Order]([UserId])
 CREATE INDEX [IX_Order_RestaurantId] ON [Order]([RestaurantId])
-CREATE INDEX [IX_OrderProductLight_OrderId] ON [OrderProductLight]([OrderId])

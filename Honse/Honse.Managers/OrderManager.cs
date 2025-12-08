@@ -3,28 +3,39 @@ using Honse.Resources.Interfaces;
 using Honse.Resources.Interfaces.Entities;
 using Honse.Global.Extensions;
 using Honse.Global;
+using EntityOrder = Honse.Resources.Interfaces.Entities.Order;
 
 namespace Honse.Managers
 {
     public class OrderManager : IOrderManager
     {
         private readonly IOrderResource _orderResource;
-        private readonly IOrderProductResource _orderProductResource;
         private readonly Engines.Filtering.Interfaces.IOrderFilteringEngine _orderFilteringEngine;
 
         public OrderManager(
             IOrderResource orderResource,
-            IOrderProductResource orderProductResource,
             Engines.Filtering.Interfaces.IOrderFilteringEngine orderFilteringEngine)
         {
             _orderResource = orderResource;
-            _orderProductResource = orderProductResource;
             _orderFilteringEngine = orderFilteringEngine;
         }
 
-        public async Task<Order> AddOrder(CreateOrderRequest request)
+        public async Task<EntityOrder> AddOrder(CreateOrderRequest request)
         {
-            var order = new Order
+            // Calculate products with totals
+            var orderProducts = request.Products.Select(p => new Global.Order.OrderProduct
+            {
+                Name = p.Name,
+                Quantity = p.Quantity,
+                Price = p.Price,
+                VAT = p.VAT,
+                Total = p.Quantity * p.Price * (1 + p.VAT)
+            }).ToList();
+
+            // Calculate order total
+            decimal total = orderProducts.Sum(p => p.Total);
+
+            var order = new EntityOrder
             {
                 Id = Guid.NewGuid(),
                 RestaurantId = request.RestaurantId,
@@ -34,64 +45,54 @@ namespace Honse.Managers
                 ClientName = request.ClientName,
                 ClientEmail = request.ClientEmail,
                 DeliveryAddress = request.DeliveryAddress,
-                OrderStatus = OrderStatusHelper.CreateInitialStatus(),
-                Total = 0
+                Status = Global.Order.OrderStatus.New,
+                Products = System.Text.Json.JsonSerializer.Serialize(orderProducts),
+                Total = total
             };
 
-            var createdOrder = await _orderResource.Add(order);
-
-            // Add products
-            decimal total = 0;
-            foreach (var productRequest in request.Products)
+            // Initialize status history
+            order.StatusHistory = System.Text.Json.JsonSerializer.Serialize(new[]
             {
-                var product = new OrderProductLight
+                new Global.Order.OrderStatusHistoryEntry
                 {
-                    Id = Guid.NewGuid(),
-                    OrderId = createdOrder.Id,
-                    Name = productRequest.Name,
-                    Quantity = productRequest.Quantity,
-                    Price = productRequest.Price,
-                    VAT = productRequest.VAT,
-                    Total = productRequest.Quantity * productRequest.Price * (1 + productRequest.VAT)
-                };
-                
-                await _orderProductResource.Add(product);
-                total += product.Total;
-            }
+                    Status = Global.Order.OrderStatus.New,
+                    Timestamp = DateTime.UtcNow,
+                    Notes = "Order created"
+                }
+            });
 
-            // Update order total
-            createdOrder.Total = total;
-            return (await _orderResource.Update(createdOrder.Id, createdOrder.UserId, createdOrder))!;
+            return await _orderResource.Add(order);
         }
 
-        public async Task<Order?> GetOrderById(Guid id, Guid userId)
+        public async Task<EntityOrder?> GetOrderById(Guid id, Guid userId)
         {
-            var order = await _orderResource.GetByIdWithProducts(id);
-            if (order == null || order.UserId != userId)
-                return null;
-
+            var order = await _orderResource.GetById(id, userId);
             return order;
         }
 
-        public async Task<Order> UpdateOrder(UpdateOrderRequest request)
+        public async Task<EntityOrder> UpdateOrder(UpdateOrderRequest request)
         {
-            var order = await _orderResource.GetByIdPublic(request.Id) 
+            var order = await _orderResource.GetById(request.Id, request.UserId) 
                 ?? throw new InvalidOperationException("Order not found");
 
             if (order.UserId != request.UserId)
                 throw new UnauthorizedAccessException("Not authorized to update this order");
 
-            // Validate and update status using helper
-            if (!string.IsNullOrEmpty(request.OrderStatus))
+            // Update status if provided
+            if (request.NewStatus.HasValue)
             {
-                if (!OrderStatusHelper.IsValidStatus(request.OrderStatus))
-                    throw new ArgumentException($"Invalid order status: {request.OrderStatus}");
+                var history = System.Text.Json.JsonSerializer.Deserialize<List<Global.Order.OrderStatusHistoryEntry>>(order.StatusHistory) 
+                    ?? new List<Global.Order.OrderStatusHistoryEntry>();
+                
+                history.Add(new Global.Order.OrderStatusHistoryEntry
+                {
+                    Status = request.NewStatus.Value,
+                    Timestamp = DateTime.UtcNow,
+                    Notes = request.StatusNotes
+                });
 
-                order.OrderStatus = OrderStatusHelper.AddStatusEntry(
-                    order.OrderStatus, 
-                    request.OrderStatus, 
-                    request.StatusNotes
-                );
+                order.Status = request.NewStatus.Value;
+                order.StatusHistory = System.Text.Json.JsonSerializer.Serialize(history);
             }
 
             order.PreparationTime = request.PreparationTime;
@@ -102,53 +103,63 @@ namespace Honse.Managers
 
         public async Task DeleteOrder(Guid id, Guid userId)
         {
-            var order = await _orderResource.GetByIdPublic(id);
+            var order = await _orderResource.GetById(id, userId);
             if (order == null || order.UserId != userId)
                 throw new InvalidOperationException("Order not found or access denied");
 
             // Mark as cancelled instead of deleting
-            order.OrderStatus = OrderStatusHelper.AddStatusEntry(
-                order.OrderStatus, 
-                "Cancelled", 
-                "Order cancelled by user"
-            );
+            var history = System.Text.Json.JsonSerializer.Deserialize<List<Global.Order.OrderStatusHistoryEntry>>(order.StatusHistory) 
+                ?? new List<Global.Order.OrderStatusHistoryEntry>();
+            
+            history.Add(new Global.Order.OrderStatusHistoryEntry
+            {
+                Status = Global.Order.OrderStatus.Cancelled,
+                Timestamp = DateTime.UtcNow,
+                Notes = "Order cancelled by user"
+            });
+
+            order.Status = Global.Order.OrderStatus.Cancelled;
+            order.StatusHistory = System.Text.Json.JsonSerializer.Serialize(history);
 
             await _orderResource.Update(order.Id, userId, order);
         }
 
-        public async Task<Order?> GetOrderByIdPublic(Guid id)
+        public async Task<EntityOrder?> GetOrderByIdPublic(Guid id)
         {
-            return await _orderResource.GetByIdWithProducts(id);
+            return await _orderResource.GetByIdPublic(id);
         }
 
-        public async Task<Order> ProcessOrder(OrderProcessRequest request)
+        public async Task<EntityOrder> ProcessOrder(OrderProcessRequest request)
         {
-            var order = await _orderResource.GetByIdPublic(request.Id)
+            var order = await _orderResource.GetById(request.Id, request.UserId)
                 ?? throw new InvalidOperationException("Order not found");
 
             // Verify the order belongs to the restaurant
             if (order.RestaurantId != request.RestaurantId)
                 throw new UnauthorizedAccessException("Order does not belong to this restaurant");
 
-            // Validate status
-            if (!OrderStatusHelper.IsValidStatus(request.NewStatus))
-                throw new ArgumentException($"Invalid order status: {request.NewStatus}");
-
             // Update status
-            order.OrderStatus = OrderStatusHelper.AddStatusEntry(
-                order.OrderStatus,
-                request.NewStatus,
-                request.StatusNotes
-            );
+            var history = System.Text.Json.JsonSerializer.Deserialize<List<Global.Order.OrderStatusHistoryEntry>>(order.StatusHistory) 
+                ?? new List<Global.Order.OrderStatusHistoryEntry>();
+            
+            history.Add(new Global.Order.OrderStatusHistoryEntry
+            {
+                Status = request.NewStatus,
+                Timestamp = DateTime.UtcNow,
+                Notes = request.StatusNotes
+            });
 
-            // Update preparation time when status becomes "Preparing"
-            if (request.NewStatus.Equals("Preparing", StringComparison.OrdinalIgnoreCase) && !order.PreparationTime.HasValue)
+            order.Status = request.NewStatus;
+            order.StatusHistory = System.Text.Json.JsonSerializer.Serialize(history);
+
+            // Update preparation time when status becomes Accepted
+            if (request.NewStatus == Global.Order.OrderStatus.Accepted && !order.PreparationTime.HasValue)
             {
                 order.PreparationTime = DateTime.UtcNow;
             }
 
-            // Update delivery time when status becomes "Delivered"
-            if (request.NewStatus.Equals("Delivered", StringComparison.OrdinalIgnoreCase) && !order.DeliveryTime.HasValue)
+            // Update delivery time when status becomes Finished
+            if (request.NewStatus == Global.Order.OrderStatus.Finished && !order.DeliveryTime.HasValue)
             {
                 order.DeliveryTime = DateTime.UtcNow;
             }
@@ -161,31 +172,37 @@ namespace Honse.Managers
             var order = await _orderResource.GetByIdPublic(id)
                 ?? throw new InvalidOperationException("Order not found");
 
-            // Check if order can be cancelled (only if not delivered or already cancelled)
-            var currentStatus = OrderStatusHelper.GetCurrentStatus(order.OrderStatus);
-            if (currentStatus.Equals("Delivered", StringComparison.OrdinalIgnoreCase) ||
-                currentStatus.Equals("Cancelled", StringComparison.OrdinalIgnoreCase))
+            // Check if order can be cancelled (only if not finished or already cancelled)
+            if (order.Status == Global.Order.OrderStatus.Finished ||
+                order.Status == Global.Order.OrderStatus.Cancelled)
             {
-                throw new InvalidOperationException($"Cannot cancel order with status: {currentStatus}");
+                throw new InvalidOperationException($"Cannot cancel order with status: {order.Status}");
             }
 
             // Mark as cancelled
-            order.OrderStatus = OrderStatusHelper.AddStatusEntry(
-                order.OrderStatus,
-                "Cancelled",
-                "Order cancelled by customer"
-            );
+            var history = System.Text.Json.JsonSerializer.Deserialize<List<Global.Order.OrderStatusHistoryEntry>>(order.StatusHistory) 
+                ?? new List<Global.Order.OrderStatusHistoryEntry>();
+            
+            history.Add(new Global.Order.OrderStatusHistoryEntry
+            {
+                Status = Global.Order.OrderStatus.Cancelled,
+                Timestamp = DateTime.UtcNow,
+                Notes = "Order cancelled by customer"
+            });
+
+            order.Status = Global.Order.OrderStatus.Cancelled;
+            order.StatusHistory = System.Text.Json.JsonSerializer.Serialize(history);
 
             await _orderResource.Update(order.Id, order.UserId, order);
         }
 
-        public async Task<List<Order>> GetAllOrdersByRestaurant(Guid restaurantId, Guid userId)
+        public async Task<List<EntityOrder>> GetAllOrdersByRestaurant(Guid restaurantId, Guid userId)
         {
             var orders = await _orderResource.GetByRestaurantId(restaurantId);
             return orders.ToList();
         }
 
-        public async Task<Global.PaginatedResult<Order>> FilterOrders(OrderFilterRequest request)
+        public async Task<Global.PaginatedResult<EntityOrder>> FilterOrders(OrderFilterRequest request)
         {
             var specification = _orderFilteringEngine.GetSpecification(request.DeepCopyTo<Engines.Filtering.Interfaces.OrderFilterRequest>());
 

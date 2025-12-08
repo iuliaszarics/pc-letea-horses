@@ -1,4 +1,5 @@
 using Honse.Global.Specification;
+using Honse.Global.Order;
 
 namespace Honse.Engines.Filtering.Interfaces
 {
@@ -11,7 +12,7 @@ namespace Honse.Engines.Filtering.Interfaces
     {
         public Guid UserId { get; set; }
         public Guid? RestaurantId { get; set; }
-        public string? OrderStatus { get; set; }
+        public OrderStatus? OrderStatus { get; set; }
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; }
         public string? SearchKey { get; set; }

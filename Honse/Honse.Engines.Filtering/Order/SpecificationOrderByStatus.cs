@@ -5,14 +5,14 @@ namespace Honse.Engines.Filtering.Order
 {
     internal class SpecificationOrderByStatus : Specification<Resources.Interfaces.Entities.Order>
     {
-        private readonly string orderStatus;
+        private readonly Global.Order.OrderStatus orderStatus;
 
-        public SpecificationOrderByStatus(string orderStatus)
+        public SpecificationOrderByStatus(Global.Order.OrderStatus orderStatus)
         {
             this.orderStatus = orderStatus;
         }
 
         public override Expression<Func<Resources.Interfaces.Entities.Order, bool>> Expression =>
-            (Resources.Interfaces.Entities.Order order) => order.OrderStatus.Contains(orderStatus);
+            (Resources.Interfaces.Entities.Order order) => order.OrderStatus == orderStatus;
     }
 }

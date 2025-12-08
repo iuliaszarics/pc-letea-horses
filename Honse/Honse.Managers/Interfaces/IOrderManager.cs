@@ -1,18 +1,20 @@
 using Honse.Resources.Interfaces.Entities;
+using Honse.Global.Order;
+using EntityOrder = Honse.Resources.Interfaces.Entities.Order;
 
 namespace Honse.Managers.Interfaces
 {
     public interface IOrderManager
     {
-        Task<Order> AddOrder(CreateOrderRequest request);
-        Task<Order?> GetOrderById(Guid id, Guid userId);
-        Task<Order?> GetOrderByIdPublic(Guid id);
-        Task<Order> UpdateOrder(UpdateOrderRequest request);
-        Task<Order> ProcessOrder(OrderProcessRequest request);
+        Task<EntityOrder> AddOrder(CreateOrderRequest request);
+        Task<EntityOrder?> GetOrderById(Guid id, Guid userId);
+        Task<EntityOrder?> GetOrderByIdPublic(Guid id);
+        Task<EntityOrder> UpdateOrder(UpdateOrderRequest request);
+        Task<EntityOrder> ProcessOrder(OrderProcessRequest request);
         Task DeleteOrder(Guid id, Guid userId);
         Task CancelOrderPublic(Guid id);
-        Task<List<Order>> GetAllOrdersByRestaurant(Guid restaurantId, Guid userId);
-        Task<Global.PaginatedResult<Order>> FilterOrders(OrderFilterRequest request);
+        Task<List<EntityOrder>> GetAllOrdersByRestaurant(Guid restaurantId, Guid userId);
+        Task<Global.PaginatedResult<EntityOrder>> FilterOrders(OrderFilterRequest request);
     }
 
     public class CreateOrderRequest
@@ -21,15 +23,23 @@ namespace Honse.Managers.Interfaces
         public string ClientName { get; set; } = string.Empty;
         public string ClientEmail { get; set; } = string.Empty;
         public string DeliveryAddress { get; set; } = string.Empty;
-        public List<CreateOrderProductRequest> Products { get; set; } = new();
+        public List<OrderProductRequest> Products { get; set; } = new();
 
         public Guid UserId { get; set; }
+    }
+
+    public class OrderProductRequest
+    {
+        public string Name { get; set; } = string.Empty;
+        public decimal Quantity { get; set; }
+        public decimal Price { get; set; }
+        public decimal VAT { get; set; }
     }
 
     public class UpdateOrderRequest
     {
         public Guid Id { get; set; }
-        public string OrderStatus { get; set; } = string.Empty;
+        public OrderStatus? NewStatus { get; set; }
         public string? StatusNotes { get; set; }
         public DateTime? PreparationTime { get; set; }
         public DateTime? DeliveryTime { get; set; }
@@ -40,7 +50,7 @@ namespace Honse.Managers.Interfaces
     public class OrderFilterRequest
     {
         public Guid? RestaurantId { get; set; }
-        public string? OrderStatus { get; set; }
+        public OrderStatus? OrderStatus { get; set; }
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; }
         public int PageSize { get; set; } = 10;
@@ -53,7 +63,7 @@ namespace Honse.Managers.Interfaces
     {
         public Guid Id { get; set; }
         public Guid RestaurantId { get; set; }
-        public string NewStatus { get; set; } = string.Empty;
+        public OrderStatus NewStatus { get; set; }
         public string? StatusNotes { get; set; }
         public Guid UserId { get; set; }
     }

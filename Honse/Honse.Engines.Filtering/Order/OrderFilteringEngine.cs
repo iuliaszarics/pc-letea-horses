@@ -12,8 +12,8 @@ namespace Honse.Engines.Filtering.Order
             if (filter.RestaurantId.HasValue)
                 specification = specification.And(new SpecificationOrderByRestaurantId(filter.RestaurantId.Value));
 
-            if (!string.IsNullOrEmpty(filter.OrderStatus))
-                specification = specification.And(new SpecificationOrderByStatus(filter.OrderStatus));
+            if (filter.OrderStatus.HasValue)
+                specification = specification.And(new SpecificationOrderByStatus(filter.OrderStatus.Value));
 
             if (filter.FromDate.HasValue || filter.ToDate.HasValue)
                 specification = specification.And(new SpecificationOrderByDateRange(filter.FromDate, filter.ToDate));
