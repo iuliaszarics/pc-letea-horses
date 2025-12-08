@@ -1,0 +1,9 @@
+.loading, .error {
+    text-align: center;
+    padding: 48px;
+    color: #6b7280;
+}
+
+.error {
+    color: #dc2626;
+}
