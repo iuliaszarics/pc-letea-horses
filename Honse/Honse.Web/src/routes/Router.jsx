@@ -1,14 +1,18 @@
 import {createBrowserRouter} from 'react-router';
 import App from '../App';
 import RestaurantsListPage from '../pages/public/RestaurantsListPage/RestaurantsListPage';
+import RestaurantMenuPage from '../pages/public/RestaurantMenuPage/RestaurantMenuPage';
 
 import AuthenticatedRoute from '../routes/AuthenticatedRoute';
 import UnauthenticatedRoute from '../routes/UnauthenticatedRoute';
+import RedirectRoute from '../routes/RedirectRoute';
 
 import LoginPage from '../pages/public/Auth/LoginPage';
 import RegisterPage from '../pages/public/Auth/RegisterPage';
 import AllProductsPage from '../pages/private/products/AllProductsPage';
 import AddProductPage from '../pages/private/products/AddProductPage';
+import AllRestaurantsPage from '../pages/private/restaurants/AllRestaurantsPage';
+import AddRestaurantPage from '../pages/private/restaurants/AddRestaurantPage';
 export const router = createBrowserRouter([
     {
         path: "/",
@@ -25,13 +29,15 @@ export const router = createBrowserRouter([
 
             // Landing page: /public
 
+            { path: "/", element: <RestaurantsListPage /> },
             {path: "/public", element: <RestaurantsListPage />},
-            
+
             // Restaurants list page : /public/restaurants
             {path: "/public/restaurants", element: <RestaurantsListPage />},
 
             // Restaurant menu page : /public/restaurants/:id
-            
+            {path: "/public/restaurants/:restaurantId", element: <RestaurantMenuPage />},
+
             // UNAUTHENTICATED PAGES - you can access them only if you aren't logged in
 
             { path: "/public/login",
@@ -62,20 +68,49 @@ export const router = createBrowserRouter([
             },
 
             {
-            path: "/products/add",
-            element: (
-                <AuthenticatedRoute redirectPage="/public/login">
-                <AddProductPage />
-                </AuthenticatedRoute>
-            ),
+                path: "/products/add",
+                element: (
+                    <AuthenticatedRoute redirectPage="/public/login">
+                    <AddProductPage />
+                    </AuthenticatedRoute>
+                ),
+
             },
             {
-            path: "/products/edit/:id",
-            element: (
-                <AuthenticatedRoute redirectPage="/public/login">
-                <AddProductPage />
-                </AuthenticatedRoute>
-            ),
+                path: "/products/edit/:id",
+                element: (
+                    <AuthenticatedRoute redirectPage="/public/login">
+                    <AddProductPage />
+                    </AuthenticatedRoute>
+                ),
+            },
+
+            // Restaurants management routes
+            {
+                path: "/restaurants",
+                element: (
+                    <AuthenticatedRoute redirectPage="/public/login">
+                        <AllRestaurantsPage />
+                    </AuthenticatedRoute>
+                ),
+            },
+
+            {
+                path: "/restaurants/add",
+                element: (
+                    <AuthenticatedRoute redirectPage="/public/login">
+                        <AddRestaurantPage />
+                    </AuthenticatedRoute>
+                ),
+            },
+
+            {
+                path: "/restaurants/edit/:id",
+                element: (
+                    <AuthenticatedRoute redirectPage="/public/login">
+                        <AddRestaurantPage />
+                    </AuthenticatedRoute>
+                ),
             },
 
 

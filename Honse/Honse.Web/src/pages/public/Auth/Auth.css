@@ -49,6 +49,12 @@
     box-shadow: var(--shadow);
 }
 
+.password-button{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .auth-title{ font-size: 24px; font-weight: 700; margin: 4px 0 6px; color:var(--text); }
 .auth-sub{ color: var(--muted); font-size: 14px; margin-bottom: 20px; }
 

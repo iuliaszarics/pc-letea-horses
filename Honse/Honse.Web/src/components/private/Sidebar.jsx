@@ -9,25 +9,35 @@ export default function Sidebar({ onRestaurantChange }) {
   const [selectedRestaurant, setSelectedRestaurant] = useState("");
   const [showRestaurantDropdown, setShowRestaurantDropdown] = useState(false);
 
-  useEffect(() => {
-    async function loadRestaurants() {
-      const token = localStorage.getItem("token");
-      const userId = jwtDecode(token).sub;
+useEffect(() => {
+  async function loadRestaurants() {
+    const token = localStorage.getItem("token");
+    const userId = jwtDecode(token).sub;
 
-      const result = await getRestaurantsByUserAPI(userId);
-      if (result.succeeded) {
-        setRestaurants(result.data);
+    const result = await getRestaurantsByUserAPI(userId);
+    if (result.succeeded) {
+      const fetched = result.data;
+      setRestaurants(fetched);
+      const stored = localStorage.getItem("restaurantId");
+      const validStored = fetched.find(r => r.id === stored);
 
-        const stored = localStorage.getItem("restaurantId");
-        const defaultRestaurant = stored || result.data[0].id;
+      const defaultRestaurant =
+        validStored?.id || (fetched.length > 0 ? fetched[0].id : null);
 
+      if (defaultRestaurant) {
         setSelectedRestaurant(defaultRestaurant);
         localStorage.setItem("restaurantId", defaultRestaurant);
+        onRestaurantChange(defaultRestaurant);
+      } else {
+        setSelectedRestaurant(null);
+        localStorage.removeItem("restaurantId");
+        onRestaurantChange(null);
       }
     }
+  }
 
-    loadRestaurants();
-  }, []);
+  loadRestaurants();
+}, []);
 
   function handleRestaurantChange(e) {
     const value = e.target.value;
@@ -77,7 +87,7 @@ export default function Sidebar({ onRestaurantChange }) {
 
         <nav className="flex flex-col gap-2">
 
-          <NavLink
+          {/* <NavLink
             to="/orders"
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2 rounded-lg ${isActive ? "bg-blue-200 text-blue-800 font-bold" : "hover:bg-blue-100"
@@ -86,7 +96,14 @@ export default function Sidebar({ onRestaurantChange }) {
           >
             <span className="material-symbols-outlined">receipt_long</span>
             <p className="text-sm">Orders</p>
-          </NavLink>
+          </NavLink> */}
+
+          <div
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-100`}
+          >
+            <span className="material-symbols-outlined">receipt_long</span>
+            <p className="text-sm">Orders</p>
+          </div>
 
           <button
             onClick={() => setMenuOpen(!menuOpen)}
@@ -112,17 +129,6 @@ export default function Sidebar({ onRestaurantChange }) {
               >
                 All Products
               </NavLink>
-
-              <NavLink
-                to="/modifiers"
-                className={({ isActive }) =>
-                  `px-3 py-2 rounded-lg text-sm ${isActive ? "bg-blue-200 text-blue-800 font-bold" : "hover:bg-blue-100"
-                  }`
-                }
-              >
-                Modifiers
-              </NavLink>
-
               <NavLink
                 to="/restaurants"
                 className={({ isActive }) =>
@@ -135,7 +141,7 @@ export default function Sidebar({ onRestaurantChange }) {
             </div>
           )}
 
-          <NavLink
+          {/* <NavLink
             to="/sales"
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2 rounded-lg ${isActive ? "bg-blue-200 text-blue-800 font-bold" : "hover:bg-blue-100"
@@ -155,7 +161,21 @@ export default function Sidebar({ onRestaurantChange }) {
           >
             <span className="material-symbols-outlined">settings</span>
             <p className="text-sm">Settings</p>
-          </NavLink>
+          </NavLink> */}
+
+          <div
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-100`}
+          >
+            <span className="material-symbols-outlined">bar_chart</span>
+            <p className="text-sm">Sales</p>
+          </div>
+
+          <div
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-100`}
+          >
+            <span className="material-symbols-outlined">settings</span>
+            <p className="text-sm">Settings</p>
+          </div>
         </nav>
       </div>
 

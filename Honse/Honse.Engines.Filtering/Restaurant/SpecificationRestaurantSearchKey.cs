@@ -17,7 +17,7 @@ namespace Honse.Engines.Filtering.Restaurant
                 restaurant.Name.Contains(searchKey) ||
                 restaurant.CuisineType.Contains(searchKey) ||
                 restaurant.Description.Contains(searchKey) ||
-                restaurant.Address.Contains(searchKey) ||
-                restaurant.City.Contains(searchKey);
+                restaurant.Address.Street.Contains(searchKey) ||
+                restaurant.Address.City.Contains(searchKey);
     }
 }

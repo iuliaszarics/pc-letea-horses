@@ -63,6 +63,7 @@ export default function LoginPage() {
                                     type="button"
                                     onClick={() => setShowPw(s => !s)}
                                     aria-label="Toggle password visibility"
+                                    className="password-button"
                                 >
                                     {showPw ? (
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"

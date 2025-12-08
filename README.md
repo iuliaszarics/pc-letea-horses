@@ -42,11 +42,11 @@ This is the public-facing side of the application where users discover restauran
 - **Access:** Triggered by clicking on an **open** restaurant from the list.
 - **Purpose:** To display the restaurant's menu and allow item selection.
 - **Features:**
-  - Restaurant header with name, image, and operating hours.
-  - Menu categorized into logical sections (e.g., Appetizers, Main Courses, Desserts).
-  - Each product is listed with its name, description, price, and an image.
-  - An **"Add to Cart"** button for each menu item.
-  - A persistent shopping cart summary that updates as items are added.
+  - ~~Restaurant header with name, image, and operating hours.~~
+  - ~~Menu categorized into logical sections (e.g., Appetizers, Main Courses, Desserts).~~
+  - ~~Each product is listed with its name, description, price, and an image.~~
+  - An **"Add to Cart"** button for each menu item. **If a product has a modifier active, a pop-up with the modifier will appear**
+  - ~~A persistent shopping cart summary that updates as items are added.~~
 
 ### 4. Checkout & Order Placement
 - **Access:** Proceeding from the shopping cart.

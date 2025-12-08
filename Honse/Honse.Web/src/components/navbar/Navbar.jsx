@@ -17,26 +17,12 @@ export default function Navbar() {
                     <span className="brand-name">Honse</span>
                 </Link>
 
-                <button
-                    className="hamburger"
-                    aria-label="Toggle menu"
-                    aria-expanded={open}
-                    onClick={() => setOpen(s => !s)}
-                >
-                    <span />
-                    <span />
-                    <span />
-                </button>
-
                 <nav className={`nav ${open ? "open" : ""}`}>
                     {isLoggedIn() ? (
                         <>
-                            <NavLink to="/products" className="nav-link" onClick={close}>
-                                Products
-                            </NavLink>
-                            <NavLink to="/restaurants" className="nav-link" onClick={close}>
-                                Restaurants
-                            </NavLink>
+                            <Link to="/products" className="nav-link" onClick={close}>
+                                Manager mode
+                            </Link>
 
                             <div className="nav-divider" />
 
@@ -51,9 +37,6 @@ export default function Navbar() {
                         </>
                     ) : (
                         <>
-                            <NavLink to="/public/restaurants" className="nav-link" onClick={close}>
-                                Restaurants
-                            </NavLink>
                             <Link to="/public/login" className="btn btn-ghost" onClick={close}>
                                 Log in
                             </Link>

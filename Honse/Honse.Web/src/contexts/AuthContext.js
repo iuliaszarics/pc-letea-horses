@@ -48,7 +48,7 @@ export const UserProvider = ({children}) => {
         setUsername(result?.username);
         setLoggedStatus(true);
 
-        navigate('/');
+        navigate('/products');
     }
 
     const loginUser = async (username, password) => {
@@ -68,7 +68,7 @@ export const UserProvider = ({children}) => {
         setUsername(result?.username);
         setLoggedStatus(true);
 
-        navigate('/');
+        navigate('/products');
 
     }
 
@@ -84,7 +84,7 @@ export const UserProvider = ({children}) => {
         axios.defaults.headers.common["Authorization"] = "";
         setLoggedStatus(false);
 
-        navigate("/");
+        navigate('/');
     };
 
 

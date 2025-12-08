@@ -13,6 +13,6 @@ namespace Honse.Engines.Filtering.Restaurant
         }
 
         public override Expression<Func<Resources.Interfaces.Entities.Restaurant, bool>> Expression =>
-            (Resources.Interfaces.Entities.Restaurant restaurant) => restaurant.City == city;
+            (Resources.Interfaces.Entities.Restaurant restaurant) => restaurant.Address.City == city;
     }
 }
