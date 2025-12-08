@@ -3,7 +3,6 @@ using Honse.Resources.Interfaces;
 using Honse.Resources.Interfaces.Entities;
 using Honse.Global.Extensions;
 using Honse.Global;
-using EntityOrder = Honse.Resources.Interfaces.Entities.Order;
 
 namespace Honse.Managers
 {
@@ -20,7 +19,7 @@ namespace Honse.Managers
             _orderFilteringEngine = orderFilteringEngine;
         }
 
-        public async Task<EntityOrder> AddOrder(CreateOrderRequest request)
+        public async Task<Order> AddOrder(CreateOrderRequest request)
         {
             // Calculate products with totals
             var orderProducts = request.Products.Select(p => new Global.Order.OrderProduct
@@ -35,7 +34,7 @@ namespace Honse.Managers
             // Calculate order total
             decimal total = orderProducts.Sum(p => p.Total);
 
-            var order = new EntityOrder
+            var order = new Order
             {
                 Id = Guid.NewGuid(),
                 RestaurantId = request.RestaurantId,
@@ -64,13 +63,13 @@ namespace Honse.Managers
             return await _orderResource.Add(order);
         }
 
-        public async Task<EntityOrder?> GetOrderById(Guid id, Guid userId)
+        public async Task<Order?> GetOrderById(Guid id, Guid userId)
         {
             var order = await _orderResource.GetById(id, userId);
             return order;
         }
 
-        public async Task<EntityOrder> UpdateOrder(UpdateOrderRequest request)
+        public async Task<Order> UpdateOrder(UpdateOrderRequest request)
         {
             var order = await _orderResource.GetById(request.Id, request.UserId) 
                 ?? throw new InvalidOperationException("Order not found");
@@ -124,12 +123,12 @@ namespace Honse.Managers
             await _orderResource.Update(order.Id, userId, order);
         }
 
-        public async Task<EntityOrder?> GetOrderByIdPublic(Guid id)
+        public async Task<Order?> GetOrderByIdPublic(Guid id)
         {
             return await _orderResource.GetByIdPublic(id);
         }
 
-        public async Task<EntityOrder> ProcessOrder(OrderProcessRequest request)
+        public async Task<Order> ProcessOrder(OrderProcessRequest request)
         {
             var order = await _orderResource.GetById(request.Id, request.UserId)
                 ?? throw new InvalidOperationException("Order not found");
@@ -196,13 +195,13 @@ namespace Honse.Managers
             await _orderResource.Update(order.Id, order.UserId, order);
         }
 
-        public async Task<List<EntityOrder>> GetAllOrdersByRestaurant(Guid restaurantId, Guid userId)
+        public async Task<List<Order>> GetAllOrdersByRestaurant(Guid restaurantId, Guid userId)
         {
             var orders = await _orderResource.GetByRestaurantId(restaurantId);
             return orders.ToList();
         }
 
-        public async Task<Global.PaginatedResult<EntityOrder>> FilterOrders(OrderFilterRequest request)
+        public async Task<Global.PaginatedResult<Order>> FilterOrders(OrderFilterRequest request)
         {
             var specification = _orderFilteringEngine.GetSpecification(request.DeepCopyTo<Engines.Filtering.Interfaces.OrderFilterRequest>());
 
