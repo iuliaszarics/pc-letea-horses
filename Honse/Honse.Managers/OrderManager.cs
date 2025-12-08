@@ -2,7 +2,7 @@ using Honse.Managers.Interfaces;
 using Honse.Resources.Interfaces;
 using Honse.Resources.Interfaces.Entities;
 using Honse.Global.Extensions;
-using System.Text.Json;
+using Honse.Global;
 
 namespace Honse.Managers
 {
@@ -28,15 +28,13 @@ namespace Honse.Managers
             {
                 Id = Guid.NewGuid(),
                 RestaurantId = request.RestaurantId,
+                UserId = request.UserId,
                 OrderNo = GenerateOrderNumber(),
                 Timestamp = DateTime.UtcNow,
                 ClientName = request.ClientName,
                 ClientEmail = request.ClientEmail,
                 DeliveryAddress = request.DeliveryAddress,
-                OrderStatus = JsonSerializer.Serialize(new[] 
-                { 
-                    new { Status = "Pending", Timestamp = DateTime.UtcNow } 
-                }),
+                OrderStatus = OrderStatusHelper.CreateInitialStatus(),
                 Total = 0
             };
 
@@ -80,15 +78,25 @@ namespace Honse.Managers
             var order = await _orderResource.GetByIdPublic(request.Id) 
                 ?? throw new InvalidOperationException("Order not found");
 
-            // Update status history
-            var statusHistory = JsonSerializer.Deserialize<List<object>>(order.OrderStatus) ?? new();
-            statusHistory.Add(new { Status = request.OrderStatus, Timestamp = DateTime.UtcNow });
-            order.OrderStatus = JsonSerializer.Serialize(statusHistory);
+            if (order.UserId != request.UserId)
+                throw new UnauthorizedAccessException("Not authorized to update this order");
+
+            // Validate and update status using helper
+            if (!string.IsNullOrEmpty(request.OrderStatus))
+            {
+                if (!OrderStatusHelper.IsValidStatus(request.OrderStatus))
+                    throw new ArgumentException($"Invalid order status: {request.OrderStatus}");
+
+                order.OrderStatus = OrderStatusHelper.AddStatusEntry(
+                    order.OrderStatus, 
+                    request.OrderStatus, 
+                    request.StatusNotes
+                );
+            }
 
             order.PreparationTime = request.PreparationTime;
             order.DeliveryTime = request.DeliveryTime;
 
-            // Assuming UpdateOrderRequest contains UserId property
             return (await _orderResource.Update(order.Id, request.UserId, order))!;
         }
 
@@ -98,7 +106,14 @@ namespace Honse.Managers
             if (order == null || order.UserId != userId)
                 throw new InvalidOperationException("Order not found or access denied");
 
-            await _orderResource.Delete(id, userId);
+            // Mark as cancelled instead of deleting
+            order.OrderStatus = OrderStatusHelper.AddStatusEntry(
+                order.OrderStatus, 
+                "Cancelled", 
+                "Order cancelled by user"
+            );
+
+            await _orderResource.Update(order.Id, userId, order);
         }
 
         public async Task<List<Order>> GetAllOrders(Guid userId)

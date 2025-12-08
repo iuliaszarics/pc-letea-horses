@@ -27,6 +27,7 @@ namespace Honse.Managers.Interfaces
     {
         public Guid Id { get; set; }
         public string OrderStatus { get; set; } = string.Empty;
+        public string? StatusNotes { get; set; }
         public DateTime? PreparationTime { get; set; }
         public DateTime? DeliveryTime { get; set; }
         
