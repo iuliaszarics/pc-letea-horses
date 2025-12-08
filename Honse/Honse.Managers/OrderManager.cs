@@ -116,10 +116,72 @@ namespace Honse.Managers
             await _orderResource.Update(order.Id, userId, order);
         }
 
-        public async Task<List<Order>> GetAllOrders(Guid userId)
+        public async Task<Order?> GetOrderByIdPublic(Guid id)
         {
-            IEnumerable<Resources.Interfaces.Entities.Order> orders = await _orderResource.GetAll(userId);
+            return await _orderResource.GetByIdWithProducts(id);
+        }
 
+        public async Task<Order> ProcessOrder(OrderProcessRequest request)
+        {
+            var order = await _orderResource.GetByIdPublic(request.Id)
+                ?? throw new InvalidOperationException("Order not found");
+
+            // Verify the order belongs to the restaurant
+            if (order.RestaurantId != request.RestaurantId)
+                throw new UnauthorizedAccessException("Order does not belong to this restaurant");
+
+            // Validate status
+            if (!OrderStatusHelper.IsValidStatus(request.NewStatus))
+                throw new ArgumentException($"Invalid order status: {request.NewStatus}");
+
+            // Update status
+            order.OrderStatus = OrderStatusHelper.AddStatusEntry(
+                order.OrderStatus,
+                request.NewStatus,
+                request.StatusNotes
+            );
+
+            // Update preparation time when status becomes "Preparing"
+            if (request.NewStatus.Equals("Preparing", StringComparison.OrdinalIgnoreCase) && !order.PreparationTime.HasValue)
+            {
+                order.PreparationTime = DateTime.UtcNow;
+            }
+
+            // Update delivery time when status becomes "Delivered"
+            if (request.NewStatus.Equals("Delivered", StringComparison.OrdinalIgnoreCase) && !order.DeliveryTime.HasValue)
+            {
+                order.DeliveryTime = DateTime.UtcNow;
+            }
+
+            return (await _orderResource.Update(order.Id, order.UserId, order))!;
+        }
+
+        public async Task CancelOrderPublic(Guid id)
+        {
+            var order = await _orderResource.GetByIdPublic(id)
+                ?? throw new InvalidOperationException("Order not found");
+
+            // Check if order can be cancelled (only if not delivered or already cancelled)
+            var currentStatus = OrderStatusHelper.GetCurrentStatus(order.OrderStatus);
+            if (currentStatus.Equals("Delivered", StringComparison.OrdinalIgnoreCase) ||
+                currentStatus.Equals("Cancelled", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidOperationException($"Cannot cancel order with status: {currentStatus}");
+            }
+
+            // Mark as cancelled
+            order.OrderStatus = OrderStatusHelper.AddStatusEntry(
+                order.OrderStatus,
+                "Cancelled",
+                "Order cancelled by customer"
+            );
+
+            await _orderResource.Update(order.Id, order.UserId, order);
+        }
+
+        public async Task<List<Order>> GetAllOrdersByRestaurant(Guid restaurantId, Guid userId)
+        {
+            var orders = await _orderResource.GetByRestaurantId(restaurantId);
             return orders.ToList();
         }
 

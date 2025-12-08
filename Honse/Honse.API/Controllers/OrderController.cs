@@ -19,10 +19,15 @@ namespace Honse.API.Controllers
             this.userManager = userManager;
         }
 
+        /// <summary>
+        /// Gets all the orders of a restaurant
+        /// </summary>
+        /// <param name="restaurantId"></param>
+        /// <returns></returns>
         [Authorize]
         [HttpGet]
-        [Route("{id}")]
-        public async Task<IActionResult> GetOrder([FromRoute] Guid id)
+        [Route("all/{restaurantId}")]
+        public async Task<IActionResult> GetAllOrders([FromRoute] Guid restaurantId)
         {
             if (!ModelState.IsValid)
             {
@@ -45,7 +50,7 @@ namespace Honse.API.Controllers
 
             Global.User user = userResponse.Result;
 
-            var orderResponse = await orderManager.GetOrderById(id, user.Id).WithTryCatch();
+            var orderResponse = await orderManager.GetAllOrdersByRestaurant(restaurantId, user.Id).WithTryCatch();
 
             if (!orderResponse.IsSuccessfull)
             {
@@ -92,10 +97,16 @@ namespace Honse.API.Controllers
             return Ok(orderResponse.Result);
         }
 
+        /// <summary>
+        /// Gets details of an order
+        /// </summary>
+        /// <param name="restaurantId"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [Authorize]
         [HttpGet]
-        [Route("all")]
-        public async Task<IActionResult> GetAllOrders()
+        [Route("details/{restaurantId}/{id}")]
+        public async Task<IActionResult> GetOrderDetails([FromRoute] Guid restaurantId, [FromRoute] Guid id)
         {
             if (!ModelState.IsValid)
             {
@@ -118,7 +129,56 @@ namespace Honse.API.Controllers
 
             Global.User user = userResponse.Result;
 
-            var orderResponse = await orderManager.GetAllOrders(user.Id).WithTryCatch();
+            var orderResponse = await orderManager.GetOrderById(id, user.Id).WithTryCatch();
+
+            if (!orderResponse.IsSuccessfull)
+            {
+                return BadRequest(orderResponse.Exception.Message);
+            }
+
+            // Verify order belongs to restaurant
+            if (orderResponse.Result?.RestaurantId != restaurantId)
+            {
+                return BadRequest(new { errorMessage = "Order does not belong to this restaurant" });
+            }
+
+            return Ok(orderResponse.Result);
+        }
+
+        /// <summary>
+        /// Processes an order from one status to another
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost]
+        [Route("process")]
+        public async Task<IActionResult> ProcessOrder([FromBody] OrderProcessRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                string errorMessage = ModelState.Values
+                    .SelectMany(x => x.Errors)
+                    .First()
+                    .ErrorMessage;
+
+                return BadRequest((new { errorMessage }));
+            }
+
+            string? userName = User.FindFirstValue(ClaimTypes.GivenName);
+
+            var userResponse = await userManager.GetUserByName(userName).WithTryCatch();
+
+            if (!userResponse.IsSuccessfull)
+            {
+                return BadRequest(userResponse.Exception.Message);
+            }
+
+            Global.User user = userResponse.Result;
+
+            request.UserId = user.Id;
+
+            var orderResponse = await orderManager.ProcessOrder(request).WithTryCatch();
 
             if (!orderResponse.IsSuccessfull)
             {
@@ -163,79 +223,6 @@ namespace Honse.API.Controllers
             }
 
             return Created();
-        }
-
-        [Authorize]
-        [HttpDelete]
-        [Route("{id}")]
-        public async Task<IActionResult> DeleteOrder([FromRoute] Guid id)
-        {
-            if (!ModelState.IsValid)
-            {
-                string errorMessage = ModelState.Values
-                    .SelectMany(x => x.Errors)
-                    .First()
-                    .ErrorMessage;
-
-                return BadRequest((new { errorMessage }));
-            }
-
-            string? userName = User.FindFirstValue(ClaimTypes.GivenName);
-
-            var userResponse = await userManager.GetUserByName(userName).WithTryCatch();
-
-            if (!userResponse.IsSuccessfull)
-            {
-                return BadRequest(userResponse.Exception.Message);
-            }
-
-            Global.User user = userResponse.Result;
-
-            var orderResponse = await orderManager.DeleteOrder(id, user.Id).WithTryCatch();
-
-            if (!orderResponse.IsSuccessfull)
-            {
-                return BadRequest(orderResponse.Exception.Message);
-            }
-
-            return Ok();
-        }
-
-        [Authorize]
-        [HttpPut]
-        public async Task<IActionResult> UpdateOrder([FromBody] UpdateOrderRequest request)
-        {
-            if (!ModelState.IsValid)
-            {
-                string errorMessage = ModelState.Values
-                    .SelectMany(x => x.Errors)
-                    .First()
-                    .ErrorMessage;
-
-                return BadRequest((new { errorMessage }));
-            }
-
-            string? userName = User.FindFirstValue(ClaimTypes.GivenName);
-
-            var userResponse = await userManager.GetUserByName(userName).WithTryCatch();
-
-            if (!userResponse.IsSuccessfull)
-            {
-                return BadRequest(userResponse.Exception.Message);
-            }
-
-            Global.User user = userResponse.Result;
-
-            request.UserId = user.Id;
-
-            var orderResponse = await orderManager.UpdateOrder(request).WithTryCatch();
-
-            if (!orderResponse.IsSuccessfull)
-            {
-                return BadRequest(orderResponse.Exception.Message);
-            }
-
-            return Ok(orderResponse.Result);
         }
     }
 }

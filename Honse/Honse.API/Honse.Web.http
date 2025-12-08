@@ -113,16 +113,69 @@ Authorization: Bearer {{token}}
   ]
 }
 
-### Update an order (use actual order ID)
+### Update an order - Change status to Confirmed
 PUT {{Honse.Web_HostAddress}}/api/orders
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
   "id": "{{orderId}}",
-  "orderStatus": "InProgress",
+  "orderStatus": "Confirmed",
+  "statusNotes": "Payment verified",
+  "preparationTime": null,
+  "deliveryTime": null
+}
+
+### Update an order - Change status to Preparing
+PUT {{Honse.Web_HostAddress}}/api/orders
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "id": "{{orderId}}",
+  "orderStatus": "Preparing",
+  "statusNotes": "Chef started preparing",
   "preparationTime": "2025-12-08T14:30:00Z",
   "deliveryTime": null
+}
+
+### Update an order - Change status to Ready
+PUT {{Honse.Web_HostAddress}}/api/orders
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "id": "{{orderId}}",
+  "orderStatus": "Ready",
+  "statusNotes": "Order is ready for pickup",
+  "preparationTime": "2025-12-08T14:30:00Z",
+  "deliveryTime": null
+}
+
+### Update an order - Change status to InDelivery
+PUT {{Honse.Web_HostAddress}}/api/orders
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "id": "{{orderId}}",
+  "orderStatus": "InDelivery",
+  "statusNotes": "Driver picked up the order",
+  "preparationTime": "2025-12-08T14:30:00Z",
+  "deliveryTime": null
+}
+
+### Update an order - Change status to Delivered
+PUT {{Honse.Web_HostAddress}}/api/orders
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "id": "{{orderId}}",
+  "orderStatus": "Delivered",
+  "statusNotes": "Order delivered successfully",
+  "preparationTime": "2025-12-08T14:30:00Z",
+  "deliveryTime": "2025-12-08T15:00:00Z"
 }
 
 ### Delete an order
