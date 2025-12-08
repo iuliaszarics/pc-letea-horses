@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -120,6 +121,10 @@ builder.Services.AddScoped<Honse.Managers.Interfaces.IUserManager, Honse.Manager
 builder.Services.AddScoped<Honse.Managers.Interfaces.IProductManager, Honse.Managers.ProductManager>();
 builder.Services.AddScoped<Honse.Managers.Interfaces.IProductCategoryManager, Honse.Managers.ProductCategoryManager>();
 builder.Services.AddScoped<Honse.Managers.Interfaces.IRestaurantManager, Honse.Managers.RestaurantManager>();
+
+// Services
+
+builder.Services.AddTransient<IEmailSender, Honse.Services.Email.EmailSenderService>();
 
 var app = builder.Build();
 

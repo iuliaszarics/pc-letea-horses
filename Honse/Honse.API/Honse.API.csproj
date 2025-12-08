@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>581ec68b-8103-412d-a08b-dc58f2135465</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,11 +22,13 @@
   <ItemGroup>
     <ProjectReference Include="..\Honse.Engines.Filtering\Honse.Engines.Filtering.csproj" />
     <ProjectReference Include="..\Honse.Engines.Interfaces\Honse.Engines.Common.csproj" />
+    <ProjectReference Include="..\Honse.Engines.Processing\Honse.Engines.Processing.csproj" />
     <ProjectReference Include="..\Honse.Engines.Validation\Honse.Engines.Validation.csproj" />
     <ProjectReference Include="..\Honse.Global\Honse.Global.csproj" />
     <ProjectReference Include="..\Honse.Managers\Honse.Managers.csproj" />
     <ProjectReference Include="..\Honse.Resources.Interfaces\Honse.Resources.Interfaces.csproj" />
     <ProjectReference Include="..\Honse.Resources\Honse.Resources.csproj" />
+    <ProjectReference Include="..\Honse.Services\Honse.Services.csproj" />
   </ItemGroup>
 
 </Project>
