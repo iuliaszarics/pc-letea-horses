@@ -13,6 +13,8 @@ namespace Honse.Resources.Interfaces
 
         public DbSet<Entities.Restaurant> Restaurant { get; set; }
 
+        public DbSet<Entities.Order> Order { get; set; }
+
         public AppDbContext(DbContextOptions<AppDbContext> context) : base(context)
         {
         }
