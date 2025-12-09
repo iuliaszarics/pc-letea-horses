@@ -2,7 +2,13 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router";
 import Sidebar from "../../../components/private/Sidebar";
 import Header from "../../../components/private/Header";
-import { getFilteredOrdersAPI, MOCK_RESTAURANT_ID } from "../../../services/orderService";
+import { 
+    getFilteredOrdersAPI, 
+    MOCK_RESTAURANT_ID,
+    OrderStatus,
+    getStatusLabel,
+    getStatusColor
+} from "../../../services/orderService";
 import "./AllOrdersPage.css";
 
 export default function AllOrdersPage() {
@@ -70,28 +76,6 @@ export default function AllOrdersPage() {
 
     const getOrdersByStatus = (status) => {
         return orders.filter(order => order.status === status);
-    };
-
-    const getStatusLabel = (status) => {
-        const statusMap = {
-            "New": "New",
-            "Preparing": "Preparing",
-            "OutForDelivery": "Out for Delivery",
-            "Delivered": "Delivered",
-            "Cancelled": "Cancelled"
-        };
-        return statusMap[status] || status;
-    };
-
-    const getStatusColor = (status) => {
-        const colorMap = {
-            "New": "#3b82f6",
-            "Preparing": "#f59e0b",
-            "OutForDelivery": "#8b5cf6",
-            "Delivered": "#10b981",
-            "Cancelled": "#ef4444"
-        };
-        return colorMap[status] || "#6b7280";
     };
 
     const handleOrderClick = (orderId) => {
@@ -181,7 +165,7 @@ export default function AllOrdersPage() {
                     ) : viewMode === "kanban" ? (
                         /* Kanban View */
                         <div className="kanban-container">
-                            {["New", "Preparing", "OutForDelivery", "Delivered", "Cancelled"].map((status) => {
+                            {[OrderStatus.New, OrderStatus.Accepted, OrderStatus.Delivery, OrderStatus.Finished, OrderStatus.Cancelled].map((status) => {
                                 const statusOrders = getOrdersByStatus(status);
                                 return (
                                     <div key={status} className="kanban-column">

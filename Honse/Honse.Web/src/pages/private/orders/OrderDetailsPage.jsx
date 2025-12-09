@@ -1,7 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router";
 import Sidebar from "../../../components/private/Sidebar";
-import { getOrderDetailsAPI, processOrderAPI } from "../../../services/orderService";
+import { 
+    getOrderDetailsAPI, 
+    processOrderAPI, 
+    OrderStatus,
+    getStatusLabel,
+    getStatusColor,
+    getNextStatus
+} from "../../../services/orderService";
 import "./OrderDetailsPage.css";
 
 export default function OrderDetailsPage() {
@@ -64,40 +71,7 @@ export default function OrderDetailsPage() {
 
     const handleCancel = async () => {
         if (!window.confirm("Are you sure you want to cancel this order?")) return;
-        await handleStatusChange("Cancelled");
-    };
-
-    const getNextStatus = (currentStatus) => {
-        const statusFlow = {
-            "New": { next: "Preparing", label: "Accept" },
-            "Preparing": { next: "OutForDelivery", label: "Ready" },
-            "OutForDelivery": { next: "Delivered", label: "Delivered" },
-            "Delivered": null,
-            "Cancelled": null
-        };
-        return statusFlow[currentStatus];
-    };
-
-    const getStatusLabel = (status) => {
-        const statusMap = {
-            "New": "New",
-            "Preparing": "Preparing",
-            "OutForDelivery": "Out for Delivery",
-            "Delivered": "Delivered",
-            "Cancelled": "Cancelled"
-        };
-        return statusMap[status] || status;
-    };
-
-    const getStatusColor = (status) => {
-        const colorMap = {
-            "New": "#3b82f6",
-            "Preparing": "#f59e0b",
-            "OutForDelivery": "#8b5cf6",
-            "Delivered": "#10b981",
-            "Cancelled": "#ef4444"
-        };
-        return colorMap[status] || "#6b7280";
+        await handleStatusChange(OrderStatus.Cancelled);
     };
 
     if (loading) {
@@ -123,7 +97,7 @@ export default function OrderDetailsPage() {
     }
 
     const total = order.subtotal + order.tax + order.deliveryFee;
-    const nextStatus = getNextStatus(order.status);
+    const nextStatusInfo = getNextStatus(order.status);
 
     return (
         <div className="flex min-h-screen bg-gray-50">
@@ -153,15 +127,15 @@ export default function OrderDetailsPage() {
                     </div>
 
                     {/* Action Buttons */}
-                    {order.status !== "Delivered" && order.status !== "Cancelled" && (
+                    {order.status !== OrderStatus.Finished && order.status !== OrderStatus.Cancelled && (
                         <div className="flex gap-3 mb-6">
-                            {nextStatus && (
+                            {nextStatusInfo && (
                                 <button
-                                    onClick={() => handleStatusChange(nextStatus.next)}
+                                    onClick={() => handleStatusChange(nextStatusInfo.next)}
                                     disabled={processing}
                                     className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium"
                                 >
-                                    {nextStatus.label}
+                                    {nextStatusInfo.label}
                                 </button>
                             )}
                             <button
