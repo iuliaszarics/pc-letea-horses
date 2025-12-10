@@ -4,7 +4,7 @@ namespace Honse.Engines.Filtering.Interfaces
 {
     public interface IOrderProductFilteringEngine
     {
-        Specification<Resources.Interfaces.Entities.OrderProductLight> GetSpecification(OrderProductFilterRequest filter);
+        Specification<Resources.Interfaces.Entities.Order> GetSpecification(OrderProductFilterRequest filter);
     }
 
     public class OrderProductFilterRequest

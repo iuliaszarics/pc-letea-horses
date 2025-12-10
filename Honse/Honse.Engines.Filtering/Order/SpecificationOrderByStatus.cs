@@ -13,6 +13,6 @@ namespace Honse.Engines.Filtering.Order
         }
 
         public override Expression<Func<Resources.Interfaces.Entities.Order, bool>> Expression =>
-            (Resources.Interfaces.Entities.Order order) => order.OrderStatus == orderStatus;
+            (Resources.Interfaces.Entities.Order order) => order.Status == orderStatus;
     }
 }
