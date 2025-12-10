@@ -12,7 +12,7 @@ namespace Honse.Global.Order
         public string ClientName { get; set; } = string.Empty;
         public string ClientEmail { get; set; } = string.Empty;
         public string DeliveryAddress { get; set; } = string.Empty;
-        public OrderStatus Status { get; set; } = OrderStatus.New;
+        public OrderStatus OrderStatus { get; set; }
         public string StatusHistory { get; set; } = string.Empty; // JSON array of status changes
         public string Products { get; set; } = string.Empty; // JSON array of products
         public decimal Total { get; set; }
@@ -84,13 +84,13 @@ namespace Honse.Global.Order
                 Timestamp = DateTime.UtcNow,
                 Notes = notes
             });
-            order.Status = newStatus;
+            order.OrderStatus = newStatus;
             order.SetStatusHistory(history);
         }
 
         public static void InitializeOrder(this Order order)
         {
-            order.Status = OrderStatus.New;
+            order.OrderStatus = OrderStatus.New;
             var initialHistory = new List<OrderStatusHistoryEntry>
             {
                 new OrderStatusHistoryEntry

@@ -13,7 +13,7 @@ namespace Honse.Resources.Interfaces.Entities
         public decimal Total { get; set; }
 
         // Current status as enum
-        public OrderStatus Status { get; set; } = OrderStatus.New;
+        public OrderStatus OrderStatus { get; set; } = OrderStatus.New;
 
         // Stores the JSON history of status changes
         public string StatusHistory { get; set; } = string.Empty;
