@@ -41,20 +41,20 @@ namespace Honse.API.Controllers
 
             string? userName = User.FindFirstValue(ClaimTypes.GivenName);
 
-            var userResponse = await userManager.GetUserByName(userName).WithTryCatch();
+            var userResponse = await userManager.GetUserByName(userName!).WithTryCatch();
 
             if (!userResponse.IsSuccessfull)
             {
-                return BadRequest(userResponse.Exception.Message);
+                return BadRequest(userResponse.Exception!.Message);
             }
 
-            Global.User user = userResponse.Result;
+            Global.User user = userResponse.Result!;
 
             var orderResponse = await orderManager.GetAllOrdersByRestaurant(restaurantId, user.Id).WithTryCatch();
 
             if (!orderResponse.IsSuccessfull)
             {
-                return BadRequest(orderResponse.Exception.Message);
+                return BadRequest(orderResponse.Exception!.Message);
             }
 
             return Ok(orderResponse.Result);
@@ -76,14 +76,14 @@ namespace Honse.API.Controllers
 
             string? userName = User.FindFirstValue(ClaimTypes.GivenName);
 
-            var userResponse = await userManager.GetUserByName(userName).WithTryCatch();
+            var userResponse = await userManager.GetUserByName(userName!).WithTryCatch();
 
             if (!userResponse.IsSuccessfull)
             {
-                return BadRequest(userResponse.Exception.Message);
+                return BadRequest(userResponse.Exception!.Message);
             }
 
-            Global.User user = userResponse.Result;
+            Global.User user = userResponse.Result!;
 
             request.UserId = user.Id;
 
@@ -91,7 +91,7 @@ namespace Honse.API.Controllers
 
             if (!orderResponse.IsSuccessfull)
             {
-                return BadRequest(orderResponse.Exception.Message);
+                return BadRequest(orderResponse.Exception!.Message);
             }
 
             return Ok(orderResponse.Result);
@@ -120,20 +120,20 @@ namespace Honse.API.Controllers
 
             string? userName = User.FindFirstValue(ClaimTypes.GivenName);
 
-            var userResponse = await userManager.GetUserByName(userName).WithTryCatch();
+            var userResponse = await userManager.GetUserByName(userName!).WithTryCatch();
 
             if (!userResponse.IsSuccessfull)
             {
-                return BadRequest(userResponse.Exception.Message);
+                return BadRequest(userResponse.Exception!.Message);
             }
 
-            Global.User user = userResponse.Result;
+            Global.User user = userResponse.Result!;
 
             var orderResponse = await orderManager.GetOrderById(id, user.Id).WithTryCatch();
 
             if (!orderResponse.IsSuccessfull)
             {
-                return BadRequest(orderResponse.Exception.Message);
+                return BadRequest(orderResponse.Exception!.Message);
             }
 
             // Verify order belongs to restaurant
@@ -167,14 +167,14 @@ namespace Honse.API.Controllers
 
             string? userName = User.FindFirstValue(ClaimTypes.GivenName);
 
-            var userResponse = await userManager.GetUserByName(userName).WithTryCatch();
+            var userResponse = await userManager.GetUserByName(userName!).WithTryCatch();
 
             if (!userResponse.IsSuccessfull)
             {
-                return BadRequest(userResponse.Exception.Message);
+                return BadRequest(userResponse.Exception!.Message);
             }
 
-            Global.User user = userResponse.Result;
+            Global.User user = userResponse.Result!;
 
             request.UserId = user.Id;
 
@@ -182,7 +182,7 @@ namespace Honse.API.Controllers
 
             if (!orderResponse.IsSuccessfull)
             {
-                return BadRequest(orderResponse.Exception.Message);
+                return BadRequest(orderResponse.Exception!.Message);
             }
 
             return Ok(orderResponse.Result);

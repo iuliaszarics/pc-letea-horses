@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Honse.Managers.Interfaces;
 using Honse.Resources.Interfaces;
 using Honse.Resources.Interfaces.Entities;
@@ -10,62 +11,21 @@ namespace Honse.Managers
     {
         private readonly IOrderResource _orderResource;
         private readonly Engines.Filtering.Interfaces.IOrderFilteringEngine _orderFilteringEngine;
+        private readonly Resources.Interfaces.IRestaurantResource _restaurantResource;
+        private readonly Resources.Interfaces.IProductResource _productResource;
 
         public OrderManager(
             IOrderResource orderResource,
-            Engines.Filtering.Interfaces.IOrderFilteringEngine orderFilteringEngine)
+            Engines.Filtering.Interfaces.IOrderFilteringEngine orderFilteringEngine,
+            Resources.Interfaces.IRestaurantResource restaurantResource,
+            Resources.Interfaces.IProductResource productResource)
         {
             _orderResource = orderResource;
             _orderFilteringEngine = orderFilteringEngine;
+            _restaurantResource = restaurantResource;
+            _productResource = productResource;
         }
 
-<<<<<<< Updated upstream
-        public async Task<Order> AddOrder(CreateOrderRequest request)
-        {
-            // Calculate products with totals
-            var orderProducts = request.Products.Select(p => new Global.Order.OrderProduct
-            {
-                Name = p.Name,
-                Quantity = p.Quantity,
-                Price = p.Price,
-                VAT = p.VAT,
-                Total = p.Quantity * p.Price * (1 + p.VAT)
-            }).ToList();
-
-            // Calculate order total
-            decimal total = orderProducts.Sum(p => p.Total);
-
-            var order = new Order
-            {
-                Id = Guid.NewGuid(),
-                RestaurantId = request.RestaurantId,
-                UserId = request.UserId,
-                OrderNo = GenerateOrderNumber(),
-                Timestamp = DateTime.UtcNow,
-                ClientName = request.ClientName,
-                ClientEmail = request.ClientEmail,
-                DeliveryAddress = request.DeliveryAddress,
-                Status = Global.Order.OrderStatus.New,
-                Products = System.Text.Json.JsonSerializer.Serialize(orderProducts),
-                Total = total
-            };
-
-            // Initialize status history
-            order.StatusHistory = System.Text.Json.JsonSerializer.Serialize(new[]
-            {
-                new Global.Order.OrderStatusHistoryEntry
-                {
-                    Status = Global.Order.OrderStatus.New,
-                    Timestamp = DateTime.UtcNow,
-                    Notes = "Order created"
-                }
-            });
-
-            return await _orderResource.Add(order);
-        }
-
-=======
->>>>>>> Stashed changes
         public async Task<Order?> GetOrderById(Guid id, Guid userId)
         {
             var order = await _orderResource.GetById(id, userId);
@@ -215,13 +175,9 @@ namespace Honse.Managers
         {
             return $"ORD-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString()[..8].ToUpper()}";
         }
-<<<<<<< Updated upstream
-=======
 
         public async Task<PlaceOrderResponse> PlaceOrder(PlaceOrderRequest request, Guid? userId)
         {
-            _orderValidationEngine.ValidatePlaceOrder(request.DeepCopyTo<Engines.Common.PlaceOrder>());
-
             var restaurant = await _restaurantResource.GetByIdPublic(request.RestaurantId);
             if (restaurant == null)
                 throw new ValidationException("Restaurant not found!");
@@ -240,7 +196,7 @@ namespace Honse.Managers
 
             foreach (var item in request.Products)
             {
-                var product = await _productResource.GetProductByIdPublic(item.ProductId);
+                var product = await _productResource.GetByIdNoTracking(item.ProductId, userId ?? Guid.Empty);
                 if (product == null)
                     throw new ValidationException($"Product with ID {item.ProductId} not found!");
 
@@ -269,13 +225,13 @@ namespace Honse.Managers
             {
                 Id = Guid.NewGuid(),
                 RestaurantId = request.RestaurantId,
-                UserId = userId,
+                UserId = userId ?? Guid.Empty,
                 OrderNo = confirmationToken.ToString(),
                 Timestamp = DateTime.UtcNow,
                 ClientName = request.CustomerName,
                 ClientEmail = request.CustomerEmail,
                 DeliveryAddress = System.Text.Json.JsonSerializer.Serialize(request.DeliveryAddress),
-                OrderStatus = Global.Order.OrderStatus.Unconfirmed,
+                Status = Global.Order.OrderStatus.New,
                 Products = System.Text.Json.JsonSerializer.Serialize(orderProducts),
                 Total = totalAmount
             };
@@ -284,7 +240,7 @@ namespace Honse.Managers
             {
                 new Global.Order.OrderStatusHistoryEntry
                 {
-                    Status = Global.Order.OrderStatus.Unconfirmed,
+                    Status = Global.Order.OrderStatus.New,
                     Timestamp = DateTime.UtcNow,
                     Notes = "Order placed, awaiting confirmation"
                 }
@@ -300,6 +256,5 @@ namespace Honse.Managers
                 Message = "Order placed successfully! Please check your email for confirmation."
             };
         }
->>>>>>> Stashed changes
     }
 }

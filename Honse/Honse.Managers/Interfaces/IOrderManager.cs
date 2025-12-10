@@ -1,3 +1,4 @@
+using Honse.Global;
 using Honse.Resources.Interfaces.Entities;
 using Honse.Global.Order;
 using Order = Honse.Resources.Interfaces.Entities.Order;
@@ -6,19 +7,11 @@ namespace Honse.Managers.Interfaces
 {
     public interface IOrderManager
     {
-<<<<<<< Updated upstream
-        Task<EntityOrder> AddOrder(CreateOrderRequest request);
-        Task<EntityOrder?> GetOrderById(Guid id, Guid userId);
-        Task<EntityOrder?> GetOrderByIdPublic(Guid id);
-        Task<EntityOrder> UpdateOrder(UpdateOrderRequest request);
-        Task<EntityOrder> ProcessOrder(OrderProcessRequest request);
-=======
         Task<PlaceOrderResponse> PlaceOrder(PlaceOrderRequest request, Guid? userId);
         Task<Order?> GetOrderById(Guid id, Guid userId);
         Task<Order?> GetOrderByIdPublic(Guid id);
         Task<Order> UpdateOrder(UpdateOrderRequest request);
         Task<Order> ProcessOrder(OrderProcessRequest request);
->>>>>>> Stashed changes
         Task DeleteOrder(Guid id, Guid userId);
         Task CancelOrderPublic(Guid id);
         Task<List<Order>> GetAllOrdersByRestaurant(Guid restaurantId, Guid userId);
@@ -56,8 +49,6 @@ namespace Honse.Managers.Interfaces
         public string? StatusNotes { get; set; }
         public Guid UserId { get; set; }
     }
-<<<<<<< Updated upstream
-=======
 
     public class PlaceOrderRequest
     {
@@ -91,5 +82,4 @@ namespace Honse.Managers.Interfaces
 
         public decimal TotalAmount { get; set; }
     }
->>>>>>> Stashed changes
 }
