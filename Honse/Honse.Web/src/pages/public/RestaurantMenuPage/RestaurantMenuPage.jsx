@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import "./RestaurantMenuPage.css";
 import { getPublicRestaurantsMenu } from "../../../services/restaurantService";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import { useCart } from "../../../contexts/CartContext";
 
 const RestaurantMenu = () => {
   const { restaurantId } = useParams();
+  const navigate = useNavigate();
   const [restaurant, setRestaurant] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -217,7 +218,13 @@ const RestaurantMenu = () => {
                 Total <span>${total.toFixed(2)}</span>
               </h4>
             </div>
-            <button className="checkout-btn" disabled={!restaurantCart.length}>
+            <button
+                className="checkout-btn"
+                disabled={!restaurantCart.length}
+                onClick={() =>
+                    navigate(`/public/restaurants/${restaurantId}/checkout`)
+                }
+            >
               Checkout
             </button>
           </div>
