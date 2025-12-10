@@ -188,41 +188,6 @@ namespace Honse.API.Controllers
             return Ok(orderResponse.Result);
         }
 
-        [Authorize]
-        [HttpPost]
-        public async Task<IActionResult> CreateOrder([FromBody] CreateOrderRequest request)
-        {
-            if (!ModelState.IsValid)
-            {
-                string errorMessage = ModelState.Values
-                    .SelectMany(x => x.Errors)
-                    .First()
-                    .ErrorMessage;
-
-                return BadRequest((new { errorMessage }));
-            }
-
-            string? userName = User.FindFirstValue(ClaimTypes.GivenName);
-
-            var userResponse = await userManager.GetUserByName(userName).WithTryCatch();
-
-            if (!userResponse.IsSuccessfull)
-            {
-                return BadRequest(userResponse.Exception.Message);
-            }
-
-            Global.User user = userResponse.Result;
-
-            request.UserId = user.Id;
-
-            var orderResponse = await orderManager.AddOrder(request).WithTryCatch();
-
-            if (!orderResponse.IsSuccessfull)
-            {
-                return BadRequest(orderResponse.Exception.Message);
-            }
-
-            return Created();
-        }
+       
     }
 }

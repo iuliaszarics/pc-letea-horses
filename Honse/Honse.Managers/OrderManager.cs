@@ -19,6 +19,7 @@ namespace Honse.Managers
             _orderFilteringEngine = orderFilteringEngine;
         }
 
+<<<<<<< Updated upstream
         public async Task<Order> AddOrder(CreateOrderRequest request)
         {
             // Calculate products with totals
@@ -63,6 +64,8 @@ namespace Honse.Managers
             return await _orderResource.Add(order);
         }
 
+=======
+>>>>>>> Stashed changes
         public async Task<Order?> GetOrderById(Guid id, Guid userId)
         {
             var order = await _orderResource.GetById(id, userId);
@@ -212,5 +215,91 @@ namespace Honse.Managers
         {
             return $"ORD-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString()[..8].ToUpper()}";
         }
+<<<<<<< Updated upstream
+=======
+
+        public async Task<PlaceOrderResponse> PlaceOrder(PlaceOrderRequest request, Guid? userId)
+        {
+            _orderValidationEngine.ValidatePlaceOrder(request.DeepCopyTo<Engines.Common.PlaceOrder>());
+
+            var restaurant = await _restaurantResource.GetByIdPublic(request.RestaurantId);
+            if (restaurant == null)
+                throw new ValidationException("Restaurant not found!");
+
+            if (!restaurant.IsEnabled)
+                throw new ValidationException("Restaurant is currently disabled!");
+
+            var currentTime = TimeOnly.FromDateTime(DateTime.Now);
+            bool isOpen = currentTime >= restaurant.OpeningTime && currentTime <= restaurant.ClosingTime;
+
+            if (!isOpen)
+                throw new ValidationException($"Restaurant is currently closed. Opens at {restaurant.OpeningTime} and closes at {restaurant.ClosingTime}.");
+
+            decimal totalAmount = 0;
+            var orderProducts = new List<Global.Order.OrderProduct>();
+
+            foreach (var item in request.Products)
+            {
+                var product = await _productResource.GetProductByIdPublic(item.ProductId);
+                if (product == null)
+                    throw new ValidationException($"Product with ID {item.ProductId} not found!");
+
+                if (product.Category.RestaurantId != request.RestaurantId)
+                    throw new ValidationException($"Product '{product.Name}' does not belong to the selected restaurant!");
+
+                if (!product.IsEnabled)
+                    throw new ValidationException($"Product '{product.Name}' is currently unavailable!");
+
+                decimal subtotal = product.Price * item.Quantity;
+                totalAmount += subtotal;
+
+                orderProducts.Add(new Global.Order.OrderProduct
+                {
+                    Name = product.Name,
+                    Quantity = item.Quantity,
+                    Price = product.Price,
+                    VAT = product.VAT,
+                    Total = subtotal,
+                    Image = product.Image
+                });
+            }
+
+            var confirmationToken = Guid.NewGuid();
+            var order = new Order
+            {
+                Id = Guid.NewGuid(),
+                RestaurantId = request.RestaurantId,
+                UserId = userId,
+                OrderNo = confirmationToken.ToString(),
+                Timestamp = DateTime.UtcNow,
+                ClientName = request.CustomerName,
+                ClientEmail = request.CustomerEmail,
+                DeliveryAddress = System.Text.Json.JsonSerializer.Serialize(request.DeliveryAddress),
+                OrderStatus = Global.Order.OrderStatus.Unconfirmed,
+                Products = System.Text.Json.JsonSerializer.Serialize(orderProducts),
+                Total = totalAmount
+            };
+
+            order.StatusHistory = System.Text.Json.JsonSerializer.Serialize(new[]
+            {
+                new Global.Order.OrderStatusHistoryEntry
+                {
+                    Status = Global.Order.OrderStatus.Unconfirmed,
+                    Timestamp = DateTime.UtcNow,
+                    Notes = "Order placed, awaiting confirmation"
+                }
+            });
+
+            await _orderResource.Add(order);
+
+            return new PlaceOrderResponse
+            {
+                OrderId = order.Id,
+                ConfirmationToken = confirmationToken,
+                TotalAmount = totalAmount,
+                Message = "Order placed successfully! Please check your email for confirmation."
+            };
+        }
+>>>>>>> Stashed changes
     }
 }
