@@ -27,7 +27,6 @@ namespace Honse.Global.Order
         public decimal Price { get; set; }
         public decimal VAT { get; set; }
         public decimal Total { get; set; }
-
         public string Image { get; set; } = string.Empty;
     }
 
