@@ -20,9 +20,11 @@
   <ItemGroup>
     <ProjectReference Include="..\Honse.Engines.Filtering\Honse.Engines.Filtering.csproj" />
     <ProjectReference Include="..\Honse.Engines.Interfaces\Honse.Engines.Common.csproj" />
+    <ProjectReference Include="..\Honse.Engines.Processing\Honse.Engines.Processing.csproj" />
     <ProjectReference Include="..\Honse.Engines.Validation\Honse.Engines.Validation.csproj" />
     <ProjectReference Include="..\Honse.Global\Honse.Global.csproj" />
     <ProjectReference Include="..\Honse.Resources.Interfaces\Honse.Resources.Interfaces.csproj" />
+    <ProjectReference Include="..\Honse.Services\Honse.Services.csproj" />
   </ItemGroup>
 
 </Project>

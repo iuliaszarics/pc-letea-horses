@@ -1,38 +1,49 @@
 using Honse.Managers.Interfaces;
-using Honse.Resources.Interfaces;
 using Honse.Resources.Interfaces.Entities;
 using Honse.Global.Extensions;
+using Honse.Engines.Processing.Interfaces;
 using Honse.Global;
+using Microsoft.AspNetCore.SignalR;
+using Azure.Core;
 
 namespace Honse.Managers
 {
     public class OrderManager : IOrderManager
     {
-        private readonly IOrderResource orderResource;
+        private readonly Resources.Interfaces.IOrderResource orderResource;
         private readonly Engines.Filtering.Interfaces.IOrderFilteringEngine orderFilteringEngine;
+        private readonly IOrderProcessorEngine orderProcessorEngine;
         private readonly Resources.Interfaces.IRestaurantResource restaurantResource;
         private readonly Resources.Interfaces.IProductResource productResource;
+        private readonly IHubContext<Services.Hub.OrderingHub> hubContext;
 
         public OrderManager(
-            IOrderResource orderResource,
+            Resources.Interfaces.IOrderResource orderResource,
             Engines.Filtering.Interfaces.IOrderFilteringEngine orderFilteringEngine,
+            Engines.Processing.Interfaces.IOrderProcessorEngine orderProcessorEngine,
             Resources.Interfaces.IRestaurantResource restaurantResource,
-            Resources.Interfaces.IProductResource productResource)
+            Resources.Interfaces.IProductResource productResource,
+            IHubContext<Services.Hub.OrderingHub> hubContext)
         {
             this.orderResource = orderResource;
             this.orderFilteringEngine = orderFilteringEngine;
+            this.orderProcessorEngine = orderProcessorEngine;
             this.restaurantResource = restaurantResource;
             this.productResource = productResource;
+            this.hubContext = hubContext;
         }
 
-        public async Task<Order?> GetOrderById(Guid id, Guid? userId)
+        public async Task<Global.Order.Order?> GetOrderById(Guid id, Guid? userId)
         {
-            var order = userId != null ? await orderResource.GetById(id, userId.Value) : await orderResource.GetByIdPublic(id);
-            return order;
+            Order? order = userId != null ? await orderResource.GetById(id, userId.Value) : await orderResource.GetByIdPublic(id);
+
+            if (order == null)
+                return null;
+
+            return order.DeepCopyTo<Global.Order.Order>();
         }
 
-        //TODO: Move to OrderProcessorEngine
-        public async Task<Order> ProcessOrder(OrderProcessRequest request)
+        public async Task<Global.Order.Order> ProcessOrder(OrderProcessRequest request)
         {
             var order = await orderResource.GetById(request.Id, request.UserId)
                 ?? throw new InvalidOperationException("Order not found");
@@ -41,33 +52,13 @@ namespace Honse.Managers
             if (order.RestaurantId != request.RestaurantId)
                 throw new UnauthorizedAccessException("Order does not belong to this restaurant");
 
-            // Update status
-            var history = System.Text.Json.JsonSerializer.Deserialize<List<Global.Order.OrderStatusHistoryEntry>>(order.StatusHistory) 
-                ?? new List<Global.Order.OrderStatusHistoryEntry>();
-            
-            history.Add(new Global.Order.OrderStatusHistoryEntry
-            {
-                Status = request.NewStatus,
-                Timestamp = DateTime.UtcNow,
-                Notes = request.StatusNotes
-            });
+            order = orderProcessorEngine.ProcessOrder(order.DeepCopyTo<Global.Order.Order>(), request.NextStatus, request.PreparationTimeMinutes, request.StatusNotes).DeepCopyTo<Order>();
 
-            order.OrderStatus = request.NewStatus;
-            order.StatusHistory = System.Text.Json.JsonSerializer.Serialize(history);
+            order = (await orderResource.Update(order.Id, order.UserId, order))!;
 
-            // Update preparation time when status becomes Accepted
-            if (request.NewStatus == Global.Order.OrderStatus.Accepted && !order.PreparationTime.HasValue)
-            {
-                order.PreparationTime = DateTime.UtcNow;
-            }
+            await hubContext.Clients.All.SendAsync("PingOrderUpdated", order.Id);
 
-            // Update delivery time when status becomes Finished
-            if (request.NewStatus == Global.Order.OrderStatus.Finished && !order.DeliveryTime.HasValue)
-            {
-                order.DeliveryTime = DateTime.UtcNow;
-            }
-
-            return (await orderResource.Update(order.Id, order.UserId, order))!;
+            return order.DeepCopyTo<Global.Order.Order>();
         }
 
         /// <summary>
@@ -82,41 +73,27 @@ namespace Honse.Managers
             Order order = (userId != null ? await orderResource.GetById(id, userId.Value) : await orderResource.GetByIdPublic(id))
                 ?? throw new InvalidOperationException("Order not found");
 
-            // Check if order can be cancelled (only if not finished or already cancelled)
-            if (order.OrderStatus == Global.Order.OrderStatus.Finished ||
-                order.OrderStatus == Global.Order.OrderStatus.Cancelled)
-            {
-                throw new InvalidOperationException($"Cannot cancel order with status: {order.OrderStatus}");
-            }
-
-            // Mark as cancelled
-            var history = System.Text.Json.JsonSerializer.Deserialize<List<Global.Order.OrderStatusHistoryEntry>>(order.StatusHistory) 
-                ?? new List<Global.Order.OrderStatusHistoryEntry>();
-            
-            history.Add(new Global.Order.OrderStatusHistoryEntry
-            {
-                Status = Global.Order.OrderStatus.Cancelled,
-                Timestamp = DateTime.UtcNow,
-                Notes = "Order cancelled by customer"
-            });
-
-            order.OrderStatus = Global.Order.OrderStatus.Cancelled;
-            order.StatusHistory = System.Text.Json.JsonSerializer.Serialize(history);
+            order = orderProcessorEngine.CancelOrder(order.DeepCopyTo<Global.Order.Order>()).DeepCopyTo<Order>();
 
             await orderResource.Update(order.Id, order.UserId, order);
+
+            await hubContext.Clients.All.SendAsync("PingOrderUpdated", order.Id);
         }
 
-        public async Task<List<Order>> GetAllOrdersByRestaurant(Guid restaurantId, Guid userId)
+        public async Task<List<Global.Order.Order>> GetAllOrdersByRestaurant(Guid restaurantId, Guid userId)
         {
             var orders = await orderResource.GetByRestaurantId(restaurantId);
-            return orders.ToList();
+
+            return orders.Select(o => o.DeepCopyTo<Global.Order.Order>()).ToList();
         }
 
-        public async Task<Global.PaginatedResult<Order>> FilterOrders(OrderFilterRequest request)
+        public async Task<Global.PaginatedResult<Global.Order.Order>> FilterOrders(OrderFilterRequest request)
         {
             var specification = orderFilteringEngine.GetSpecification(request.DeepCopyTo<Engines.Filtering.Interfaces.OrderFilterRequest>());
 
-            return await orderResource.Filter(specification, request.PageSize, request.PageNumber);
+            var orders = await orderResource.Filter(specification, request.PageSize, request.PageNumber);
+
+            return orders.DeepCopyTo<PaginatedResult<Global.Order.Order>>();
         }
     }
 }

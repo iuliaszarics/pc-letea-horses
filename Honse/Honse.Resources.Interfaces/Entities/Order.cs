@@ -17,7 +17,7 @@ namespace Honse.Resources.Interfaces.Entities
         public OrderStatus OrderStatus { get; set; } = OrderStatus.New;
 
         // Stores the JSON history of status changes
-        public string StatusHistory { get; set; } = string.Empty;
+        public List<OrderStatusHistory> StatusHistory { get; set; } = [];
 
         // Flattened Client Info
         public string ClientName { get; set; } = string.Empty;
@@ -25,10 +25,10 @@ namespace Honse.Resources.Interfaces.Entities
         public string ClientEmail { get; set; } = string.Empty;
 
         // Stores the JSON Address structure
-        public string DeliveryAddress { get; set; } = string.Empty;
+        public Global.Address DeliveryAddress { get; set; }
 
         // Stores the JSON array of products
-        public string Products { get; set; } = string.Empty;
+        public List<OrderProduct> Products { get; set; } = [];
 
         // Nullable timings
         public DateTime? PreparationTime { get; set; }

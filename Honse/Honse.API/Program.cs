@@ -117,6 +117,7 @@ builder.Services.AddScoped<Honse.Engines.Validation.Interfaces.IRestaurantValida
 builder.Services.AddScoped<Honse.Engines.Validation.Interfaces.IProductCategoryValidationEngine, Honse.Engines.Validation.ProductCategoryValidationEngine>();
 builder.Services.AddScoped<Honse.Engines.Filtering.Interfaces.IRestaurantFilteringEngine, Honse.Engines.Filtering.Restaurant.RestaurantFilteringEngine>();
 builder.Services.AddScoped<Honse.Engines.Filtering.Interfaces.IOrderFilteringEngine, Honse.Engines.Filtering.Order.OrderFilteringEngine>();
+builder.Services.AddScoped<Honse.Engines.Processing.Interfaces.IOrderProcessorEngine, Honse.Engines.Processing.OrderProcessorEngine>();
 
 // Managers
 builder.Services.AddScoped<Honse.Managers.Interfaces.IUserManager, Honse.Managers.UserManager>();
@@ -132,6 +133,7 @@ builder.Services.AddHostedService<Honse.Services.Order.OrderConfirmationCleanupS
 builder.Services.AddHostedService<Honse.Services.Order.OrderPreparationMonitorService>();
 builder.Services.AddHostedService<Honse.Services.Order.OrderDeliveryMonitorService>();
 
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -148,5 +150,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHub<Honse.Services.Hub.OrderingHub>("/api/orderinghub");
 
 app.Run();

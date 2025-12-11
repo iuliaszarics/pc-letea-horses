@@ -1,7 +1,5 @@
 using Honse.Global;
-using Honse.Resources.Interfaces.Entities;
 using Honse.Global.Order;
-using Order = Honse.Resources.Interfaces.Entities.Order;
 
 namespace Honse.Managers.Interfaces
 {
@@ -38,9 +36,11 @@ namespace Honse.Managers.Interfaces
        
         public Guid RestaurantId { get; set; }
         
-        public OrderStatus NewStatus { get; set; }
+        public OrderStatus NextStatus { get; set; }
         
         public string? StatusNotes { get; set; }
+
+        public int PreparationTimeMinutes { get; set; }
         
         public Guid UserId { get; set; }
     }
