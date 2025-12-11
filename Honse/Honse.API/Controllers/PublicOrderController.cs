@@ -34,7 +34,7 @@ namespace Honse.API.Controllers
                 return BadRequest((new { errorMessage }));
             }
 
-            var orderResponse = await orderManager.GetOrderByIdPublic(id).WithTryCatch();
+            var orderResponse = await orderManager.GetOrderById(id).WithTryCatch();
 
             if (!orderResponse.IsSuccessfull)
             {
@@ -68,7 +68,7 @@ namespace Honse.API.Controllers
                 return BadRequest((new { errorMessage }));
             }
 
-            var cancelResponse = await orderManager.CancelOrderPublic(id).WithTryCatch();
+            var cancelResponse = await orderManager.CancelOrder(id).WithTryCatch();
 
             if (!cancelResponse.IsSuccessfull)
             {
@@ -76,6 +76,27 @@ namespace Honse.API.Controllers
             }
 
             return Ok(new { message = "Order cancelled successfully" });
+        }
+
+        [HttpPost]
+        [Route("place")]
+        public async Task<IActionResult> PlaceOrder([FromBody] PlaceOrderRequest request)
+        {
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("validate")]
+        public async Task<IActionResult> ValidateOrder([FromBody] PlaceOrderRequest request)
+        {
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("confirm/{id}")]
+        public async Task<IActionResult> ValidateOrder([FromRoute] Guid id)
+        {
+            return Ok();
         }
     }
 }

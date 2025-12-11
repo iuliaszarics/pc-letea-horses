@@ -7,46 +7,41 @@ namespace Honse.Managers.Interfaces
 {
     public interface IOrderManager
     {
-        Task<PlaceOrderResponse> PlaceOrder(PlaceOrderRequest request, Guid? userId);
-        Task<Order?> GetOrderById(Guid id, Guid userId);
-        Task<Order?> GetOrderByIdPublic(Guid id);
-        Task<Order> UpdateOrder(UpdateOrderRequest request);
+        //Task<PlaceOrderResponse> PlaceOrder(PlaceOrderRequest request);
+        Task<Order?> GetOrderById(Guid id, Guid? userId = null);
         Task<Order> ProcessOrder(OrderProcessRequest request);
-        Task DeleteOrder(Guid id, Guid userId);
-        Task CancelOrderPublic(Guid id);
+        Task CancelOrder(Guid id, Guid? userId = null);
         Task<List<Order>> GetAllOrdersByRestaurant(Guid restaurantId, Guid userId);
         Task<Global.PaginatedResult<Order>> FilterOrders(OrderFilterRequest request);
-    }
-
-    public class UpdateOrderRequest
-    {
-        public Guid Id { get; set; }
-        public OrderStatus? NewStatus { get; set; }
-        public string? StatusNotes { get; set; }
-        public DateTime? PreparationTime { get; set; }
-        public DateTime? DeliveryTime { get; set; }
-        
-        public Guid UserId { get; set; }
     }
 
     public class OrderFilterRequest
     {
         public Guid? RestaurantId { get; set; }
-        public OrderStatus? OrderStatus { get; set; }
-        public DateTime? FromDate { get; set; }
-        public DateTime? ToDate { get; set; }
-        public int PageSize { get; set; } = 10;
-        public int PageNumber { get; set; } = 1;
 
+        public OrderStatus? OrderStatus { get; set; }
+        
+        public DateTime? FromDate { get; set; }
+        
+        public DateTime? ToDate { get; set; }
+        
+        public int PageSize { get; set; } = 10;
+        
+        public int PageNumber { get; set; } = 1;
+        
         public Guid UserId { get; set; }
     }
 
     public class OrderProcessRequest
     {
         public Guid Id { get; set; }
+       
         public Guid RestaurantId { get; set; }
+        
         public OrderStatus NewStatus { get; set; }
+        
         public string? StatusNotes { get; set; }
+        
         public Guid UserId { get; set; }
     }
 
@@ -62,24 +57,6 @@ namespace Honse.Managers.Interfaces
 
         public Address DeliveryAddress { get; set; } = new Address();
 
-        public List<OrderProductRequest> Products { get; set; } = new List<OrderProductRequest>();
-    }
-
-    public class OrderProductRequest
-    {
-        public Guid ProductId { get; set; }
-
-        public int Quantity { get; set; }
-    }
-
-    public class PlaceOrderResponse
-    {
-        public Guid OrderId { get; set; }
-
-        public Guid ConfirmationToken { get; set; }
-
-        public string Message { get; set; } = string.Empty;
-
-        public decimal TotalAmount { get; set; }
+        public List<OrderProduct> Products { get; set; } = new List<OrderProduct>();
     }
 }

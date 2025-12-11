@@ -107,6 +107,7 @@ builder.Services.AddScoped<Honse.Resources.Interfaces.IProductResource, Honse.Re
 builder.Services.AddScoped<Honse.Resources.Interfaces.IProductCategoryResource, Honse.Resources.ProductCategoryResource>();
 builder.Services.AddScoped<Honse.Resources.Interfaces.IRestaurantResource, Honse.Resources.RestaurantResource>();
 builder.Services.AddScoped<Honse.Resources.Interfaces.IOrderResource, Honse.Resources.OrderResource>();
+builder.Services.AddScoped<Honse.Resources.Interfaces.IOrderConfirmationTokenResource, Honse.Resources.OrderConfirmationTokenResource>();
 
 // Engines
 builder.Services.AddScoped<Honse.Engines.Filtering.Interfaces.IProductFilteringEngine, Honse.Engines.Filtering.Product.ProductFilteringEngine>();
@@ -127,6 +128,9 @@ builder.Services.AddScoped<Honse.Managers.Interfaces.IOrderManager, Honse.Manage
 // Services
 
 builder.Services.AddTransient<IEmailSender, Honse.Services.Email.EmailSenderService>();
+builder.Services.AddHostedService<Honse.Services.Order.OrderConfirmationCleanupService>();
+builder.Services.AddHostedService<Honse.Services.Order.OrderPreparationMonitorService>();
+builder.Services.AddHostedService<Honse.Services.Order.OrderDeliveryMonitorService>();
 
 
 var app = builder.Build();

@@ -188,6 +188,29 @@ namespace Honse.API.Controllers
             return Ok(orderResponse.Result);
         }
 
-       
+        [Authorize]
+        [HttpPost]
+        [Route("cancel/{id}")]
+        public async Task<IActionResult> CancelOrder([FromRoute] Guid id)
+        {
+            if (!ModelState.IsValid)
+            {
+                string errorMessage = ModelState.Values
+                    .SelectMany(x => x.Errors)
+                    .First()
+                    .ErrorMessage;
+
+                return BadRequest((new { errorMessage }));
+            }
+
+            var cancelResponse = await orderManager.CancelOrder(id).WithTryCatch();
+
+            if (!cancelResponse.IsSuccessfull)
+            {
+                return BadRequest(cancelResponse.Exception.Message);
+            }
+
+            return Ok(new { message = "Order cancelled successfully" });
+        }
     }
 }

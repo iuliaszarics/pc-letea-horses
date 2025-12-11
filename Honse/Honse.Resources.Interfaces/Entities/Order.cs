@@ -1,4 +1,5 @@
 using Honse.Global.Order;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Honse.Resources.Interfaces.Entities
 {
