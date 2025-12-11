@@ -1,12 +1,11 @@
-﻿using Honse.Resources.Interfaces.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace Honse.Resources.Interfaces
 {
     public abstract class Resource<T> : IResource<T> where T : Entities.Entity
     {
-        private readonly AppDbContext dbContext;
+        protected readonly AppDbContext dbContext;
 
         protected DbSet<T> dbSet;
         protected List<Expression<Func<T, object>>> includeProperties = new List<Expression<Func<T, object>>>();

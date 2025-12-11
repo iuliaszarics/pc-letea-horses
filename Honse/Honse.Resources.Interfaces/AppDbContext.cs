@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Honse.Resources.Interfaces.Entities;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Honse.Resources.Interfaces
 {
@@ -12,6 +13,10 @@ namespace Honse.Resources.Interfaces
         public DbSet<Entities.ProductCategory> ProductCategory { get; set; }
 
         public DbSet<Entities.Restaurant> Restaurant { get; set; }
+
+        public DbSet<Entities.Order> Order { get; set; }
+
+        public DbSet<Entities.OrderConfirmationToken> OrderConfirmationToken { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> context) : base(context)
         {
@@ -26,6 +31,24 @@ namespace Honse.Resources.Interfaces
                 {
                     owned.ToJson();
                 });
+
+            modelBuilder.Entity<OrderConfirmationToken>()
+                .OwnsOne(r => r.DeliveryAddress, owned =>
+                {
+                    owned.ToJson();
+                });
+
+            modelBuilder.Entity<OrderConfirmationToken>()
+                .OwnsMany(r => r.Products, owned =>
+                {
+                    owned.ToJson();
+                });
+        }
+
+        protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+        {
+            configurationBuilder.Properties<decimal>()
+                .HavePrecision(18, 2);
         }
     }
 }

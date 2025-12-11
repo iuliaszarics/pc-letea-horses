@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>3af48d38-3237-469c-85eb-0c993be74e19</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,14 +19,16 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Honse.Engines.Filtering\Honse.Engines.Filtering.csproj" />
-    <ProjectReference Include="..\Honse.Engines.Interfaces\Honse.Engines.Common.csproj" />
-    <ProjectReference Include="..\Honse.Engines.Validation\Honse.Engines.Validation.csproj" />
-    <ProjectReference Include="..\Honse.Global\Honse.Global.csproj" />
-    <ProjectReference Include="..\Honse.Managers\Honse.Managers.csproj" />
-    <ProjectReference Include="..\Honse.Resources.Interfaces\Honse.Resources.Interfaces.csproj" />
-    <ProjectReference Include="..\Honse.Resources\Honse.Resources.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Honse.Engines.Filtering\Honse.Engines.Filtering.csproj" />
+		<ProjectReference Include="..\Honse.Engines.Interfaces\Honse.Engines.Common.csproj" />
+		<ProjectReference Include="..\Honse.Engines.Processing\Honse.Engines.Processing.csproj" />
+		<ProjectReference Include="..\Honse.Engines.Validation\Honse.Engines.Validation.csproj" />
+		<ProjectReference Include="..\Honse.Global\Honse.Global.csproj" />
+		<ProjectReference Include="..\Honse.Managers\Honse.Managers.csproj" />
+		<ProjectReference Include="..\Honse.Resources.Interfaces\Honse.Resources.Interfaces.csproj" />
+		<ProjectReference Include="..\Honse.Resources\Honse.Resources.csproj" />
+		<ProjectReference Include="..\Honse.Services\Honse.Services.csproj" />
+	</ItemGroup>
 
 </Project>

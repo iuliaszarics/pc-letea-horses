@@ -16,6 +16,8 @@ import AddRestaurantPage from '../pages/private/restaurants/AddRestaurantPage';
 import AllOrdersPage from '../pages/private/orders/AllOrdersPage';
 import OrderDetailsPage from '../pages/private/orders/OrderDetailsPage';
 
+import CheckoutPage from "../pages/public/Checkout/CheckoutPage";
+import OrderEmailConfirmationPage from "../pages/public/Checkout/OrderEmailConfirmationPage";
 export const router = createBrowserRouter([
     {
         path: "/",
@@ -40,6 +42,12 @@ export const router = createBrowserRouter([
 
             // Restaurant menu page : /public/restaurants/:id
             {path: "/public/restaurants/:restaurantId", element: <RestaurantMenuPage />},
+
+            // Checkout page: /public/restaurants/:restaurantId/checkout
+            {path: "/public/restaurants/:restaurantId/checkout", element: <CheckoutPage />},
+
+            // Email confirmation page
+            {path: "/order/confirm-email", element: <OrderEmailConfirmationPage />},
 
             // UNAUTHENTICATED PAGES - you can access them only if you aren't logged in
 
