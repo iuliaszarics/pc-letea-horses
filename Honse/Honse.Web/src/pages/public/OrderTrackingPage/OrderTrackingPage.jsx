@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getOrderDetailsAPI, cancelOrderAPI, STATUS_INFO } from "../../../services/publicOrderService";
 import { useNavigate, useParams } from "react-router";
+import * as signalR from '@microsoft/signalr'
 
 export default function OrderTrackingPage() {
   const [order, setOrder] = useState(null);
@@ -10,21 +11,55 @@ export default function OrderTrackingPage() {
   const [error, setError] = useState("");
   const { id } = useParams();
   const [minutesRemaining, setMinutesRemaining] = useState(0);
+  const [connection, setConnection] = useState(null);
+
   useEffect(() => {
-    async function loadOrder() {
-      const res = await getOrderDetailsAPI(id);
+  const newConnection = new signalR.HubConnectionBuilder()
+    .withUrl("https://localhost:2000/api/orderinghub", {
+      skipNegotiation: true,
+      transport: signalR.HttpTransportType.WebSockets,
+    })
+    .withAutomaticReconnect()
+    .build();
 
-      if (res.succeeded) {
-        setOrder(res.data);
-      } else {
-        console.error(res.errorMessage);
-        setError(res.errorMessage);
-      }
+  setConnection(newConnection);
+}, []);
 
-      setLoading(false);
-    }
+useEffect(() =>{
+        if (!connection) 
+            return;
 
-    loadOrder();
+            connection.start().then(() =>{
+                console.log("SignalR connected.");
+		
+                connection.on('PingOrderUpdated', updatedId => {
+
+                  if(updatedId === id)
+                    reloadOrder();
+                });
+              })
+            .catch(e => console.log('Connection failed: ', e))
+
+         return () => {
+    connection.stop();
+  };
+}, [connection, id]);
+
+
+async function reloadOrder() {
+  const res = await getOrderDetailsAPI(id);
+
+  if (res.succeeded) {
+    setOrder(res.data);
+  } else {
+    console.error(res.errorMessage);
+    setError(res.errorMessage);
+  }
+}
+
+  useEffect(() => {
+  setLoading(true);
+  reloadOrder().finally(() => setLoading(false));
   }, [id]);
 
   const navigate = useNavigate();

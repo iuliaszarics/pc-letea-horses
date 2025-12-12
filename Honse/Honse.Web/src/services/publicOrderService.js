@@ -86,6 +86,7 @@ export async function getOrderDetailsAPI(orderId) {
         if (!order) {
             return failure("Order not found");
         }
+        //return successData(order.data);
         return successData(order);
     } catch (err) {
         return failure(parseError(err, "Failed to fetch order details"));
