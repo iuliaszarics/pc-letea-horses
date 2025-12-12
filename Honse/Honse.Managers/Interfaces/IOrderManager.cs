@@ -5,7 +5,9 @@ namespace Honse.Managers.Interfaces
 {
     public interface IOrderManager
     {
-        //Task<PlaceOrderResponse> PlaceOrder(PlaceOrderRequest request);
+        Task<ValidationResult> ValidateOrder(PlaceOrderRequest request);
+        Task<Guid> PlaceOrder(PlaceOrderRequest request);
+        Task<Order> ConfirmOrder(Guid tokenId);
         Task<Order?> GetOrderById(Guid id, Guid? userId = null);
         Task<Order> ProcessOrder(OrderProcessRequest request);
         Task CancelOrder(Guid id, Guid? userId = null);
@@ -57,6 +59,23 @@ namespace Honse.Managers.Interfaces
 
         public Address DeliveryAddress { get; set; } = new Address();
 
-        public List<OrderProduct> Products { get; set; } = new List<OrderProduct>();
+        public List<PlaceOrderProductRequest> Products { get; set; } = new List<PlaceOrderProductRequest>();
+    }
+
+    public class PlaceOrderProductRequest
+    {
+        public Guid ProductId { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public decimal Quantity { get; set; }
+        public decimal Price { get; set; }
+        public decimal VAT { get; set; }
+        public decimal Total { get; set; }
+        public string Image { get; set; } = string.Empty;
+    }
+
+    public class ValidationResult
+    {
+        public bool IsValid { get; set; }
+        public List<string> Errors { get; set; } = new List<string>();
     }
 }

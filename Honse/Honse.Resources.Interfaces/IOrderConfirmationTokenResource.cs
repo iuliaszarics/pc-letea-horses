@@ -7,5 +7,7 @@ namespace Honse.Resources.Interfaces
 
         public Task<bool> DeleteRange(IEnumerable<Entities.OrderConfirmationToken> tokens);
 
+        public Task<Entities.OrderConfirmationToken?> GetByIdPublic(Guid id);
+
     }
 }

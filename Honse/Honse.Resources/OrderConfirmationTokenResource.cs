@@ -25,5 +25,10 @@ namespace Honse.Resources
         {
             return await dbSet.Where(token => token.ExpiresAt < DateTime.UtcNow && !token.Used).ToListAsync();
         }
+
+        public async Task<OrderConfirmationToken?> GetByIdPublic(Guid id)
+        {
+            return await dbSet.FirstOrDefaultAsync(token => token.Id == id);
+        }
     }
 }

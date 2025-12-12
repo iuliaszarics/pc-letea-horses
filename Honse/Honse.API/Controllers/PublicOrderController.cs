@@ -82,21 +82,77 @@ namespace Honse.API.Controllers
         [Route("place")]
         public async Task<IActionResult> PlaceOrder([FromBody] PlaceOrderRequest request)
         {
-            return Ok();
+            if (!ModelState.IsValid)
+            {
+                string errorMessage = ModelState.Values
+                    .SelectMany(x => x.Errors)
+                    .First()
+                    .ErrorMessage;
+
+                return BadRequest(new { errorMessage });
+            }
+
+            var placeResponse = await orderManager.PlaceOrder(request).WithTryCatch();
+
+            if (!placeResponse.IsSuccessfull)
+            {
+                return BadRequest(placeResponse.Exception.Message);
+            }
+
+            return Ok(new { tokenId = placeResponse.Result, message = "Order placed successfully. Please check your email to confirm." });
         }
 
         [HttpPost]
         [Route("validate")]
         public async Task<IActionResult> ValidateOrder([FromBody] PlaceOrderRequest request)
         {
-            return Ok();
+            if (!ModelState.IsValid)
+            {
+                string errorMessage = ModelState.Values
+                    .SelectMany(x => x.Errors)
+                    .First()
+                    .ErrorMessage;
+
+                return BadRequest(new { errorMessage });
+            }
+
+            var validationResponse = await orderManager.ValidateOrder(request).WithTryCatch();
+
+            if (!validationResponse.IsSuccessfull)
+            {
+                return BadRequest(validationResponse.Exception.Message);
+            }
+
+            if (!validationResponse.Result.IsValid)
+            {
+                return BadRequest(new { errors = validationResponse.Result.Errors });
+            }
+
+            return Ok(new { message = "Order validation successful" });
         }
 
         [HttpPost]
         [Route("confirm/{id}")]
-        public async Task<IActionResult> ValidateOrder([FromRoute] Guid id)
+        public async Task<IActionResult> ConfirmOrder([FromRoute] Guid id)
         {
-            return Ok();
+            if (!ModelState.IsValid)
+            {
+                string errorMessage = ModelState.Values
+                    .SelectMany(x => x.Errors)
+                    .First()
+                    .ErrorMessage;
+
+                return BadRequest(new { errorMessage });
+            }
+
+            var confirmResponse = await orderManager.ConfirmOrder(id).WithTryCatch();
+
+            if (!confirmResponse.IsSuccessfull)
+            {
+                return BadRequest(confirmResponse.Exception.Message);
+            }
+
+            return Ok(new { order = confirmResponse.Result, message = "Order confirmed successfully" });
         }
     }
 }
