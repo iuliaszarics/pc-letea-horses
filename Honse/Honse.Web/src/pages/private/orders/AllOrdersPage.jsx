@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router";
+import * as signalR from '@microsoft/signalr';
 import Sidebar from "../../../components/private/Sidebar";
 import Header from "../../../components/private/Header";
 import { 
-    getFilteredOrdersAPI, 
-    MOCK_RESTAURANT_ID,
+    getFilteredOrdersAPI,
+    getOrderDetailsAPI,
     OrderStatus,
     getStatusLabel,
     getStatusColor
@@ -18,16 +19,8 @@ export default function AllOrdersPage() {
     const [error, setError] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
     const [viewMode, setViewMode] = useState("kanban");
-    const [restaurantId, setRestaurantId] = useState(
-        localStorage.getItem("restaurantId") || MOCK_RESTAURANT_ID
-    );
-
-    useEffect(() => {
-        if (!restaurantId) {
-            setRestaurantId(MOCK_RESTAURANT_ID);
-            localStorage.setItem("restaurantId", MOCK_RESTAURANT_ID);
-        }
-    }, [restaurantId]);
+    const [restaurantId, setRestaurantId] = useState(localStorage.getItem("restaurantId"));
+    const [connection, setConnection] = useState(null);
 
     const fetchOrders = useCallback(async () => {
         if (!restaurantId) {
@@ -60,6 +53,92 @@ export default function AllOrdersPage() {
             setLoading(false);
         }
     }, [restaurantId, searchQuery]);
+
+    // Fetch single order and update/add to list
+    const fetchAndUpdateOrder = useCallback(async (orderId) => {
+        if (!restaurantId) return;
+
+        try {
+            console.log(`🔄 Fetching updated order: ${orderId}`);
+            const result = await getOrderDetailsAPI(restaurantId, orderId);
+
+            if (result.succeeded) {
+                const updatedOrder = result.data;
+                
+                setOrders(prevOrders => {
+                    const existingIndex = prevOrders.findIndex(o => o.id === orderId);
+                    
+                    if (existingIndex !== -1) {
+                        // Update existing order
+                        console.log(`✅ Updated order ${orderId} in list`);
+                        const newOrders = [...prevOrders];
+                        newOrders[existingIndex] = updatedOrder;
+                        return newOrders;
+                    } else {
+                        // Add new order (if it belongs to this restaurant)
+                        if (updatedOrder.restaurantId === restaurantId) {
+                            console.log(`✅ Added new order ${orderId} to list`);
+                            return [updatedOrder, ...prevOrders];
+                        }
+                        return prevOrders;
+                    }
+                });
+            }
+        } catch (err) {
+            console.error(`❌ Failed to fetch order ${orderId}:`, err);
+        }
+    }, [restaurantId]);
+
+    // Initialize SignalR connection
+    useEffect(() => {
+        const newConnection = new signalR.HubConnectionBuilder()
+            .withUrl(`https://localhost:2000/api/orderinghub`, {
+                skipNegotiation: true,
+                transport: signalR.HttpTransportType.WebSockets,
+            })
+            .withAutomaticReconnect()
+            .build();
+        
+        setConnection(newConnection);
+        
+        return () => {
+            if (newConnection) {
+                newConnection.stop();
+            }
+        };
+    }, []);
+
+    // Setup SignalR event listeners
+    useEffect(() => {
+        if (connection) {
+            connection.start()
+                .then(() => {
+                    console.log('✅ SignalR Connected');
+
+                    // When an order is updated (status changed)
+                    connection.on('PingOrderUpdated', (orderId) => {
+                        console.log(`🔔 Order updated: ${orderId}`);
+                        fetchAndUpdateOrder(orderId);
+                    });
+
+                    // When a new order is added
+                    connection.on('PingOrderAdded', (orderId) => {
+                        console.log(`🔔 New order added: ${orderId}`);
+                        fetchAndUpdateOrder(orderId);
+                    });
+                })
+                .catch(e => {
+                    console.error('❌ SignalR Connection failed:', e);
+                });
+        }
+
+        return () => {
+            if (connection) {
+                connection.off('PingOrderUpdated');
+                connection.off('PingOrderAdded');
+            }
+        };
+    }, [connection, fetchAndUpdateOrder]);
 
     // Debounce search - only fetch after user stops typing for 500ms
     useEffect(() => {
@@ -103,6 +182,14 @@ export default function AllOrdersPage() {
                         addPath={null}
                         selectedRestaurant={restaurantId}
                     />
+
+                    {/* SignalR Connection Status */}
+                    {connection && connection.state === signalR.HubConnectionState.Connected && (
+                        <div className="mb-4 px-4 py-2 bg-green-50 border border-green-200 rounded-lg flex items-center gap-2 text-green-800 text-sm">
+                            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                            <span>Live updates enabled</span>
+                        </div>
+                    )}
 
                     {error && <p className="text-red-500 mb-4">{error}</p>}
 
@@ -160,7 +247,7 @@ export default function AllOrdersPage() {
                         </div>
                     ) : orders.length === 0 ? (
                         <div className="text-center py-12 text-gray-500">
-                            No orders found
+                            {searchQuery ? "No orders found matching your search" : "No orders found"}
                         </div>
                     ) : viewMode === "kanban" ? (
                         /* Kanban View */
