@@ -194,8 +194,7 @@ namespace Honse.Managers
 
             await orderConfirmationTokenResource.Add(token);
 
-            var frontendLink = $"https://localhost:2000/{token.Id}";
-            var backendLink = $"https://localhost:2000/api/public/orders/confirm/{token.Id}";
+            var frontendLink = $"https://localhost:3000/public/confirm-order/{token.Id}";
             
             var emailBody = $@"
                 <h2>Order Confirmation</h2>
@@ -214,24 +213,22 @@ namespace Honse.Managers
         public async Task<Global.Order.Order> ConfirmOrder(Guid tokenId)
         {
             var token = await orderConfirmationTokenResource.GetByIdPublic(tokenId);
-            if (token == null)
+            
+            if (token == null || token.ExpiresAt < DateTime.UtcNow)
             {
-                throw new InvalidOperationException("Confirmation token not found");
+                throw new InvalidOperationException("Confirmation token not found or it has expired");
             }
 
             if (token.Used)
             {
-                throw new InvalidOperationException("This confirmation link has already been used");
+                var order = await orderResource.GetByIdPublic(tokenId) ?? throw new InvalidOperationException("Order not found");
+
+                return order.DeepCopyTo<Global.Order.Order>();
             }
 
-            if (token.ExpiresAt < DateTime.UtcNow)
+            var newOrder = new Order
             {
-                throw new InvalidOperationException("This confirmation link has expired");
-            }
-
-            var order = new Order
-            {
-                Id = Guid.NewGuid(),
+                Id = tokenId,
                 UserId = token.UserId,
                 RestaurantId = token.RestaurantId,
                 ClientName = token.ClientName,
@@ -253,14 +250,14 @@ namespace Honse.Managers
                 OrderNo = $"ORD-{DateTime.UtcNow:yyyyMMddHHmmss}"
             };
 
-            await orderResource.Add(order);
+            await orderResource.Add(newOrder);
 
             token.Used = true;
             await orderConfirmationTokenResource.Update(token.Id, token.UserId, token);
 
-            await hubContext.Clients.All.SendAsync("PingOrderUpdated", order.Id);
+            await hubContext.Clients.All.SendAsync("PingOrderAdded", newOrder.Id);
 
-            return order.DeepCopyTo<Global.Order.Order>();
+            return newOrder.DeepCopyTo<Global.Order.Order>();
         }
     }
 }
