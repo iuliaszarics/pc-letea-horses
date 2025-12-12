@@ -107,6 +107,7 @@ builder.Services.AddScoped<Honse.Resources.Interfaces.IProductResource, Honse.Re
 builder.Services.AddScoped<Honse.Resources.Interfaces.IProductCategoryResource, Honse.Resources.ProductCategoryResource>();
 builder.Services.AddScoped<Honse.Resources.Interfaces.IRestaurantResource, Honse.Resources.RestaurantResource>();
 builder.Services.AddScoped<Honse.Resources.Interfaces.IOrderResource, Honse.Resources.OrderResource>();
+builder.Services.AddScoped<Honse.Resources.Interfaces.IConfigurationResource, Honse.Resources.ConfigurationResource>();
 builder.Services.AddScoped<Honse.Resources.Interfaces.IOrderConfirmationTokenResource, Honse.Resources.OrderConfirmationTokenResource>();
 
 // Engines
@@ -125,6 +126,7 @@ builder.Services.AddScoped<Honse.Managers.Interfaces.IProductManager, Honse.Mana
 builder.Services.AddScoped<Honse.Managers.Interfaces.IProductCategoryManager, Honse.Managers.ProductCategoryManager>();
 builder.Services.AddScoped<Honse.Managers.Interfaces.IRestaurantManager, Honse.Managers.RestaurantManager>();
 builder.Services.AddScoped<Honse.Managers.Interfaces.IOrderManager, Honse.Managers.OrderManager>();
+builder.Services.AddScoped<Honse.Managers.Interfaces.IConfigurationsManager, Honse.Managers.ConfigurationsManager>();
 
 // Services
 

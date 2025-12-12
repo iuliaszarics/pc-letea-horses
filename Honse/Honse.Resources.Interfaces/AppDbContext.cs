@@ -16,6 +16,8 @@ namespace Honse.Resources.Interfaces
 
         public DbSet<Entities.Order> Order { get; set; }
 
+        public DbSet<Entities.Configuration> Configuration { get; set; }   
+        
         public DbSet<Entities.OrderConfirmationToken> OrderConfirmationToken { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> context) : base(context)
@@ -43,6 +45,11 @@ namespace Honse.Resources.Interfaces
                 {
                     owned.ToJson();
                 });
+
+            //no need for .OwnsMany or .ToJson
+            //List<Guid> gets mapped automatically to a JSON Array in the SQL Server
+            modelBuilder.Entity<Configuration>()
+                .Property(c => c.CategoryIds);
 
             modelBuilder.Entity<Order>()
                 .OwnsOne(r => r.DeliveryAddress, owned =>

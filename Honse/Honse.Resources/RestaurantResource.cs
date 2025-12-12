@@ -13,7 +13,9 @@ namespace Honse.Resources
 
         public async Task<Restaurant?> GetByIdPublic(Guid id)
         {
-            return await dbSet.FirstOrDefaultAsync(r => r.Id == id);
+            return await dbSet
+                .Include(r => r.Configuration) // added .include
+                .FirstOrDefaultAsync(r => r.Id == id);
         }
     }
 }

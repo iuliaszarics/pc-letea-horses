@@ -1,4 +1,6 @@
 ﻿
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace Honse.Resources.Interfaces.Entities
 {
     public class Restaurant : Entity
@@ -28,6 +30,12 @@ namespace Honse.Resources.Interfaces.Entities
         public TimeOnly ClosingTime { get; set; }
         
         // UserID is inherited from EntityClass
+
+        // configuration
+        public Guid? ConfigurationId { get; set; }
+
+        [ForeignKey("ConfigurationId")]
+        public Configuration? Configuration { get; set; }
     }
 
 }
