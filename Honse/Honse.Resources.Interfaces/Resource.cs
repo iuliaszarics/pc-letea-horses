@@ -76,6 +76,11 @@ namespace Honse.Resources.Interfaces
             return t;
         }
 
+        public async Task SaveChanges()
+        {
+            await dbContext.SaveChangesAsync();
+        }
+
         protected IQueryable<T> ApplyIncludes(IQueryable<T> query)
         {
             if (includeProperties.Any())
