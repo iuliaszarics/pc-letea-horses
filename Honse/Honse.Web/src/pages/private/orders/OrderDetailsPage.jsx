@@ -8,7 +8,8 @@ import {
     OrderStatus,
     getStatusLabel,
     getStatusColor,
-    getNextStatus
+    getNextStatus,
+    cancelOrderAPI
 } from "../../../services/orderService";
 import "./OrderDetailsPage.css";
 
@@ -127,7 +128,7 @@ export default function OrderDetailsPage() {
 
     const handleCancel = async () => {
         if (!window.confirm("Are you sure you want to cancel this order?")) return;
-        await handleStatusChange(OrderStatus.Cancelled);
+        await cancelOrderAPI(order.id);
     };
 
     if (loading) {

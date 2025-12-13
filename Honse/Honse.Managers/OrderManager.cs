@@ -54,32 +54,132 @@ namespace Honse.Managers
 
         public async Task<Global.Order.Order> ProcessOrder(OrderProcessRequest request)
         {
-            var order = await orderResource.GetById(request.Id, request.UserId)
+            // 1. Fetch the LIVE, TRACKED entity
+            var trackedEntity = await orderResource.GetById(request.Id, request.UserId)
                 ?? throw new InvalidOperationException("Order not found");
 
-            // Verify the order belongs to the restaurant
-            if (order.RestaurantId != request.RestaurantId)
+            if (trackedEntity.RestaurantId != request.RestaurantId)
                 throw new UnauthorizedAccessException("Order does not belong to this restaurant");
 
-            order = orderProcessorEngine.ProcessOrder(order.DeepCopyTo<Global.Order.Order>(), request.NextStatus, request.PreparationTimeMinutes, request.StatusNotes).DeepCopyTo<Order>();
+            // 2. Create a copy for the Engine
+            var domainOrder = trackedEntity.DeepCopyTo<Global.Order.Order>();
 
-            order = (await orderResource.Update(order.Id, order.UserId, order))!;
+            // 3. Process
+            // The engine updates 'domainOrder' logic
+            orderProcessorEngine.ProcessOrder(
+                domainOrder, 
+                request.NextStatus, 
+                request.PreparationTimeMinutes, 
+                request.StatusNotes
+            );
 
-            await hubContext.Clients.All.SendAsync("PingOrderUpdated", order.Id);
+            // 4. SYNC BACK: Map properties manually
+            
+            // FIX 1: Use 'OrderStatus' (not Status)
+            // Your error confirmed 'Status' doesn't exist, so it must match the Entity name.
+            trackedEntity.OrderStatus = domainOrder.OrderStatus;
 
-            return order.DeepCopyTo<Global.Order.Order>();
+            // FIX 2: Handle Preparation Time
+            // Your error confirmed 'PreparationTimeMinutes' doesn't exist on the Order object.
+            // We use the value from the REQUEST instead to calculate the new time.
+            if (request.PreparationTimeMinutes > 0)
+            {
+                trackedEntity.PreparationTime = DateTime.UtcNow.AddMinutes(request.PreparationTimeMinutes);
+            }
+
+            // FIX 3 & 4: Fix Namespace and Property Names for History
+            var newHistoryItem = domainOrder.StatusHistory.Last();
+
+            // We simply use 'new OrderStatusHistory' without the 'Entities.' prefix.
+            // Since your Order entity uses this class, the compiler already knows what it is.
+            trackedEntity.StatusHistory.Add(new Global.Order.OrderStatusHistory 
+            {
+                Status = newHistoryItem.Status,
+                Timestamp = newHistoryItem.Timestamp, // FIX: Use 'Timestamp' instead of 'Date'
+                Notes = newHistoryItem.Notes
+            });
+
+            // 5. Save Changes
+            await orderResource.SaveChanges();
+
+            await hubContext.Clients.All.SendAsync("PingOrderUpdated", trackedEntity.Id);
+
+            return domainOrder;
         }
 
         public async Task CancelOrder(Guid id, Guid? userId)
         {
-            Order order = (userId != null ? await orderResource.GetById(id, userId.Value) : await orderResource.GetByIdPublic(id))
+            Console.WriteLine($"[DEBUG] CancelOrder started for OrderId: {id}");
+
+            // 1. Fetch Tracked Entity
+            var trackedEntity = (userId != null 
+                ? await orderResource.GetById(id, userId.Value) 
+                : await orderResource.GetByIdPublic(id))
                 ?? throw new InvalidOperationException("Order not found");
 
-            order = orderProcessorEngine.CancelOrder(order.DeepCopyTo<Global.Order.Order>()).DeepCopyTo<Order>();
+            Console.WriteLine($"[DEBUG] ✅ Order found. Current Status: {trackedEntity.OrderStatus}");
 
-            await orderResource.Update(order.Id, order.UserId, order);
+            // 2. Manual Mapping (Safe Copy)
+            // We strictly map only the properties that exist in both classes to avoid errors.
+            var domainOrder = new Global.Order.Order 
+            {
+                Id = trackedEntity.Id,
+                RestaurantId = trackedEntity.RestaurantId,
+                OrderNo = trackedEntity.OrderNo,
+                Timestamp = trackedEntity.Timestamp,
+                Total = trackedEntity.Total,
+                OrderStatus = trackedEntity.OrderStatus,
+                ClientName = trackedEntity.ClientName,
+                ClientEmail = trackedEntity.ClientEmail,
+                
+                // Map DateTime directly (Fixes CS0117 for PreparationTimeMinutes)
+                PreparationTime = trackedEntity.PreparationTime,
+                DeliveryTime = trackedEntity.DeliveryTime,
+                
+                // Pass the reference for Address (safe, as Address usually doesn't loop back to Order)
+                DeliveryAddress = trackedEntity.DeliveryAddress, 
 
-            await hubContext.Clients.All.SendAsync("PingOrderUpdated", order.Id);
+                // We skip 'Products' here to be 100% safe from StackOverflows during cancellation, 
+                // as the Engine usually only needs Status + History to cancel.
+                
+                // Map History
+                StatusHistory = trackedEntity.StatusHistory.Select(h => new Global.Order.OrderStatusHistory 
+                {
+                    Status = h.Status,
+                    Timestamp = h.Timestamp,
+                    Notes = h.Notes
+                }).ToList()
+            };
+
+            // 3. Process
+            Console.WriteLine("[DEBUG] Running CancelOrder engine logic...");
+            orderProcessorEngine.CancelOrder(domainOrder);
+
+            Console.WriteLine($"[DEBUG] Engine finished. New Status: {domainOrder.OrderStatus}");
+
+            // 4. SYNC BACK: Update the Entity
+            Console.WriteLine("[DEBUG] Syncing changes back to tracked entity...");
+            
+            trackedEntity.OrderStatus = domainOrder.OrderStatus;
+
+            var newHistoryItem = domainOrder.StatusHistory.LastOrDefault();
+            if (newHistoryItem != null)
+            {
+                // Add directly using the global class since we know it matches
+                trackedEntity.StatusHistory.Add(new Global.Order.OrderStatusHistory 
+                {
+                    Status = newHistoryItem.Status,
+                    Timestamp = newHistoryItem.Timestamp,
+                    Notes = newHistoryItem.Notes
+                });
+            }
+
+            // 5. Save
+            Console.WriteLine("[DEBUG] Saving changes...");
+            await orderResource.SaveChanges(); 
+
+            Console.WriteLine("[DEBUG] ✅ Success!");
+            await hubContext.Clients.All.SendAsync("PingOrderUpdated", trackedEntity.Id);
         }
 
         public async Task<List<Global.Order.Order>> GetAllOrdersByRestaurant(Guid restaurantId, Guid userId)

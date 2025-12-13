@@ -13,5 +13,7 @@
         public Task<T?> Update(Guid id, Guid userId, T t);
 
         public Task<bool> Delete(Guid id, Guid userId);
+
+        public Task SaveChanges();
     }
 }
