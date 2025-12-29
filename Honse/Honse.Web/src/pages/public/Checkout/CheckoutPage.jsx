@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { useCart } from "../../../contexts/CartContext";
+import { placeOrderAPI } from "../../../services/publicOrderService";
 import "./CheckoutPage.css";
 
 export default function CheckoutPage() {
@@ -77,14 +78,34 @@ export default function CheckoutPage() {
             return;
         }
 
-        // TODO: later:
-        // 1) Call backend to validate restaurant & products
-        // 2) If invalid -> show error & do not proceed
-        // 3) If valid -> send order + trigger email
-
         try {
-            // backend call placeholder
-            // await placeOrderAPI({ restaurantId, items: restaurantCart, customer });
+            const payload = {
+                restaurantId,
+                customerEmail: customer.email,
+                customerName: customer.fullName,
+                customerPhone: customer.phone,
+                deliveryAddress: {
+                    street: customer.address,
+                    city: customer.city,
+                    country: customer.country,
+                    postalCode: "",
+                },
+                products: restaurantCart.map((item) => ({
+                    productId: item.id,
+                    name: item.name,
+                    quantity: item.quantity,
+                    price: item.price,
+                    vat: item.vat ?? 0,
+                    total: item.price * item.quantity,
+                    image: item.image || item.imgUrl || "",
+                })),
+            };
+
+            const res = await placeOrderAPI(payload);
+            if (!res.succeeded) {
+                setError(res.errorMessage || "Failed to place order");
+                return;
+            }
 
             clear();
             navigate("/order/confirm-email");

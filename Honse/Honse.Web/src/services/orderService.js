@@ -258,15 +258,15 @@ export async function enrichOrderProducts(products, restaurantId) {
         const productMap = await getAllProductsForRestaurant(restaurantId);
         
         if (productMap.size === 0) {
-            console.warn("⚠️ No products found for restaurant");
+            console.warn("⚠️ No products found for restaurant, using order data as fallback");
             return products.map((p, index) => ({
                 id: p.Id || p.id || String(index + 1),
-                name: "Product not loaded",
-                description: "",
+                name: p.Name || p.name || "Product not loaded",
+                description: p.Description || p.description || "",
                 quantity: Number(p.Qty || p.qty || p.Quantity || p.quantity || 1),
-                price: 0,
-                image: "",
-                vat: 0
+                price: Number(p.Price || p.price || 0),
+                image: p.Image || p.image || "",
+                vat: Number(p.VAT || p.vat || 0)
             }));
         }
 
@@ -295,14 +295,16 @@ export async function enrichOrderProducts(products, restaurantId) {
             } else {
                 console.warn(`⚠️ Product ${productId} not found in restaurant products`);
                 console.warn(`Available IDs:`, Array.from(productMap.keys())); // ✅ Show what's available
+                
+                // ✅ Use fallback data from order product itself
                 return {
                     id: productId,
-                    name: "Product not found",
-                    description: "",
+                    name: orderProduct.Name || orderProduct.name || "Product not found",
+                    description: orderProduct.Description || orderProduct.description || "",
                     quantity: quantity,
-                    price: 0,
-                    image: "",
-                    vat: 0
+                    price: Number(orderProduct.Price || orderProduct.price || 0),
+                    image: orderProduct.Image || orderProduct.image || "",
+                    vat: Number(orderProduct.VAT || orderProduct.vat || 0)
                 };
             }
         });
@@ -313,15 +315,15 @@ export async function enrichOrderProducts(products, restaurantId) {
     } catch (err) {
         console.error("❌ Failed to enrich products:", err);
         
-        // Fallback
+        // Fallback: use order product data directly
         return products.map((p, index) => ({
             id: p.Id || p.id || String(index + 1),
-            name: "Product details unavailable",
-            description: "",
-            quantity: Number(p.Qty || p.qty || 1),
-            price: 0,
-            image: "",
-            vat: 0
+            name: p.Name || p.name || "Product details unavailable",
+            description: p.Description || p.description || "",
+            quantity: Number(p.Qty || p.qty || p.Quantity || p.quantity || 1),
+            price: Number(p.Price || p.price || 0),
+            image: p.Image || p.image || "",
+            vat: Number(p.VAT || p.vat || 0)
         }));
     }
 }
@@ -440,6 +442,7 @@ async function transformOrder(backendOrder) {
         tax: tax,
         deliveryFee: deliveryFee,
         total: Number(total),
+        timestamp: backendOrder.timestamp || backendOrder.Timestamp || backendOrder.createdAt || backendOrder.orderDate,
         orderDate: orderDate.toLocaleDateString(),
         orderTime: orderDate.toLocaleTimeString(),
         timeAgo: timeAgo

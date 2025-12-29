@@ -13,6 +13,8 @@ import AllProductsPage from '../pages/private/products/AllProductsPage';
 import AddProductPage from '../pages/private/products/AddProductPage';
 import AllRestaurantsPage from '../pages/private/restaurants/AllRestaurantsPage';
 import AddRestaurantPage from '../pages/private/restaurants/AddRestaurantPage';
+import AllConfigurationsPage from '../pages/private/configurations/AllConfigurationsPage';
+import AddConfigurationPage from '../pages/private/configurations/AddConfigurationPage';
 import OrderTrackingPage from '../pages/public/OrderTrackingPage/OrderTrackingPage';
 import AllOrdersPage from '../pages/private/orders/AllOrdersPage';
 import OrderDetailsPage from '../pages/private/orders/OrderDetailsPage';
@@ -134,6 +136,34 @@ export const router = createBrowserRouter([
                 element: (
                     <AuthenticatedRoute redirectPage="/public/login">
                         <AddRestaurantPage />
+                    </AuthenticatedRoute>
+                ),
+            },
+
+            // Configurations management routes
+            {
+                path: "/configurations",
+                element: (
+                    <AuthenticatedRoute redirectPage="/public/login">
+                        <AllConfigurationsPage />
+                    </AuthenticatedRoute>
+                ),
+            },
+
+            {
+                path: "/configurations/add",
+                element: (
+                    <AuthenticatedRoute redirectPage="/public/login">
+                        <AddConfigurationPage />
+                    </AuthenticatedRoute>
+                ),
+            },
+
+            {
+                path: "/configurations/edit/:id",
+                element: (
+                    <AuthenticatedRoute redirectPage="/public/login">
+                        <AddConfigurationPage />
                     </AuthenticatedRoute>
                 ),
             },

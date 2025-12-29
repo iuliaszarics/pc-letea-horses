@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
-import { addRestaurantAPI, updateRestaurantAPI, getRestaurantByIdAPI, getAllCategoriesAPI, getCategoriesByRestaurantAPI } from "../../../services/restaurantService";
+import { addRestaurantAPI, updateRestaurantAPI, getRestaurantByIdAPI } from "../../../services/restaurantService";
+import { getAllConfigurationsAPI } from "../../../services/configurationService";
 import { jwtDecode } from "jwt-decode";
 
 export default function AddRestaurantPage() {
@@ -21,66 +22,48 @@ export default function AddRestaurantPage() {
     isEnabled: true,
     openingTime: "09:00",
     closingTime: "21:00",
+    configurationId: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [categories, setCategories] = useState([]);
-  const [selectedCategoryIds, setSelectedCategoryIds] = useState([]);
+  const [configurations, setConfigurations] = useState([]);
 
   useEffect(() => {
     async function load() {
       setLoading(true);
 
       try {
-        const catRes = await getAllCategoriesAPI();
-        if (catRes.succeeded) {
-          const raw = catRes.data;
+        const configRes = await getAllConfigurationsAPI();
+        if (configRes.succeeded) {
+          const raw = configRes.data;
           const list = raw?.result || raw?.data || raw || [];
           if (Array.isArray(list)) {
             const normalized = list.map((c) => ({ ...c, id: String(c.id) }));
-            setCategories(normalized);
-          }
-        }
-      } catch (err) {
-
-      }
-
-      if (!id) { setLoading(false); return; }
-
-      let assignedIds = [];
-      try {
-        const byRes = await getCategoriesByRestaurantAPI(id);
-        if (byRes.succeeded) {
-          const rawBy = byRes.data;
-          const listBy = rawBy?.result || rawBy?.data || rawBy || [];
-          if (Array.isArray(listBy) && listBy.length > 0) {
-            assignedIds = listBy.map((c) => String(c.id));
-            setSelectedCategoryIds(assignedIds);
+            setConfigurations(normalized);
           }
         }
       } catch (err) {
         // ignore
       }
 
+      if (!id) {
+        setLoading(false);
+        return;
+      }
+
       const result = await getRestaurantByIdAPI(id);
       if (result.succeeded) {
-
         if (result.data) {
-          result.data = {...result.data, "city": result.data.address.city, "postalCode": result.data.address.postalCode, "street": result.data.address.street}
+          result.data = {
+            ...result.data,
+            city: result.data.address.city,
+            postalCode: result.data.address.postalCode,
+            street: result.data.address.street,
+          };
         }
 
         const data = result.data || {};
-
         setRestaurant(data);
-
-        // If we didn't get assigned categories from the productCategory endpoint, try older shapes
-        if (assignedIds.length === 0) {
-          let ids = [];
-          if (Array.isArray(data.categories)) ids = data.categories.map((c) => String(c.id || c));
-          else if (Array.isArray(data.categoryIds)) ids = data.categoryIds.map(String);
-          else if (Array.isArray(data.productCategories)) ids = data.productCategories.map((c) => String(c.id || c));
-          setSelectedCategoryIds(ids.map(String));
-        }
       } else {
         setError(result.errorMessage || "Failed to load restaurant");
       }
@@ -96,10 +79,6 @@ export default function AddRestaurantPage() {
     setRestaurant((prev) => ({ ...prev, [name]: type === "checkbox" ? checked : value }));
   }
 
-  function toggleCategory(catId) {
-    setSelectedCategoryIds((prev) => (prev.includes(catId) ? prev.filter((x) => x !== catId) : [...prev, catId]));
-  }
-
   async function handleSubmit(e) {
     e.preventDefault();
     setLoading(true);
@@ -111,9 +90,9 @@ export default function AddRestaurantPage() {
         name: restaurant.name,
         description: restaurant.description,
         address: {
-          "city": restaurant.city,
-          "postalCode": restaurant.postalCode,
-          "street": restaurant.street,
+          city: restaurant.city,
+          postalCode: restaurant.postalCode,
+          street: restaurant.street,
         },
         phone: restaurant.phone,
         email: restaurant.email,
@@ -122,12 +101,12 @@ export default function AddRestaurantPage() {
         isEnabled: restaurant.isEnabled,
         openingTime: restaurant.openingTime,
         closingTime: restaurant.closingTime,
+        configurationId: restaurant.configurationId || null,
         userId,
       };
 
-      payload.categoryIds = selectedCategoryIds && selectedCategoryIds.length > 0 ? selectedCategoryIds : [];
       console.log(payload);
-      
+
       if (!id) {
         await addRestaurantAPI(payload);
       } else {
@@ -218,21 +197,23 @@ export default function AddRestaurantPage() {
         </div>
 
         <div>
-          <label className="block mb-1 font-medium text-gray-700">Categories</label>
-          <div className="grid grid-cols-2 gap-2">
-            {categories.length === 0 && <div className="text-sm text-gray-500">No categories available</div>}
-            {categories.map((c) => (
-              <label key={c.id} className="inline-flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={selectedCategoryIds.includes(c.id)}
-                  onChange={() => toggleCategory(c.id)}
-                  className="form-checkbox h-4 w-4"
-                />
-                <span className="text-sm">{c.name}</span>
-              </label>
+          <label className="block mb-1 font-medium text-gray-700">Configuration</label>
+          <select
+            name="configurationId"
+            value={restaurant.configurationId || ""}
+            onChange={handleChange}
+            className="form-select w-full rounded-lg border border-gray-300 px-4 py-2"
+          >
+            <option value="">Select a configuration</option>
+            {configurations.map((config) => (
+              <option key={config.id} value={config.id}>
+                {config.name}
+              </option>
             ))}
-          </div>
+          </select>
+          {configurations.length === 0 && (
+            <p className="text-sm text-gray-500 mt-2">No configurations available. Create one first.</p>
+          )}
         </div>
 
         {id && (

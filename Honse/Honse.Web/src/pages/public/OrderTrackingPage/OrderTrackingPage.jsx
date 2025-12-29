@@ -150,9 +150,12 @@ async function reloadOrder() {
               {products.map((item, i) => (
                 <li key={i} className="p-4 flex gap-4">
                   <img
-                    src={item.imgUrl || "/placeholder-food.jpg"}
+                    src={item.imgUrl || item.image || item.Image || "/placeholder-food.jpg"}
                     alt={item.name}
                     className="w-16 h-16 rounded-md object-cover"
+                    onError={(e) => {
+                      e.target.src = "/placeholder-food.jpg";
+                    }}
                   />
                   <div className="flex-1">
                     <p className="font-semibold">{item.name}</p>
@@ -229,7 +232,7 @@ async function reloadOrder() {
 
   <ul className="space-y-4">
     {statusHistory
-      .sort((a, b) => new Date(b.timeStamp) - new Date(a.timeStamp))
+      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
       .map((entry, index) => {
         const info = STATUS_INFO[entry.status];
         return (
@@ -244,7 +247,7 @@ async function reloadOrder() {
                 {info.label}
               </p>
               <p className="text-sm text-secondary-text-light">
-                {new Date(entry.timeStamp).toLocaleTimeString([], {
+                {new Date(entry.timestamp).toLocaleTimeString([], {
                   hour: "2-digit",
                   minute: "2-digit",
                 })}
@@ -282,7 +285,11 @@ async function reloadOrder() {
                 <span className="material-symbols-outlined text-gray-500 mt-0.5">home</span>
                 <div>
                   <p className="text-sm text-[#9a6c4c]">Delivery Address</p>
-                  <p className="font-medium text-[#1b130d]">{clientAddress}</p>
+                  <p className="font-medium text-[#1b130d]">
+                    {typeof clientAddress === "object" && clientAddress
+                      ? `${clientAddress.street}, ${clientAddress.city}, ${clientAddress.country} ${clientAddress.postalCode}`
+                      : clientAddress || "No address provided"}
+                  </p>
                 </div>
               </div>
             </div>

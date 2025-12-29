@@ -81,13 +81,8 @@ export const STATUS_INFO = {
 
 export async function getOrderDetailsAPI(orderId) {
     try {
-        const order = MOCK_ORDERS.find(o => o.id === orderId);
-       // const order = await api.get(`/api/public/orders/${orderId}`);
-        if (!order) {
-            return failure("Order not found");
-        }
-        //return successData(order.data);
-        return successData(order);
+        const res = await api.get(`/api/public/orders/${orderId}`);
+        return successData(res.data);
     } catch (err) {
         return failure(parseError(err, "Failed to fetch order details"));
     }
@@ -95,9 +90,8 @@ export async function getOrderDetailsAPI(orderId) {
 
 export async function cancelOrderAPI(orderId) {
     try { 
-        //const res = await api.post(`/api/public/orders/cancel/${orderId}`);
-        //return successData(res.data);
-        return successData();
+        const res = await api.post(`/api/public/orders/cancel/${orderId}`);
+        return successData(res.data);
     } catch (err) {
         return failure(parseError(err, "Failed to cancel order"));
     }
@@ -105,62 +99,32 @@ export async function cancelOrderAPI(orderId) {
 
 export async function confirmOrderAPI(id) {
     try {
-        await new Promise(resolve => setTimeout(resolve, 10000));
-       // const res = await api.post(`/api/public/confirm/${id}`);
-         const order = MOCK_ORDERS.find(o => o.id === id);
-          if (!order) {
-            return failure("On no! Order confirmation link expired");
-        }
-        return successData();
+        const res = await api.post(`/api/public/orders/confirm/${id}`);
+        return successData(res.data);
     } catch (err) {
         return failure(parseError(err, "Failed to confirm order"));
     }
 }
 
-const MOCK_ORDERS = [
-    {
-        id: "order-1",
-        orderNo: "#ORD-2023-12345",
-        restaurantId: "123",
-        orderStatus: OrderStatus.Delivery,
-        clientName: "John Doe",
-        clientEmail: "john_doe2gmail.com",
-        deliveryAddress: "456 Oak Street, New York, NY 10002",
-        products: [
-            { id: "1", name: "Margherita Pizza", quantity: 1, price: 12.99, vat:9, total:12.99, imgUrl: 'https://i.pinimg.com/736x/68/ef/90/68ef9032fae3d204d6f5bb72221d9b6e.jpg' },
-            { id: "1", name: "Cola", quantity: 1, price: 5.99, vat:9, total:5.99, imgUrl: 'https://i.pinimg.com/736x/68/ef/90/68ef9032fae3d204d6f5bb72221d9b6e.jpg' },
-        ],
-        deliveryTime: "2025-12-11T16:45:00",
-        timeStamp: "2025-12-11T16:45:00",
-        preparationTime: "2025-12-11T16:45:00",
-        total: 70,
-        statusHistory: [
-            {status: OrderStatus.New , timeStamp: "2025-12-10T16:01:00" , notes: ""},
-            {status: OrderStatus.Accepted , timeStamp: "2025-12-10T16:12:00" , notes: ""},
-            {status: OrderStatus.Delivery , timeStamp: "2025-12-10T16:37:00" , notes: ""},
-        ],
-    },
-    {
-        id: "order-2",
-        orderNo: "#ORD-2023-12346",
-        restaurantId: "321",
-        orderStatus: OrderStatus.Accepted,
-        clientName: "Jane Smith",
-        clientEmail: "janeSmith@gmail.com",
-         deliveryAddress: "123 Main St, New York, NY 10001",
-        products: [
-            { id: "1", name: "Burger", quantity: 2, price: 15.00, total: 30, imgUrl: 'https://i.pinimg.com/736x/68/ef/90/68ef9032fae3d204d6f5bb72221d9b6e.jpg' },
-             { id: "1", name: "Pasta", quantity: 1, price: 42.75, total: 42.75, imgUrl: 'https://i.pinimg.com/736x/68/ef/90/68ef9032fae3d204d6f5bb72221d9b6e.jpg',  }
-        ],
-        total: 15.00,
-        deliveryTime: "2025-12-10T16:45:00",
-        preparationTime: "2025-12-10T16:45:00",
-        timeStamp: "2025-12-09T16:45:00",
-        statusHistory: [
-            {status: OrderStatus.New , timeStamp: "2025-12-10T16:22:00" , notes: ""},
-            {status: OrderStatus.Accepted , timeStamp: "2025-12-10T16:31:00" , notes: ""},
-        ],
-    },
-];
+// Place an order (creates confirmation token and sends email)
+export async function placeOrderAPI(payload) {
+    try {
+        const res = await api.post(`/api/public/orders/place`, payload);
+        // backend returns { tokenId, message }
+        return successData(res.data, { tokenId: res.data?.tokenId });
+    } catch (err) {
+        return failure(parseError(err, "Failed to place order"));
+    }
+}
+
+// Validate order before placing (optional step)
+export async function validateOrderAPI(payload) {
+    try {
+        const res = await api.post(`/api/public/orders/validate`, payload);
+        return successData(res.data);
+    } catch (err) {
+        return failure(parseError(err, "Failed to validate order"));
+    }
+}
 
 

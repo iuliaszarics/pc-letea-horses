@@ -294,7 +294,8 @@ namespace Honse.Managers
 
             await orderConfirmationTokenResource.Add(token);
 
-            var frontendLink = $"https://localhost:3000/public/confirm-order/{token.Id}";
+            // Use HTTP for local dev; HTTPS here causes ERR_SSL_PROTOCOL_ERROR unless a cert is configured
+            var frontendLink = $"http://localhost:3000/public/confirm-order/{token.Id}";
             
             var emailBody = $@"
                 <h2>Order Confirmation</h2>

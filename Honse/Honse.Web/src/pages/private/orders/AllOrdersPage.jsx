@@ -12,6 +12,47 @@ import {
 } from "../../../services/orderService";
 import "./AllOrdersPage.css";
 
+// Helper component to show live updating time ago
+function TimeAgo({ timestamp }) {
+    const [timeAgo, setTimeAgo] = useState("");
+
+    useEffect(() => {
+        function calculateTimeAgo() {
+            if (!timestamp) return "Unknown";
+            
+            const orderDate = new Date(timestamp);
+            
+            // Check if date is valid
+            if (isNaN(orderDate.getTime())) {
+                return "Unknown";
+            }
+            
+            const now = new Date();
+            const diffMs = now - orderDate;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMins / 60);
+            const diffDays = Math.floor(diffHours / 24);
+            
+            if (diffMins < 1) return "just now";
+            if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+            if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+            return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+        }
+
+        // Initial calculation
+        setTimeAgo(calculateTimeAgo());
+
+        // Update every minute
+        const interval = setInterval(() => {
+            setTimeAgo(calculateTimeAgo());
+        }, 60000);
+
+        return () => clearInterval(interval);
+    }, [timestamp]);
+
+    return <span>{timeAgo}</span>;
+}
+
 export default function AllOrdersPage() {
     const navigate = useNavigate();
     const [orders, setOrders] = useState([]);
@@ -271,7 +312,9 @@ export default function AllOrdersPage() {
                                                 >
                                                     <div className="order-card-header">
                                                         <span className="order-number">{order.orderNumber}</span>
-                                                        <span className="order-time">{order.timeAgo}</span>
+                                                        <span className="order-time">
+                                                            <TimeAgo timestamp={order.timestamp} />
+                                                        </span>
                                                     </div>
                                                     <div className="order-card-body">
                                                         <p className="customer-name">{order.customerName}</p>
@@ -316,7 +359,9 @@ export default function AllOrdersPage() {
                                                         {getStatusLabel(order.status)}
                                                     </span>
                                                 </td>
-                                                <td className="px-6 py-4 text-gray-500">{order.timeAgo}</td>
+                                                <td className="px-6 py-4 text-gray-500">
+                                                    <TimeAgo timestamp={order.timestamp} />
+                                                </td>
                                             </tr>
                                         ))}
                                     </tbody>
