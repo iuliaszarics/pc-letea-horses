@@ -1,12 +1,16 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useSearchParams } from "react-router";
 import RestaurantCard from "./RestaurantCard";
 import "./RestaurantsListPage.css";
 import { getPublicRestaurantsAPI } from "../../../services/restaurantService";
 
 export default function RestaurantsListPage() {
+    const [searchParams] = useSearchParams();
+    const initialSearch = searchParams.get('search') || "";
+    
     const [restaurants, setRestaurants] = useState([]);
     const [filteredRestaurants, setFilteredRestaurants] = useState([]);
-    const [searchQuery, setSearchQuery] = useState("");
+    const [searchQuery, setSearchQuery] = useState(initialSearch);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [pageNumber, setPageNumber] = useState(1);
@@ -14,16 +18,7 @@ export default function RestaurantsListPage() {
     const [totalCount, setTotalCount] = useState(0);
     const searchInputRef = useRef(null);
 
-    // Debounce search - only fetch after user stops typing for 500ms
-    useEffect(() => {
-        const timeoutId = setTimeout(() => {
-            fetchRestaurants();
-        }, 500);
-
-        return () => clearTimeout(timeoutId);
-    }, [searchQuery, pageNumber]);
-
-    const fetchRestaurants = async () => {
+    const fetchRestaurants = useCallback(async () => {
         try {
             setLoading(true);
             
@@ -58,7 +53,16 @@ export default function RestaurantsListPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [pageNumber, pageSize, searchQuery]);
+
+    // Debounce search - only fetch after user stops typing for 500ms
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            fetchRestaurants();
+        }, 500);
+
+        return () => clearTimeout(timeoutId);
+    }, [fetchRestaurants, searchQuery, pageNumber]);
 
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);

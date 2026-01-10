@@ -1,11 +1,11 @@
 import {createBrowserRouter} from 'react-router';
 import App from '../App';
+import LandingPage from '../pages/public/LandingPage/LandingPage';
 import RestaurantsListPage from '../pages/public/RestaurantsListPage/RestaurantsListPage';
 import RestaurantMenuPage from '../pages/public/RestaurantMenuPage/RestaurantMenuPage';
 
 import AuthenticatedRoute from '../routes/AuthenticatedRoute';
 import UnauthenticatedRoute from '../routes/UnauthenticatedRoute';
-import RedirectRoute from '../routes/RedirectRoute';
 
 import LoginPage from '../pages/public/Auth/LoginPage';
 import RegisterPage from '../pages/public/Auth/RegisterPage';
@@ -36,9 +36,10 @@ export const router = createBrowserRouter([
 
             // PUBLIC PAGES - anyone can access them
 
-            // Landing page: /public
-
-            { path: "/", element: <RestaurantsListPage /> },
+            // Landing page: /
+            { path: "/", element: <LandingPage /> },
+            
+            // Public pages
             {path: "/public", element: <RestaurantsListPage />},
 
             // Restaurants list page : /public/restaurants
@@ -55,16 +56,30 @@ export const router = createBrowserRouter([
 
             // UNAUTHENTICATED PAGES - you can access them only if you aren't logged in
 
+            { path: "/login",
+                element: (
+                    <UnauthenticatedRoute redirectPage='/public/restaurants'>
+                        <LoginPage />
+                    </UnauthenticatedRoute>
+                )
+            },
             { path: "/public/login",
                 element: (
-                    <UnauthenticatedRoute redirectPage='/public'>
+                    <UnauthenticatedRoute redirectPage='/public/restaurants'>
                         <LoginPage />
+                    </UnauthenticatedRoute>
+                )
+            },
+            { path: "/register",
+                element: (
+                    <UnauthenticatedRoute redirectPage='/public/restaurants'>
+                        <RegisterPage />
                     </UnauthenticatedRoute>
                 )
             },
             { path: "/public/register",
                 element: (
-                    <UnauthenticatedRoute redirectPage='/public'>
+                    <UnauthenticatedRoute redirectPage='/public/restaurants'>
                         <RegisterPage />
                     </UnauthenticatedRoute>
                 )
