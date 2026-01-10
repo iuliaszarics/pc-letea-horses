@@ -114,5 +114,46 @@ namespace Honse.Managers
 
             return tokenHandler.WriteToken(token);
         }
+        
+        public async Task<User> UpdateProfile(string userId, UpdateProfileRequest request)
+        {
+            userValidationEngine.ValidateProfileUpdate(new Engines.Common.UserProfileUpdate
+            {
+                UserName = request.UserName,
+                Email = request.Email
+            });
+
+            User? user = await userManager.FindByIdAsync(userId);
+            if (user == null)
+                throw new Exception("User not found!");
+
+            var usernameResult = await userManager.SetUserNameAsync(user, request.UserName.Trim());
+            if (!usernameResult.Succeeded)
+                throw new Exception(string.Join("\n", usernameResult.Errors.Select(e => e.Description)));
+
+            var emailResult = await userManager.SetEmailAsync(user, request.Email.Trim());
+            if (!emailResult.Succeeded)
+                throw new Exception(string.Join("\n", emailResult.Errors.Select(e => e.Description)));
+
+            return user;
+        }
+        public async Task ChangePassword(string userId, ChangePasswordRequest request)
+        {
+            userValidationEngine.ValidateChangePassword(new Engines.Common.UserChangePassword
+            {
+                CurrentPassword = request.CurrentPassword,
+                NewPassword = request.NewPassword,
+                ConfirmNewPassword = request.ConfirmNewPassword
+            });
+
+            User? user = await userManager.FindByIdAsync(userId);
+            if (user == null)
+                throw new Exception("User not found!");
+
+            var result = await userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
+            if (!result.Succeeded)
+                throw new Exception(string.Join("\n", result.Errors.Select(e => e.Description)));
+        }
+        
     }
 }

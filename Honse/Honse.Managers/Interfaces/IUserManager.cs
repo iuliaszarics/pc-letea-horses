@@ -9,6 +9,10 @@ namespace Honse.Managers.Interfaces
         public Task<UserAuthenticationResponse> Login(UserLoginRequest request);
 
         public Task<Global.User> GetUserByName(string userName);
+        
+        public Task<Global.User> UpdateProfile(string userId, UpdateProfileRequest request);
+
+        public Task ChangePassword(string userId, ChangePasswordRequest request);
     }
 
     public class UserRegisterRequest
@@ -36,5 +40,21 @@ namespace Honse.Managers.Interfaces
         public string Token { get; set; }
 
         public string Username { get; set; }
+    }
+
+    public class UpdateProfileRequest
+    {
+        public string UserName { get; set; }
+
+        public string Email { get; set; }
+    }
+    
+    public class ChangePasswordRequest
+    {
+        public string CurrentPassword { get; set; }
+
+        public string NewPassword { get; set; }
+
+        public string ConfirmNewPassword { get; set; }
     }
 }

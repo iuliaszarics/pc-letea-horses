@@ -20,4 +20,21 @@ namespace Honse.Engines.Common
 
         public string ConfirmPassword { get; set; }
     }
+
+    public class UserProfileUpdate
+    {
+        public string UserName { get; set; }
+
+        [EmailAddress]
+        public string Email { get; set; }
+    }
+    
+    public class UserChangePassword
+    {
+        public string CurrentPassword { get; set; }
+
+        public string NewPassword { get; set; }
+
+        public string ConfirmNewPassword { get; set; }
+    }
 }
