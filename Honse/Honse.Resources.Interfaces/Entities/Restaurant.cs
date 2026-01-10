@@ -18,8 +18,10 @@ namespace Honse.Resources.Interfaces.Entities
 
         public string CuisineType {  get; set; } = string.Empty;
 
+        [NotMapped]
         public float AverageRating { get; set; } = 0;
 
+        [NotMapped]
         public int TotalReviews { get; set; } = 0;
 
         public bool IsEnabled { get; set; } = true;

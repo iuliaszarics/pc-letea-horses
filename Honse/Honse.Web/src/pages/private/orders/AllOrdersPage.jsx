@@ -20,15 +20,14 @@ function TimeAgo({ timestamp }) {
         function calculateTimeAgo() {
             if (!timestamp) return "Unknown";
             
-            const orderDate = new Date(timestamp);
-            
+            const orderDate = new Date(timestamp+"Z");
             // Check if date is valid
             if (isNaN(orderDate.getTime())) {
                 return "Unknown";
             }
             
-            const now = new Date();
-            const diffMs = now - orderDate;
+            const now = new Date().getTime();
+            const diffMs = now - orderDate.getTime();
             const diffMins = Math.floor(diffMs / 60000);
             const diffHours = Math.floor(diffMins / 60);
             const diffDays = Math.floor(diffHours / 24);

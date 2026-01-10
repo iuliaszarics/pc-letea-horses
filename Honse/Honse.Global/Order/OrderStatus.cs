@@ -7,6 +7,6 @@ namespace Honse.Global.Order
         Accepted,
         Delivery,
         Finished,
-        Cancelled = -1
+        Cancelled
     }
 }

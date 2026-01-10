@@ -3,11 +3,11 @@ import { useNavigate, useParams } from "react-router";
 import {
   addProductAPI,
   updateProductAPI,
-  getCategoriesByRestaurantAPI,
   getProductByIdAPI,
   getAllCategoriesAPI,
 } from "../../../services/productService";
 import { jwtDecode } from "jwt-decode";
+import UploadImage from "../../../services/cloudinaryService";
 
 export default function AddProductPage() {
   const { id } = useParams();
@@ -27,6 +27,8 @@ export default function AddProductPage() {
   const [loading, setLoading] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
   const [generalError, setGeneralError] = useState(""); 
+
+  const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
    async function loadCategories() {
@@ -119,14 +121,11 @@ export default function AddProductPage() {
       const categoryName = productData.isNewCategory
       ? productData.newCategoryName
       : categories.find(c => c.id === productData.categoryId)?.name || "";
-      const restaurantId = productData.isNewCategory ? localStorage.getItem("restaurantId") : categories.find(c => c.id === productData.categoryId)?.restaurant.id;
-      if(restaurantId == null)
-        restaurantId = localStorage.getItem("restaurantId");
+     
       const payload = {
         ...(id && { id }),
         name: productData.name,
         userId: jwtDecode(token).sub,
-        restaurantId: restaurantId,
         description: productData.description,
         price: parseFloat(productData.price),
         vat: parseFloat(productData.vat),
@@ -135,6 +134,11 @@ export default function AddProductPage() {
         categoryName,
         isEnabled: productData.isEnabled,
       };
+      const imageURL = await UploadImage(selectedImage);
+
+      if (imageURL !== "") {
+        payload.image = imageURL;
+      }
 
       if (!id) {
         await addProductAPI(payload);
@@ -215,15 +219,29 @@ export default function AddProductPage() {
       </div>
 
       <div>
-        <label className="block mb-1 font-medium text-gray-700">Image URL</label>
+        <label className="block mb-1 font-medium text-gray-700">Image</label>
         <input
           name="image"
-          value={productData.image}
-          onChange={handleChange}
+          // value={productData.image}
+          // onChange={handleChange}
+          type="file"
+          accept="image/*"
+          onChange={(e) =>{
+            const file = e.target.files?.[0];
+            setSelectedImage(file ? file : null)
+          }}
           className="form-input w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-          placeholder="https://example.com/image.jpg"
         />
       </div>
+
+      { selectedImage &&
+        (<img
+            src={URL.createObjectURL(selectedImage)}
+            width={400}
+            height={400}
+            className="max-h-[400px] object-fit-contain"
+        />)
+      }
 
       <div className="flex items-center gap-3 mb-3">
         <input
@@ -260,7 +278,7 @@ export default function AddProductPage() {
             <option value="">-- Choose Category --</option>
             {categories.map((c) => (
               <option key={c.id} value={c.id}>
-                {c.name} - {c.restaurant.name}
+                {c.name}
               </option>
             ))}
           </select>

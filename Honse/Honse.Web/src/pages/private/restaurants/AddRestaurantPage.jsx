@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router";
 import { addRestaurantAPI, updateRestaurantAPI, getRestaurantByIdAPI } from "../../../services/restaurantService";
 import { getAllConfigurationsAPI } from "../../../services/configurationService";
 import { jwtDecode } from "jwt-decode";
+import UploadImage from "../../../services/cloudinaryService";
 
 export default function AddRestaurantPage() {
   const { id } = useParams();
@@ -27,6 +28,7 @@ export default function AddRestaurantPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [configurations, setConfigurations] = useState([]);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
     async function load() {
@@ -105,7 +107,11 @@ export default function AddRestaurantPage() {
         userId,
       };
 
-      console.log(payload);
+      const imageURL = await UploadImage(selectedImage);
+
+      if (imageURL !== "") {
+        payload.image = imageURL;
+      }
 
       if (!id) {
         await addRestaurantAPI(payload);
@@ -169,15 +175,35 @@ export default function AddRestaurantPage() {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block mb-1 font-medium text-gray-700">Image URL</label>
-            <input name="image" value={restaurant.image || ""} onChange={handleChange} className="form-input w-full rounded-lg border border-gray-300 px-4 py-2" placeholder="https://example.com/link-or-image" />
-          </div>
-
-          <div>
             <label className="block mb-1 font-medium text-gray-700">Cuisine Type</label>
             <input name="cuisineType" value={restaurant.cuisineType || ""} onChange={handleChange} className="form-input w-full rounded-lg border border-gray-300 px-4 py-2" />
           </div>
         </div>
+
+      <div>
+        <label className="block mb-1 font-medium text-gray-700">Image</label>
+        <input
+          name="image"
+          // value={productData.image}
+          // onChange={handleChange}
+          type="file"
+          accept="image/*"
+          onChange={(e) =>{
+            const file = e.target.files?.[0];
+            setSelectedImage(file ? file : null)
+          }}
+          className="form-input w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+        />
+      </div>
+
+      { selectedImage &&
+        (<img
+            src={URL.createObjectURL(selectedImage)}
+            width={400}
+            height={400}
+            className="max-h-[400px] object-fit-contain"
+        />)
+      }
 
         <div className="grid grid-cols-2 gap-4">
           <div>

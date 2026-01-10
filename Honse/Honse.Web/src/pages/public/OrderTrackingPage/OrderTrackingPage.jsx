@@ -92,7 +92,6 @@ async function reloadOrder() {
     const newMinutes = Math.max(0, Math.round((deliveryTime - new Date()) / 60000));
     setMinutesRemaining(newMinutes);
   }, 60_000);
-
   return () => clearInterval(interval);
 }, [order]);
 
@@ -110,14 +109,16 @@ async function reloadOrder() {
   const currentStatus = order.orderStatus;
   const statusHistory = order.statusHistory ?? [];
   const deliveryTime = new Date(order.deliveryTime);
-  const statusStages = ["confirmed", "preparing", "out for delivery", "delivered"];
+  const statusStages = ["confirmed", "preparing", "out for delivery", "delivered", "cancelled"];
   const progressIndexMap = {
     0: 0,
     1: 1,
     2: 2,
     3: 3,
-    [-1]: 0
+    4: 4
   };
+
+console.log(statusHistory);
 
   const statusIndex = progressIndexMap[currentStatus] ?? 0;
   const progressPercent = ((statusIndex + 1) / 4) * 100;
@@ -129,7 +130,7 @@ async function reloadOrder() {
       {/* Heading */}
       <div className="pt-6 pb-8">
         <h1 className="text-4xl font-extrabold">
-          Your order is <span className="text-orange-500">{statusLabel}</span>!
+          Your order is <span className={currentStatus === 4 ? "text-red-500" : "text-orange-500"}>{statusLabel}</span>!
         </h1>
         <p className="text-2xl text-gray-600">Order Number: {orderNo}</p>
         {error && <p className="text-red-500 mb-4">{error}</p>}
@@ -179,7 +180,8 @@ async function reloadOrder() {
           </div>
 
           {/* Progress Bar */}
-          <div>
+          {currentStatus !== 4 && (
+            <div>
             <p className="text-lg font-bold">{statusLabel}</p>
 
             <div className="w-full bg-blue-100 rounded-lg h-3 mt-2">
@@ -200,7 +202,9 @@ async function reloadOrder() {
               ))}
             </div>
           </div>
-          {order.status !== -1 && order.status !== 3 && (
+          )}
+
+          { currentStatus <= 1 && (
             <button
               onClick={() => setIsCancelModalOpen(true)}
               className="mt-4 inline-flex px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white font-bold text-sm rounded-lg mx-auto"
@@ -217,12 +221,18 @@ async function reloadOrder() {
           {/* ETA */}
           <div className="bg-white p-6 rounded-xl border border-[#e7d9cf] shadow-sm">
             <h2 className="text-lg font-bold mb-1">Estimated Delivery</h2>
-            <p className="text-4xl font-black text-[#3b82f6]">
-              {deliveryTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-            </p>
-            <p className="text-gray-600 mt-1">
-              Arriving in {minutesRemaining} minutes
-            </p>
+
+            { currentStatus === 4 ? <p className="text-4xl font-black text-[#3b82f6]">{"):"}</p> :
+              <>    
+                <p className="text-4xl font-black text-[#3b82f6]">
+                  {deliveryTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                </p>
+                <p className="text-gray-600 mt-1">
+                  Arriving in {minutesRemaining} minutes
+                </p>
+              </>
+
+            }
           </div>
 
          <div className="bg-card-background-light rounded-xl p-6 shadow-sm border border-border-light">
@@ -231,7 +241,8 @@ async function reloadOrder() {
   </h2>
 
   <ul className="space-y-4">
-    {statusHistory
+    { statusHistory &&
+    statusHistory
       .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
       .map((entry, index) => {
         const info = STATUS_INFO[entry.status];
@@ -262,7 +273,7 @@ async function reloadOrder() {
           {/* Customer Details */}
           <div className="rounded-xl border border-gray-200/50 bg-white shadow-sm">
             <h2 className="text-[#1b130d] text-lg font-bold p-4 border-b border-gray-200/50">
-              Customer Details
+              Your Details
             </h2>
             <div className="p-4 space-y-4">
               <div className="flex items-center gap-4">

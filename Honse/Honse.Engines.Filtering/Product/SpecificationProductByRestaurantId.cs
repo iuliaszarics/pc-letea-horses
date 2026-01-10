@@ -13,6 +13,6 @@ namespace Honse.Engines.Filtering.Product
         }
 
         public override Expression<Func<Resources.Interfaces.Entities.Product, bool>> Expression =>
-            (Resources.Interfaces.Entities.Product product) => product.Category.RestaurantId == restaurantId;
+            (Resources.Interfaces.Entities.Product product) => true;
     }
 }

@@ -9,11 +9,15 @@ namespace Honse.Resources
         public RestaurantResource(AppDbContext dbContext) : base(dbContext)
         {
             dbSet = dbContext.Restaurant;
+            includeProperties = [(Restaurant restaurant) => restaurant.Configuration];
         }
 
         public async Task<Restaurant?> GetByIdPublic(Guid id)
         {
-            return await dbSet
+            var query = dbSet.AsQueryable();
+            query = ApplyIncludes(query);
+
+            return await query
                 .Include(r => r.Configuration) // added .include
                 .FirstOrDefaultAsync(r => r.Id == id);
         }

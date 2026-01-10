@@ -2,7 +2,7 @@ import Sidebar from "../../../components/private/Sidebar"
 import Header from "../../../components/private/Header"
 import Filters from "../../../components/private/Filters"
 import ProductsTable from "../../../components/private/ProductsTable"
-import { getProductsAPI, getCategoriesByRestaurantAPI } from "../../../services/productService";
+import { getProductsAPI, getAllCategoriesAPI } from "../../../services/productService";
 import { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 
@@ -23,7 +23,7 @@ export default function AllProductsPage() {
   const [restaurantId, setRestaurantId] = useState(localStorage.getItem("restaurantId"));
   useEffect(() => {
     async function loadCategories() {
-      const result = await getCategoriesByRestaurantAPI(restaurantId);
+      const result = await getAllCategoriesAPI();
       if (result.succeeded) {
         setCategories(result.data);
       }
@@ -36,7 +36,6 @@ export default function AllProductsPage() {
       const userId = jwtDecode(token).sub;
       const result = await getProductsAPI({
         userId,
-        restaurantId,
         categoryId,
         isActive,
         searchKey,

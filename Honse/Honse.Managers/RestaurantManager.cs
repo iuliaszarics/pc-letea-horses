@@ -12,19 +12,22 @@ namespace Honse.Managers
         private readonly IProductResource productResource;
         private readonly Engines.Filtering.Interfaces.IRestaurantFilteringEngine restaurantFilteringEngine;
         private readonly Engines.Validation.Interfaces.IRestaurantValidationEngine restaurantValidationEngine;
+        private readonly Engines.Filtering.Interfaces.IProductFilteringEngine productFilteringEngine;
 
         public RestaurantManager(
             Resources.Interfaces.IRestaurantResource restaurantResource,
             Resources.Interfaces.IProductCategoryResource productCategoryResource,
             IProductResource productResource,
             Engines.Filtering.Interfaces.IRestaurantFilteringEngine restaurantFilteringEngine,
-            Engines.Validation.Interfaces.IRestaurantValidationEngine restaurantValidationEngine)
+            Engines.Validation.Interfaces.IRestaurantValidationEngine restaurantValidationEngine,
+            Engines.Filtering.Interfaces.IProductFilteringEngine productFilteringEngine)
         {
             this.restaurantResource = restaurantResource;
             this.productCategoryResource = productCategoryResource;
             this.productResource = productResource;
             this.restaurantFilteringEngine = restaurantFilteringEngine;
             this.restaurantValidationEngine = restaurantValidationEngine;
+            this.productFilteringEngine = productFilteringEngine;
         }
 
         public async Task<Interfaces.Restaurant> AddRestaurant(CreateRestaurantRequest request)
@@ -142,11 +145,21 @@ namespace Honse.Managers
             if (!restaurant.IsEnabled)
                 throw new Exception("Restaurant is not available!");
 
+            if (restaurant.Configuration == null)
+                throw new Exception("Restaurant must have a configuration selected!");
+
             // Get all categories for this restaurant
-            var categories = await productCategoryResource.GetPublicRestaurantCategories(restaurantId);
+            var categories = await productCategoryResource.GetConfigurationCategories(restaurant.Configuration);
+
+            var specification = productFilteringEngine.GetSpecification(new Engines.Filtering.Interfaces.ProductFilterRequest
+            {
+                UserId = restaurant.UserId,
+                CategoriesIds = categories.Select(category => category.Id).ToList(),
+                IsEnabled =  true,
+            });
 
             // Get all enabled products for this restaurant
-            var products = await productResource.GetPublicRestaurantProducts(restaurantId);
+            var products = await productResource.GetPublicRestaurantProducts(specification);
 
             // Build the menu structure
             var menu = new Interfaces.RestaurantMenu

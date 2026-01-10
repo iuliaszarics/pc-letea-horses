@@ -23,42 +23,6 @@ namespace Honse.API.Controllers
         [Authorize]
         [HttpGet]
         [Route("{id}")]
-        public async Task<IActionResult> GetRestaurantsCategory([FromRoute] Guid id)
-        {
-            if (!ModelState.IsValid)
-            {
-                string errorMessage = ModelState.Values
-                    .SelectMany(x => x.Errors)
-                    .First()
-                    .ErrorMessage;
-
-                return BadRequest((new { errorMessage }));
-            }
-
-            string? userName = User.FindFirstValue(ClaimTypes.GivenName);
-
-            var userResponse = await userManager.GetUserByName(userName).WithTryCatch();
-
-            if (!userResponse.IsSuccessfull)
-            {
-                return BadRequest(userResponse.Exception.Message);
-            }
-
-            Global.User user = userResponse.Result;
-
-            var categoryResponse = await productCategoryManager.GetCategoryById(id, user.Id).WithTryCatch();
-
-            if (!categoryResponse.IsSuccessfull)
-            {
-                return BadRequest(categoryResponse.Exception.Message);
-            }
-
-            return Ok(categoryResponse.Result);
-        }
-
-        [Authorize]
-        [HttpGet]
-        [Route("restaurant/{id}")]
         public async Task<IActionResult> GetCategory([FromRoute] Guid id)
         {
             if (!ModelState.IsValid)
@@ -82,7 +46,7 @@ namespace Honse.API.Controllers
 
             Global.User user = userResponse.Result;
 
-            var categoryResponse = await productCategoryManager.GetRestaurantCategories(user.Id, id).WithTryCatch();
+            var categoryResponse = await productCategoryManager.GetCategoryById(id, user.Id).WithTryCatch();
 
             if (!categoryResponse.IsSuccessfull)
             {

@@ -12,7 +12,18 @@ namespace Honse.Engines.Filtering.Product
             if (filter.SearchKey != null)
                 specification = specification.And(new SpecificationProductSearchKey(filter.SearchKey));
 
-            if (filter.CategoryId.HasValue)
+            if (filter.CategoriesIds != null)
+            {
+                Specification<Resources.Interfaces.Entities.Product> categoriesSpecification = new NoneSpecification<Resources.Interfaces.Entities.Product>();
+
+                foreach (var categoryID in filter.CategoriesIds)
+                {
+                    categoriesSpecification = categoriesSpecification.Or(new SpecificationProductByCategoryId(categoryID));
+                }
+
+                specification = specification.And(categoriesSpecification);
+            }
+            else if (filter.CategoryId.HasValue)
                 specification = specification.And(new SpecificationProductByCategoryId(filter.CategoryId.Value));
 
             if (filter.RestaurantId.HasValue)

@@ -40,7 +40,7 @@ export const OrderStatus = {
     Accepted: 1,
     Delivery: 2,
     Finished: 3,
-    Cancelled: -1
+    Cancelled: 4
 };
 
 export const getStatusLabel = (status) => {
@@ -49,7 +49,7 @@ export const getStatusLabel = (status) => {
         1: "Preparing",
         2: "Out for Delivery",
         3: "Delivered",
-        [-1]: "Cancelled"
+        [4]: "Cancelled"
     };
     return statusMap[status] || "Unknown";
 };

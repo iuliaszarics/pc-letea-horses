@@ -7,8 +7,6 @@ namespace Honse.Managers.Interfaces
 
         Task<ProductCategory> GetCategoryById(Guid id, Guid userId);
 
-        Task<List<ProductCategory>> GetRestaurantCategories(Guid userId, Guid restaurantId);
-
         //Task DeleteCategory(Guid id, Guid userId);
 
         Task<ProductCategory> AddCategory(CreateProductCategoryRequest request);

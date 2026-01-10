@@ -41,7 +41,7 @@ export const OrderStatus = {
     Accepted: 1,
     Delivery: 2,
     Finished: 3,
-    Cancelled: -1
+    Cancelled: 4
 };
 
 // Helper functions for status
@@ -51,7 +51,7 @@ export const getStatusLabel = (status) => {
         1: "Preparing",
         2: "Out for Delivery",
         3: "Delivered",
-        [-1]: "Cancelled"
+        4: "Cancelled"
     };
     return statusMap[status] || "Unknown";
 };
@@ -62,7 +62,7 @@ export const getStatusColor = (status) => {
         1: "#f59e0b",      // Preparing - Orange
         2: "#8b5cf6",      // Out for Delivery - Purple
         3: "#10b981",      // Delivered - Green
-        [-1]: "#ef4444"    // Cancelled - Red
+        4: "#ef4444"    // Cancelled - Red
     };
     return colorMap[status] || "#6b7280";
 };
@@ -402,18 +402,7 @@ async function transformOrder(backendOrder) {
     const phone = ""; // Empty for now - you need to add phone to Order table
 
     // Calculate time ago
-    const orderDate = new Date(backendOrder.timestamp);
-    const now = new Date();
-    const diffMs = now - orderDate;
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMins / 60);
-    const diffDays = Math.floor(diffHours / 24);
-    
-    let timeAgo;
-    if (diffMins < 1) timeAgo = "just now";
-    else if (diffMins < 60) timeAgo = `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
-    else if (diffHours < 24) timeAgo = `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-    else timeAgo = `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+    const orderDate = new Date(backendOrder.timestamp+"Z");
 
     // Calculate subtotal from enriched items
     const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -445,7 +434,6 @@ async function transformOrder(backendOrder) {
         timestamp: backendOrder.timestamp || backendOrder.Timestamp || backendOrder.createdAt || backendOrder.orderDate,
         orderDate: orderDate.toLocaleDateString(),
         orderTime: orderDate.toLocaleTimeString(),
-        timeAgo: timeAgo
     };
     
     console.log("✅ Transformed order:", transformedOrder);

@@ -16,6 +16,8 @@ namespace Honse.Engines.Filtering.Interfaces
 
         public Guid? CategoryId { get; set; }
 
+        public List<Guid>? CategoriesIds { get; set; }
+
         public Guid? RestaurantId { get; set; }
 
         public bool? IsEnabled { get; set; }

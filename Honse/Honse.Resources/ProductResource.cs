@@ -1,4 +1,5 @@
-﻿using Honse.Resources.Interfaces;
+﻿using Honse.Global.Specification;
+using Honse.Resources.Interfaces;
 using Honse.Resources.Interfaces.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,13 +15,13 @@ namespace Honse.Resources
 
         }
 
-        public async Task<IEnumerable<Product>> GetPublicRestaurantProducts(Guid restaurantId)
+        public async Task<IEnumerable<Product>> GetPublicRestaurantProducts(Specification<Product> specification)
         {
             var query = dbSet.AsQueryable();
             query = ApplyIncludes(query);
 
             return await query
-                .Where(p => p.Category.RestaurantId == restaurantId && p.IsEnabled)
+                .Where(specification.Expression)
                 .ToListAsync();
         }
     }

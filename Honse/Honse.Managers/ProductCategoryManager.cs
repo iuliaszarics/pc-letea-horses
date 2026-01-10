@@ -60,13 +60,6 @@ namespace Honse.Managers
             return productCategory.DeepCopyTo<ProductCategory>();
         }
 
-        public async Task<List<ProductCategory>> GetRestaurantCategories(Guid userId, Guid restaurantId)
-        {
-            IEnumerable<Resources.Interfaces.Entities.ProductCategory> categories = await productCategoryResource.GetRestaurantCategories(userId, restaurantId);
-
-            return categories.DeepCopyTo<List<ProductCategory>>();
-        }
-
         public async Task<ProductCategory> UpdateCategory(UpdateProductCategoryRequest request)
         {
             // Validate

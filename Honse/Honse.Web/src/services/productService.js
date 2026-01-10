@@ -110,15 +110,6 @@ export async function getProductByIdAPI(id) {
   }
 }
 
-export async function getCategoriesByRestaurantAPI(restaurantId) {
-  try {
-    const res = await api.get(`/api/ProductCategory/restaurant/${restaurantId}`);
-    return { succeeded: true, data: res.data };
-  } catch (err) {
-    return { succeeded: false, errorMessage: parseError(err, "Failed to fetch categories.") };
-  }
-}
-
 export async function getAllCategoriesAPI() {
   try {
     const res = await api.get(`/api/ProductCategory/all`);
