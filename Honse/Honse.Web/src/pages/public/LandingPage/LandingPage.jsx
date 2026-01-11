@@ -4,7 +4,7 @@ import "./LandingPage.css";
 export default function LandingPage() {
 
     return (
-        <div className="landing-page">
+        <div className="landing-page theme-light">
             <div className="landing-navbar">
                 <div className="landing-brand">
                     <img src="/horse_logo.ico" alt="Honse logo" className="landing-logo" />
@@ -61,7 +61,6 @@ export default function LandingPage() {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                 </svg>
                             </Link>
-                            <Link to="/public/restaurants" className="ghost-button">View restaurants</Link>
                         </div>
                         <ul className="scroll-list">
                             <li> Search cuisines & dishes instantly</li>
@@ -88,7 +87,6 @@ export default function LandingPage() {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                 </svg>
                             </Link>
-                            <Link to="/login" className="ghost-button">Owner login</Link>
                         </div>
                         <ul className="scroll-list">
                             <li> Create & edit menus in minutes</li>

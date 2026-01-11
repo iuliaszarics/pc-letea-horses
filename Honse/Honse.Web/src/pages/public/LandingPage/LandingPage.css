@@ -9,6 +9,222 @@
     --bg-section: #0a0a0a;
 }
 
+
+.landing-page.theme-light {
+    --bg: #ffffff;
+    --bg-section: #f8fafc;
+    --text-light: #111827; 
+    --text: #000000;
+    --muted: #4b5563;
+    --border: #e5e7eb;
+}
+
+.landing-page.theme-dark {
+    --bg: #000000;
+    --bg-section: #0a0a0a;
+    --text-light: #ffffff;
+    --text: #111827;
+    --muted: #9ca3af;
+    --border: #222;
+}
+
+
+.landing-page.theme-light {
+    color: #000 !important;
+}
+.landing-page.theme-light .scroll-section {
+    color: #000 !important;
+}
+.landing-page.theme-light .scroll-title,
+.landing-page.theme-light .scroll-description,
+.landing-page.theme-light .scroll-list,
+.landing-page.theme-light .faq-answer,
+.landing-page.theme-light .faq-question {
+    color: #000 !important;
+}
+.landing-page.theme-light .scroll-list li { color: #000 !important; }
+.landing-page.theme-light .hero-content .hero-title { color: var(--primary) !important; }
+.landing-page.theme-light .hero-content .hero-description,
+.landing-page.theme-light .guest-notice { color: #ffffff !important; }
+.landing-page.theme-light .scroll-text h1,
+.landing-page.theme-light .scroll-text h2,
+.landing-page.theme-light .scroll-text h3,
+.landing-page.theme-light .scroll-text p,
+.landing-page.theme-light .scroll-text li,
+.landing-page.theme-light .scroll-text span,
+.landing-page.theme-light .scroll-text a { color: #000 !important; }
+
+/* Role selection button text colors per theme */
+.landing-page.theme-light .role-button { color: #ffffff !important; }
+.landing-page.theme-dark .role-button { color: #ffffff !important; }
+
+
+@media (prefers-color-scheme: light) {
+    .landing-page {
+        color: var(--text) !important;
+        background: var(--bg) !important;
+    }
+
+    .landing-navbar {
+        background: linear-gradient(to bottom, rgba(255,255,255,0.85) 0%, transparent 100%) !important;
+    }
+
+    /* Hero: title orange, description black in light mode */
+    .hero-content .hero-title { color: var(--primary) !important; }
+    .hero-content .hero-description { color: #000 !important; }
+    .hero-content .guest-notice { color: #000 !important; }
+
+    .scroll-section {
+        background: var(--bg) !important;
+        border-bottom: 8px solid var(--border) !important;
+        color: var(--text) !important;
+    }
+    .scroll-section:first-of-type {
+        border-top: 8px solid var(--border) !important;
+    }
+
+    .scroll-title { color: #000 !important; }
+    .scroll-description,
+    .scroll-list,
+    .faq-answer { color: #000 !important; }
+
+
+    .scroll-text { color: var(--text) !important; }
+    .scroll-text h1,
+    .scroll-text h2,
+    .scroll-text h3,
+    .scroll-text p,
+    .scroll-text li,
+    .scroll-text span,
+    .scroll-text a { color: #000 !important; }
+    .scroll-text :is(.feature-cta-button,.ghost-button) { color: white !important; }
+
+    .role-button {
+        color: var(--text) !important;
+        background: rgba(249,115,22,0.08) !important;
+        border-color: rgba(249,115,22,0.3) !important;
+    }
+
+    .feature-section,
+    .faq-section,
+    .final-cta { background: var(--bg) !important; }
+
+    .feature-image-wrapper {
+        background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%) !important;
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.12) !important;
+    }
+
+    .landing-footer {
+        background: var(--bg-section) !important;
+        border-top: 1px solid var(--border) !important;
+    }
+    .footer-link { color: #6b7280 !important; }
+
+    .btn-sign-in {
+        background: rgba(0,0,0,0.06) !important;
+        color: var(--text) !important;
+        border-color: rgba(0,0,0,0.12) !important;
+    }
+    .btn-sign-in:hover {
+        background: rgba(0,0,0,0.12) !important;
+        border-color: rgba(0,0,0,0.2) !important;
+    }
+}
+
+@media (prefers-color-scheme: light) {
+    :root {
+        --bg: #ffffff;
+        --bg-section: #f8fafc;
+        --text-light: #111827;
+        --text: #111827;
+        --muted: #4b5563;
+        --border: #e5e7eb;
+    }
+
+    .landing-page {
+        color: var(--text);
+        background: var(--bg);
+    }
+
+    .landing-navbar {
+        background: linear-gradient(to bottom, rgba(255,255,255,0.85) 0%, transparent 100%);
+    }
+
+    .landing-brand-name,
+    .footer-brand-name,
+    .faq-question {
+        color: var(--text);
+    }
+
+    .hero-description,
+    .cta-text,
+    .scroll-description,
+    .scroll-list {
+        color: var(--muted);
+    }
+
+    .role-button {
+        color: var(--text);
+        background: rgba(249, 115, 22, 0.08);
+        border-color: rgba(249, 115, 22, 0.3);
+    }
+
+    .scroll-section {
+        background: var(--bg);
+        border-bottom: 8px solid var(--border);
+    }
+    .scroll-section:first-of-type {
+        border-top: 8px solid var(--border);
+    }
+
+    .feature-section,
+    .faq-section,
+    .final-cta {
+        background: var(--bg);
+    }
+
+    .faq-answer {
+        color: var(--muted);
+    }
+
+    .feature-image-wrapper {
+        background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.12);
+    }
+
+    .faq-item {
+        background: #f3f4f6;
+    }
+    .faq-item:hover {
+        background: #e5e7eb;
+    }
+
+    .landing-footer {
+        background: var(--bg-section);
+        border-top: 1px solid var(--border);
+    }
+    .footer-link {
+        color: #6b7280;
+    }
+    .footer-link:hover {
+        color: var(--primary);
+    }
+
+    .btn-sign-in {
+        background: rgba(0, 0, 0, 0.06);
+        color: var(--text);
+        border-color: rgba(0, 0, 0, 0.12);
+    }
+    .btn-sign-in:hover {
+        background: rgba(0, 0, 0, 0.12);
+        border-color: rgba(0, 0, 0, 0.2);
+    }
+
+    .hero-gradient {
+        background: linear-gradient(to bottom, transparent, var(--bg));
+    }
+}
+
 .landing-page {
     background: var(--bg);
     color: var(--text-light);
