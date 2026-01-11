@@ -55,7 +55,11 @@ export default function Navbar() {
 
                             <div className="nav-divider" />
 
-                            {username ? <span className="user-chip">{username}</span> : null}
+                            {username ? (
+                                <Link to="/settings/account" className="user-chip">
+                                    {username}
+                                </Link>
+                            ) : null}
 
                             <button
                                 className="btn btn-ghost"
