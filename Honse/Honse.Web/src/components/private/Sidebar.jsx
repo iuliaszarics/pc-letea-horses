@@ -152,12 +152,16 @@ useEffect(() => {
             <p className="text-sm">Restaurants</p>
           </NavLink>
 
-          <div
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-100`}
+          <NavLink
+            to="/sales"
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-3 py-2 rounded-lg ${isActive ? "bg-blue-200 text-blue-800 font-bold" : "hover:bg-blue-100"
+              }`
+            }
           >
             <span className="material-symbols-outlined">bar_chart</span>
             <p className="text-sm">Sales</p>
-          </div>
+          </NavLink>
 
           <div
             className={`flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-100`}

@@ -20,7 +20,7 @@ namespace Honse.API.Controllers
         }
 
         /// <summary>
-        /// Gets all the orders of a restaurant
+        /// Gets active orders of a restaurant (New, Accepted, Delivery)
         /// </summary>
         /// <param name="restaurantId"></param>
         /// <returns></returns>
@@ -50,7 +50,48 @@ namespace Honse.API.Controllers
 
             Global.User user = userResponse.Result!;
 
-            var orderResponse = await orderManager.GetAllOrdersByRestaurant(restaurantId, user.Id).WithTryCatch();
+            var orderResponse = await orderManager.GetActiveOrdersByRestaurant(restaurantId, user.Id).WithTryCatch();
+
+            if (!orderResponse.IsSuccessfull)
+            {
+                return BadRequest(orderResponse.Exception!.Message);
+            }
+
+            return Ok(orderResponse.Result);
+        }
+
+        /// <summary>
+        /// Gets sales/finished orders of a restaurant (Finished, Cancelled)
+        /// </summary>
+        /// <param name="restaurantId"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpGet]
+        [Route("sales/{restaurantId}")]
+        public async Task<IActionResult> GetSales([FromRoute] Guid restaurantId)
+        {
+            if (!ModelState.IsValid)
+            {
+                string errorMessage = ModelState.Values
+                    .SelectMany(x => x.Errors)
+                    .First()
+                    .ErrorMessage;
+
+                return BadRequest((new { errorMessage }));
+            }
+
+            string? userName = User.FindFirstValue(ClaimTypes.GivenName);
+
+            var userResponse = await userManager.GetUserByName(userName!).WithTryCatch();
+
+            if (!userResponse.IsSuccessfull)
+            {
+                return BadRequest(userResponse.Exception!.Message);
+            }
+
+            Global.User user = userResponse.Result!;
+
+            var orderResponse = await orderManager.GetSalesByRestaurant(restaurantId, user.Id).WithTryCatch();
 
             if (!orderResponse.IsSuccessfull)
             {

@@ -12,6 +12,8 @@ namespace Honse.Managers.Interfaces
         Task<Order> ProcessOrder(OrderProcessRequest request);
         Task CancelOrder(Guid id, Guid? userId = null);
         Task<List<Order>> GetAllOrdersByRestaurant(Guid restaurantId, Guid userId);
+        Task<List<Order>> GetActiveOrdersByRestaurant(Guid restaurantId, Guid userId);
+        Task<List<Order>> GetSalesByRestaurant(Guid restaurantId, Guid userId);
         Task<Global.PaginatedResult<Order>> FilterOrders(OrderFilterRequest request);
     }
 

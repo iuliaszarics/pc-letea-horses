@@ -189,6 +189,20 @@ namespace Honse.Managers
             return orders.Select(o => o.DeepCopyTo<Global.Order.Order>()).ToList();
         }
 
+        public async Task<List<Global.Order.Order>> GetActiveOrdersByRestaurant(Guid restaurantId, Guid userId)
+        {
+            var orders = await orderResource.GetActiveByRestaurantId(restaurantId);
+
+            return orders.Select(o => o.DeepCopyTo<Global.Order.Order>()).ToList();
+        }
+
+        public async Task<List<Global.Order.Order>> GetSalesByRestaurant(Guid restaurantId, Guid userId)
+        {
+            var orders = await orderResource.GetFinishedByRestaurantId(restaurantId);
+
+            return orders.Select(o => o.DeepCopyTo<Global.Order.Order>()).ToList();
+        }
+
         public async Task<Global.PaginatedResult<Global.Order.Order>> FilterOrders(OrderFilterRequest request)
         {
             var specification = orderFilteringEngine.GetSpecification(request.DeepCopyTo<Engines.Filtering.Interfaces.OrderFilterRequest>());
