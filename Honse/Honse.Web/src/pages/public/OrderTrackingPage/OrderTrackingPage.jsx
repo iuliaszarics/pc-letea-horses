@@ -224,7 +224,11 @@ console.log(statusHistory);
           <div className="bg-white p-6 rounded-xl border border-[#e7d9cf] shadow-sm">
             <h2 className="text-lg font-bold mb-1">Estimated Delivery</h2>
 
-            { currentStatus === 4 ? <p className="text-4xl font-black text-[#3b82f6]">{"):"}</p> :
+            { order.orderStatus === 0 ? (
+               <p className="text-3xl font-black text-[#3b82f6]">
+                Waiting for your order to be accepted
+              </p>
+            ) : currentStatus === 4 ? <p className="text-4xl font-black text-[#3b82f6]">{"The order was cancelled"}</p> :
               <>    
                 <p className="text-4xl font-black text-[#3b82f6]">
                   {deliveryTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
