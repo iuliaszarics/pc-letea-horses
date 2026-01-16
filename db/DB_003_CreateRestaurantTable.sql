@@ -20,8 +20,6 @@ CREATE TABLE [Restaurant](
     
     -- Business Details
     [CuisineType] VARCHAR(200) NOT NULL, -- e.g., "Italian, Pizza, Pasta"
-    -- [AverageRating] REAL NULL, -- 0.00 to 5.00
-    -- [TotalReviews] INT NOT NULL DEFAULT 0,
     
     [IsEnabled] BIT NOT NULL,
     -- Operating Hours (stored as JSON for flexibility)
@@ -37,12 +35,3 @@ CREATE INDEX [IX_Restaurant_Name] ON [Restaurant]([Name])
 CREATE INDEX [IX_Restaurant_CuisineType] ON [Restaurant]([CuisineType])
 CREATE INDEX [IX_Restaurant_UserId] ON [Restaurant]([UserId])
 CREATE INDEX [IX_Restaurant_IsEnabled] ON [Restaurant]([IsEnabled]) WHERE [IsEnabled] = 1
-
--- Add RestaurantId to Product table
--- ALTER TABLE [ProductCategory]
--- ADD [RestaurantId] UNIQUEIDENTIFIER 
--- NOT NULL 
--- REFERENCES [Restaurant]([Id])
-
--- Create index for faster queries
--- CREATE INDEX [IX_ProductCategory_RestaurantId] ON [ProductCategory]([RestaurantId])

@@ -112,10 +112,6 @@ namespace Honse.Managers
 
             var restaurant = request.DeepCopyTo<Resources.Interfaces.Entities.Restaurant>();
 
-            // Preserve the existing rating and review count
-            restaurant.AverageRating = existingRestaurant.AverageRating;
-            restaurant.TotalReviews = existingRestaurant.TotalReviews;
-
             // assign the new configuration id
             if(request.ConfigurationId.HasValue)
             {

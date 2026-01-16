@@ -40,10 +40,6 @@ namespace Honse.Managers.Interfaces
 
         public string CuisineType { get; set; } = string.Empty;
 
-        public float AverageRating { get; set; }
-
-        public int TotalReviews { get; set; }
-
         public bool IsEnabled { get; set; }
 
         public TimeOnly OpeningTime { get; set; }
