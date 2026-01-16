@@ -24,15 +24,5 @@ namespace Honse.Resources
                 .Where(specification.Expression)
                 .ToListAsync();
         }
-
-        public async Task<IEnumerable<Product>> GetByRestaurantId(Guid restaurantId)
-        {
-            var query = dbSet.AsQueryable();
-            query = ApplyIncludes(query);
-
-            return await query
-                .Where(p => p.Category.RestaurantId == restaurantId)
-                .ToListAsync();
-        }
     }
 }

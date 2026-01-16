@@ -1,7 +1,9 @@
-﻿using Honse.Global.Dashboard;
+﻿using Honse.Engines.Filtering.Interfaces;
+using Honse.Global.Dashboard;
 using Honse.Global.Order;
 using Honse.Managers.Interfaces;
 using Honse.Resources.Interfaces;
+using Honse.Resources.Interfaces.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,11 +15,21 @@ namespace Honse.Managers
     {
         private readonly IOrderResource _orderResource;
         private readonly IProductResource _productResource;
+        private readonly IRestaurantResource restaurantResource;
+        private readonly IProductCategoryResource productCategoryResource;
+        private readonly IProductFilteringEngine productFilteringEngine;
 
-        public DashboardManager(IOrderResource orderResource, IProductResource productResource)
+        public DashboardManager(IOrderResource orderResource, 
+            IProductResource productResource, 
+            IRestaurantResource restaurantResource, 
+            IProductCategoryResource productCategoryResource,
+            IProductFilteringEngine productFilteringEngine)
         {
             _orderResource = orderResource;
             _productResource = productResource;
+            this.restaurantResource = restaurantResource;
+            this.productCategoryResource = productCategoryResource;
+            this.productFilteringEngine = productFilteringEngine;
         }
 
         public async Task<DashboardStatsResponse> GetStats(DashboardStatsRequest request)
@@ -78,10 +90,26 @@ namespace Honse.Managers
                     TotalSales = g.Sum(p => p.Quantity)
                 })
                 .OrderByDescending(x => x.TotalSales)
-                .Take(5)
-                .ToList();
+            .Take(5)
+            .ToList();
 
-            var restaurantProducts = await _productResource.GetByRestaurantId(request.RestaurantId);
+            var restaurant = await restaurantResource.GetByIdPublic(request.RestaurantId);
+
+            if (restaurant == null)
+                throw new Exception("Restaurant not found!");
+            
+            // Get all categories for this restaurant
+            var categories = await productCategoryResource.GetConfigurationCategories(restaurant.Configuration);
+
+            var specification = productFilteringEngine.GetSpecification(new Engines.Filtering.Interfaces.ProductFilterRequest
+            {
+                UserId = restaurant.UserId,
+                CategoriesIds = categories.Select(category => category.Id).ToList(),
+                IsEnabled = true,
+            });
+
+            // Get all enabled products for this restaurant
+            var restaurantProducts = await _productResource.GetPublicRestaurantProducts(specification);
 
             var productToCategoryMap = restaurantProducts
                 .Where(p => p.Category != null)
