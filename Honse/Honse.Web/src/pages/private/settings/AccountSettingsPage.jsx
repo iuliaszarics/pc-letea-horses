@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../../../contexts/AuthContext.js";
 import "./AccountSettingsPage.css";
+import Sidebar from "../../../components/private/Sidebar.jsx";
 
 const RAW_BASE = process.env.REACT_APP_API_URL || "https://localhost:2000";
 
@@ -363,154 +364,158 @@ export default function AccountSettingsPage() {
     }
 
     return (
-        <div className="settings-wrap">
-            <div className="settings-container">
-                <header className="settings-header">
-                    <h1 className="settings-title">Account Settings</h1>
-                    <p className="settings-sub">Manage your profile and security settings.</p>
-                </header>
+        <div className="flex min-h-screen bg-gray-50">
+            <Sidebar onRestaurantChange={()=>{}} />
 
-                {status.message && (
-                    <div className={["alert", status.type === "success" ? "alert-success" : "alert-error"].join(" ")}>
-                        {status.message}
+            <div className="flex-1 p-8">
+                <div className="settings-container">
+                    <header className="settings-header">
+                        <h1 className="settings-title">Account Settings</h1>
+                        <p className="settings-sub">Manage your profile and security settings.</p>
+                    </header>
+
+                    {status.message && (
+                        <div className={["alert", status.type === "success" ? "alert-success" : "alert-error"].join(" ")}>
+                            {status.message}
+                        </div>
+                    )}
+
+                    <div className="settings-grid">
+                        <section className="settings-card">
+                            <h2 className="settings-card-title">Profile</h2>
+                            <p className="settings-card-sub">Update your account details.</p>
+
+                            <form onSubmit={handleSaveProfile} className="form-grid" noValidate>
+                                <div className="input-row">
+                                    <label className="label">Username</label>
+                                    <input
+                                        className={["input", touched.username && errors.username ? "input-invalid" : ""].join(" ")}
+                                        value={profile.username}
+                                        onChange={(e) => setProfile((p) => ({ ...p, username: e.target.value }))}
+                                        onBlur={() => markTouched("username")}
+                                        placeholder="Username"
+                                        autoComplete="username"
+                                    />
+                                    {touched.username && errors.username && <div className="field-error">{errors.username}</div>}
+                                </div>
+
+                                <div className="input-row">
+                                    <label className="label">Email</label>
+                                    <input
+                                        type="email"
+                                        className={["input", touched.email && errors.email ? "input-invalid" : ""].join(" ")}
+                                        value={profile.email}
+                                        onChange={(e) => setProfile((p) => ({ ...p, email: e.target.value }))}
+                                        onBlur={() => markTouched("email")}
+                                        placeholder="Email"
+                                        autoComplete="email"
+                                    />
+                                    {touched.email && errors.email && <div className="field-error">{errors.email}</div>}
+                                </div>
+
+                                <div className="actions">
+                                    <button className="btn btn-primary" disabled={loading.profile || !isProfileValid}>
+                                        {loading.profile ? "Saving..." : "Save changes"}
+                                    </button>
+                                </div>
+                            </form>
+                        </section>
+
+                        <section className="settings-card">
+                            <h2 className="settings-card-title">Security</h2>
+                            <p className="settings-card-sub">Change your password.</p>
+
+                            <form onSubmit={handleChangePassword} className="form-grid" noValidate>
+                                <div className="input-row">
+                                    <label className="label">Current password</label>
+
+                                    <div className="input-with-icon">
+                                        <input
+                                            type={showPw.current ? "text" : "password"}
+                                            className={["input", touched.currentPassword && errors.currentPassword ? "input-invalid" : ""].join(" ")}
+                                            value={passwords.currentPassword}
+                                            onChange={(e) => setPasswords((p) => ({...p, currentPassword: e.target.value}))}
+                                            onBlur={() => markTouched("currentPassword")}
+                                            autoComplete="current-password"
+                                        />
+                                        <button
+                                            type="button"
+                                            className="icon-btn"
+                                            aria-label={showPw.current ? "Hide current password" : "Show current password"}
+                                            onClick={() => setShowPw((s) => ({...s, current: !s.current}))}
+                                        >
+                                            <EyeIcon open={showPw.current}/>
+                                        </button>
+                                    </div>
+
+                                    {touched.currentPassword && errors.currentPassword &&
+                                        <div className="field-error">{errors.currentPassword}</div>}
+                                </div>
+
+                                <div className="input-row">
+                                    <label className="label">New password</label>
+
+                                    <div className="input-with-icon">
+                                        <input
+                                            type={showPw.next ? "text" : "password"}
+                                            className={["input", touched.newPassword && errors.newPassword ? "input-invalid" : ""].join(" ")}
+                                            value={passwords.newPassword}
+                                            onChange={(e) => setPasswords((p) => ({...p, newPassword: e.target.value}))}
+                                            onBlur={() => markTouched("newPassword")}
+                                            autoComplete="new-password"
+                                        />
+                                        <button
+                                            type="button"
+                                            className="icon-btn"
+                                            aria-label={showPw.next ? "Hide new password" : "Show new password"}
+                                            onClick={() => setShowPw((s) => ({...s, next: !s.next}))}
+                                        >
+                                            <EyeIcon open={showPw.next}/>
+                                        </button>
+                                    </div>
+
+                                    {touched.newPassword && errors.newPassword &&
+                                        <div className="field-error">{errors.newPassword}</div>}
+                                </div>
+
+                                <div className="input-row">
+                                    <label className="label">Confirm new password</label>
+
+                                    <div className="input-with-icon">
+                                        <input
+                                            type={showPw.confirm ? "text" : "password"}
+                                            className={["input", touched.confirmNewPassword && errors.confirmNewPassword ? "input-invalid" : ""].join(" ")}
+                                            value={passwords.confirmNewPassword}
+                                            onChange={(e) => setPasswords((p) => ({
+                                                ...p,
+                                                confirmNewPassword: e.target.value
+                                            }))}
+                                            onBlur={() => markTouched("confirmNewPassword")}
+                                            autoComplete="new-password"
+                                        />
+                                        <button
+                                            type="button"
+                                            className="icon-btn"
+                                            aria-label={showPw.confirm ? "Hide confirm password" : "Show confirm password"}
+                                            onClick={() => setShowPw((s) => ({...s, confirm: !s.confirm}))}
+                                        >
+                                            <EyeIcon open={showPw.confirm}/>
+                                        </button>
+                                    </div>
+
+                                    {touched.confirmNewPassword && errors.confirmNewPassword && (
+                                        <div className="field-error">{errors.confirmNewPassword}</div>
+                                    )}
+                                </div>
+
+                                <div className="actions">
+                                    <button className="btn btn-primary" disabled={loading.password || !isPasswordValid}>
+                                        {loading.password ? "Updating..." : "Update password"}
+                                    </button>
+                                </div>
+                            </form>
+                        </section>
                     </div>
-                )}
-
-                <div className="settings-grid">
-                    <section className="settings-card">
-                        <h2 className="settings-card-title">Profile</h2>
-                        <p className="settings-card-sub">Update your account details.</p>
-
-                        <form onSubmit={handleSaveProfile} className="form-grid" noValidate>
-                            <div className="input-row">
-                                <label className="label">Username</label>
-                                <input
-                                    className={["input", touched.username && errors.username ? "input-invalid" : ""].join(" ")}
-                                    value={profile.username}
-                                    onChange={(e) => setProfile((p) => ({ ...p, username: e.target.value }))}
-                                    onBlur={() => markTouched("username")}
-                                    placeholder="Username"
-                                    autoComplete="username"
-                                />
-                                {touched.username && errors.username && <div className="field-error">{errors.username}</div>}
-                            </div>
-
-                            <div className="input-row">
-                                <label className="label">Email</label>
-                                <input
-                                    type="email"
-                                    className={["input", touched.email && errors.email ? "input-invalid" : ""].join(" ")}
-                                    value={profile.email}
-                                    onChange={(e) => setProfile((p) => ({ ...p, email: e.target.value }))}
-                                    onBlur={() => markTouched("email")}
-                                    placeholder="Email"
-                                    autoComplete="email"
-                                />
-                                {touched.email && errors.email && <div className="field-error">{errors.email}</div>}
-                            </div>
-
-                            <div className="actions">
-                                <button className="btn btn-primary" disabled={loading.profile || !isProfileValid}>
-                                    {loading.profile ? "Saving..." : "Save changes"}
-                                </button>
-                            </div>
-                        </form>
-                    </section>
-
-                    <section className="settings-card">
-                        <h2 className="settings-card-title">Security</h2>
-                        <p className="settings-card-sub">Change your password.</p>
-
-                        <form onSubmit={handleChangePassword} className="form-grid" noValidate>
-                            <div className="input-row">
-                                <label className="label">Current password</label>
-
-                                <div className="input-with-icon">
-                                    <input
-                                        type={showPw.current ? "text" : "password"}
-                                        className={["input", touched.currentPassword && errors.currentPassword ? "input-invalid" : ""].join(" ")}
-                                        value={passwords.currentPassword}
-                                        onChange={(e) => setPasswords((p) => ({...p, currentPassword: e.target.value}))}
-                                        onBlur={() => markTouched("currentPassword")}
-                                        autoComplete="current-password"
-                                    />
-                                    <button
-                                        type="button"
-                                        className="icon-btn"
-                                        aria-label={showPw.current ? "Hide current password" : "Show current password"}
-                                        onClick={() => setShowPw((s) => ({...s, current: !s.current}))}
-                                    >
-                                        <EyeIcon open={showPw.current}/>
-                                    </button>
-                                </div>
-
-                                {touched.currentPassword && errors.currentPassword &&
-                                    <div className="field-error">{errors.currentPassword}</div>}
-                            </div>
-
-                            <div className="input-row">
-                                <label className="label">New password</label>
-
-                                <div className="input-with-icon">
-                                    <input
-                                        type={showPw.next ? "text" : "password"}
-                                        className={["input", touched.newPassword && errors.newPassword ? "input-invalid" : ""].join(" ")}
-                                        value={passwords.newPassword}
-                                        onChange={(e) => setPasswords((p) => ({...p, newPassword: e.target.value}))}
-                                        onBlur={() => markTouched("newPassword")}
-                                        autoComplete="new-password"
-                                    />
-                                    <button
-                                        type="button"
-                                        className="icon-btn"
-                                        aria-label={showPw.next ? "Hide new password" : "Show new password"}
-                                        onClick={() => setShowPw((s) => ({...s, next: !s.next}))}
-                                    >
-                                        <EyeIcon open={showPw.next}/>
-                                    </button>
-                                </div>
-
-                                {touched.newPassword && errors.newPassword &&
-                                    <div className="field-error">{errors.newPassword}</div>}
-                            </div>
-
-                            <div className="input-row">
-                                <label className="label">Confirm new password</label>
-
-                                <div className="input-with-icon">
-                                    <input
-                                        type={showPw.confirm ? "text" : "password"}
-                                        className={["input", touched.confirmNewPassword && errors.confirmNewPassword ? "input-invalid" : ""].join(" ")}
-                                        value={passwords.confirmNewPassword}
-                                        onChange={(e) => setPasswords((p) => ({
-                                            ...p,
-                                            confirmNewPassword: e.target.value
-                                        }))}
-                                        onBlur={() => markTouched("confirmNewPassword")}
-                                        autoComplete="new-password"
-                                    />
-                                    <button
-                                        type="button"
-                                        className="icon-btn"
-                                        aria-label={showPw.confirm ? "Hide confirm password" : "Show confirm password"}
-                                        onClick={() => setShowPw((s) => ({...s, confirm: !s.confirm}))}
-                                    >
-                                        <EyeIcon open={showPw.confirm}/>
-                                    </button>
-                                </div>
-
-                                {touched.confirmNewPassword && errors.confirmNewPassword && (
-                                    <div className="field-error">{errors.confirmNewPassword}</div>
-                                )}
-                            </div>
-
-                            <div className="actions">
-                                <button className="btn btn-primary" disabled={loading.password || !isPasswordValid}>
-                                    {loading.password ? "Updating..." : "Update password"}
-                                </button>
-                            </div>
-                        </form>
-                    </section>
                 </div>
             </div>
         </div>

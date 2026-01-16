@@ -13,6 +13,7 @@ import {
 import { getDashboardDataAPI } from '../../../services/dashboardService';
 import { jwtDecode } from "jwt-decode";
 import { getRestaurantsByUserAPI } from "../../../services/productService";
+import Sidebar from '../../../components/private/Sidebar';
 
 ChartJS.register(
   CategoryScale,
@@ -118,42 +119,16 @@ export default function DashboardPage() {
 
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden">
-      <div className="px-4 sm:px-6 lg:px-10 py-8">
+    <div className="flex min-h-screen bg-gray-50">
+      <Sidebar onRestaurantChange={(id) => {
+        setSelectedRestaurant(id);
+        setRestaurantId(id);
+      }} />
+      <main className="flex-1 p-8">
+        <div className="px-4 sm:px-6 lg:px-10 py-8">
         {/* Header */}
         <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
           <p className="text-3xl font-black">Dashboard</p>
-
-          {/* Restaurant Selector */}
-          <div className=" relative w-64">
-            <button
-              onClick={() => setShowRestaurantDropdown(!showRestaurantDropdown)}
-              className="flex w-full justify-between items-center h-9 px-3 rounded-md border bg-white  text-gray-700 "
-            >
-              <span className="truncate">
-                {restaurants.find(r => r.id === selectedRestaurant)?.name || "Select restaurant"}
-              </span>
-              <span className="material-symbols-outlined">arrow_drop_down</span>
-            </button>
-
-            {showRestaurantDropdown && (
-              <ul className="absolute mt-1 bg-white  border rounded shadow z-10 w-full max-h-60 overflow-auto">
-                {restaurants.map(r => (
-                  <li
-                    key={r.id}
-                    className="px-3 py-2 cursor-pointer hover:bg-blue-200 "
-                    onClick={() => {
-                      setSelectedRestaurant(r.id);
-                      setRestaurantId(r.id);
-                      setShowRestaurantDropdown(false);
-                    }}
-                  >
-                    {r.name}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
 
           <div className="flex gap-2 p-1  bg-gray-100  rounded-lg">
             {['lastDay', 'lastWeek', 'lastMonth', 'lastQuarter'].map((r) => (
@@ -334,6 +309,7 @@ export default function DashboardPage() {
           </div>
         </>
       )}
+      </main>
     </div>
   );
 }

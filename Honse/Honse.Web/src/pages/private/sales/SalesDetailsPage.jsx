@@ -53,7 +53,7 @@ export default function SalesDetailsPage() {
     if (loading) {
         return (
             <div className="flex min-h-screen bg-gray-50">
-                <Sidebar onRestaurantChange={setRestaurantId} />
+                <Sidebar onRestaurantChange={setRestaurantId}/>
                 <main className="flex-1 p-8">
                     <div className="flex items-center justify-center h-64">
                         <div className="text-center">
@@ -69,7 +69,7 @@ export default function SalesDetailsPage() {
     if (error || !order) {
         return (
             <div className="flex min-h-screen bg-gray-50">
-                <Sidebar onRestaurantChange={setRestaurantId} />
+                <Sidebar onRestaurantChange={(id) => {navigate("/sales")}} />
                 <main className="flex-1 p-8">
                     <div className="max-w-6xl mx-auto">
                         <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800">
@@ -87,11 +87,11 @@ export default function SalesDetailsPage() {
         );
     }
 
-    const total = order.total || (order.subtotal + order.tax + order.deliveryFee);
+    const total = (order.subtotal + order.tax + order.deliveryFee);
 
     return (
         <div className="flex min-h-screen bg-gray-50">
-            <Sidebar onRestaurantChange={setRestaurantId} />
+            <Sidebar onRestaurantChange={(id) => {navigate("/sales")}} />
             <main className="flex-1 p-8">
                 <div className="max-w-6xl mx-auto">
                     {/* Header */}
@@ -243,16 +243,6 @@ export default function SalesDetailsPage() {
                                     <div className="border-t pt-3 flex justify-between">
                                         <span className="font-bold text-gray-900">Final Total:</span>
                                         <span className="font-bold text-gray-900 text-lg">${total.toFixed(2)}</span>
-                                    </div>
-                                </div>
-                                
-                                {/* Payment Status */}
-                                <div className="mt-4 pt-4 border-t">
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-gray-600 text-sm">Payment Status:</span>
-                                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
-                                            Paid
-                                        </span>
                                     </div>
                                 </div>
                             </div>

@@ -158,7 +158,7 @@ export default function AllSalesPage() {
     };
 
     // Calculate statistics
-    const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);
+    const totalRevenue = orders.filter(o => o.status === OrderStatus.Finished).reduce((sum, order) => sum + order.total, 0);
     const deliveredCount = orders.filter(o => o.status === OrderStatus.Finished).length;
     const cancelledCount = orders.filter(o => o.status === OrderStatus.Cancelled).length;
 
@@ -332,9 +332,6 @@ export default function AllSalesPage() {
                                                 Total Amount
                                             </th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                                Payment Status
-                                            </th>
-                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                                 Order Status
                                             </th>
                                         </tr>
@@ -357,11 +354,6 @@ export default function AllSalesPage() {
                                                 </td>
                                                 <td className="px-6 py-4 font-semibold text-gray-900">
                                                     ${order.total.toFixed(2)}
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
-                                                        Paid
-                                                    </span>
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <span 

@@ -136,7 +136,7 @@ export default function OrderDetailsPage() {
     if (loading) {
         return (
             <div className="flex min-h-screen bg-gray-50">
-                <Sidebar onRestaurantChange={setRestaurantId} />
+                <Sidebar onRestaurantChange={setRestaurantId}/>
                 <main className="flex-1 p-8">
                     <div className="flex items-center justify-center h-64">
                         <div className="text-center">
@@ -152,7 +152,7 @@ export default function OrderDetailsPage() {
     if (error || !order) {
         return (
             <div className="flex min-h-screen bg-gray-50">
-                <Sidebar onRestaurantChange={setRestaurantId} />
+                <Sidebar onRestaurantChange={(id) => {navigate("/orders")}} />
                 <main className="flex-1 p-8">
                     <div className="max-w-6xl mx-auto">
                         <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800">
@@ -176,7 +176,7 @@ export default function OrderDetailsPage() {
 
     return (
         <div className="flex min-h-screen bg-gray-50">
-            <Sidebar onRestaurantChange={setRestaurantId} />
+            <Sidebar onRestaurantChange={(id) => {navigate("/orders")}} />
             <main className="flex-1 p-8">
                 <div className="max-w-6xl mx-auto">
                     {/* Header */}
@@ -345,15 +345,6 @@ export default function OrderDetailsPage() {
                                             <p className="text-sm text-gray-500">Email</p>
                                             <p className="font-medium">
                                                 {order.customer.email || "No email provided"}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-start gap-3">
-                                        <span className="material-symbols-outlined text-gray-400">phone</span>
-                                        <div>
-                                            <p className="text-sm text-gray-500">Contact</p>
-                                            <p className="font-medium">
-                                                {order.customer.phone || "No phone provided"}
                                             </p>
                                         </div>
                                     </div>

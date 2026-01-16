@@ -175,7 +175,10 @@ useEffect(() => {
 
           <NavLink
               to="/settings/account"
-              className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-100"
+               className={({ isActive }) =>
+              `flex items-center gap-3 px-3 py-2 rounded-lg ${isActive ? "bg-blue-200 text-blue-800 font-bold" : "hover:bg-blue-100"
+              }`
+            }
           >
             <span className="material-symbols-outlined">settings</span>
             <p className="text-sm">Settings</p>
