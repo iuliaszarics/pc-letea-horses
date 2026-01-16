@@ -3,7 +3,10 @@ using Honse.Global.Extensions;
 using Honse.Managers.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace Honse.API.Controllers
 {
@@ -12,10 +15,15 @@ namespace Honse.API.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserManager userManager;
+        private readonly UserManager<Honse.Global.User> identityUserManager;
 
-        public UserController(Managers.Interfaces.IUserManager userManager)
+        public UserController(
+            IUserManager userManager,
+            UserManager<Honse.Global.User> identityUserManager
+        )
         {
             this.userManager = userManager;
+            this.identityUserManager = identityUserManager;
         }
 
         [HttpPost("register")]
@@ -115,6 +123,30 @@ namespace Honse.API.Controllers
                 return BadRequest(new { errorMessage = response.Exception.Message });
 
             return Ok(new { message = "Password changed successfully" });
+        }
+
+        [Authorize]
+        [HttpGet("me")]
+        public async Task<IActionResult> Me()
+        {
+            var userId =
+                User.FindFirstValue(ClaimTypes.NameIdentifier) ??
+                User.FindFirstValue(JwtRegisteredClaimNames.Sub) ??
+                User.FindFirstValue("sub");
+
+            if (string.IsNullOrWhiteSpace(userId))
+                return Unauthorized(new { errorMessage = "Invalid token: missing user id." });
+
+            var user = await identityUserManager.FindByIdAsync(userId);
+
+            if (user == null)
+                return Unauthorized(new { errorMessage = "User not found." });
+
+            return Ok(new
+            {
+                username = user.UserName,
+                email = user.Email
+            });
         }
 
     }

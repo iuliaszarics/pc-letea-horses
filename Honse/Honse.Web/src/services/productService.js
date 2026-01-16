@@ -31,7 +31,7 @@ export function parseError(err, fallback) {
 }
 
 
-function successData(data, extra = {}) {
+export function successData(data, extra = {}) {
     return { succeeded: true, data, ...extra };
 }
 

@@ -48,7 +48,7 @@ export const UserProvider = ({children}) => {
         setUsername(result?.username);
         setLoggedStatus(true);
 
-        navigate('/products');
+        navigate('/dashboard');
     }
 
     const loginUser = async (username, password) => {
@@ -68,7 +68,7 @@ export const UserProvider = ({children}) => {
         setUsername(result?.username);
         setLoggedStatus(true);
 
-        navigate('/products');
+        navigate('/dashboard');
 
     }
 
@@ -87,9 +87,15 @@ export const UserProvider = ({children}) => {
         navigate('/');
     };
 
+    const setAuthUsername = (newUsername) => {
+        const u = (newUsername ?? "").trim();
+        setUsername(u || null);
+        if (u) localStorage.setItem("username", u);
+        else localStorage.removeItem("username");
+    };
 
     return (
-        <UserContext.Provider value={{loginUser, registerUser, logoutUser, token, isLoggedIn, username}}>
+        <UserContext.Provider value={{loginUser, registerUser, logoutUser, token, isLoggedIn, username, setAuthUsername}}>
             {isReady ? children : null}
         </UserContext.Provider>
     )

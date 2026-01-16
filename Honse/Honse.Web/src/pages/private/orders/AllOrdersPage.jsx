@@ -79,7 +79,11 @@ export default function AllOrdersPage() {
             });
 
             if (result.succeeded) {
-                setOrders(result.data.orders || []);
+                // Filter to show only active orders (exclude Finished and Cancelled)
+                const activeOrders = (result.data.orders || []).filter(order => 
+                    order.status !== OrderStatus.Finished && order.status !== OrderStatus.Cancelled
+                );
+                setOrders(activeOrders);
                 setError("");
             } else {
                 setError(result.errorMessage || "Failed to load orders");
@@ -290,9 +294,9 @@ export default function AllOrdersPage() {
                             {searchQuery ? "No orders found matching your search" : "No orders found"}
                         </div>
                     ) : viewMode === "kanban" ? (
-                        /* Kanban View */
+                        /* Kanban View - Only show active statuses */
                         <div className="kanban-container">
-                            {[OrderStatus.New, OrderStatus.Accepted, OrderStatus.Delivery, OrderStatus.Finished, OrderStatus.Cancelled].map((status) => {
+                            {[OrderStatus.New, OrderStatus.Accepted, OrderStatus.Delivery].map((status) => {
                                 const statusOrders = getOrdersByStatus(status);
                                 return (
                                     <div key={status} className="kanban-column">

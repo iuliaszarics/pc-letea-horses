@@ -1,3 +1,5 @@
+using Honse.Managers;
+using Honse.Managers.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -127,6 +129,7 @@ builder.Services.AddScoped<Honse.Managers.Interfaces.IProductCategoryManager, Ho
 builder.Services.AddScoped<Honse.Managers.Interfaces.IRestaurantManager, Honse.Managers.RestaurantManager>();
 builder.Services.AddScoped<Honse.Managers.Interfaces.IOrderManager, Honse.Managers.OrderManager>();
 builder.Services.AddScoped<Honse.Managers.Interfaces.IConfigurationsManager, Honse.Managers.ConfigurationsManager>();
+builder.Services.AddScoped<Honse.Managers.Interfaces.IDashboardManager, Honse.Managers.DashboardManager>();
 
 // Services
 

@@ -18,10 +18,14 @@ import AddConfigurationPage from '../pages/private/configurations/AddConfigurati
 import OrderTrackingPage from '../pages/public/OrderTrackingPage/OrderTrackingPage';
 import AllOrdersPage from '../pages/private/orders/AllOrdersPage';
 import OrderDetailsPage from '../pages/private/orders/OrderDetailsPage';
+import AccountSettingsPage from "../pages/private/settings/AccountSettingsPage";
+import AllSalesPage from '../pages/private/sales/AllSalesPage';
+import SalesDetailsPage from '../pages/private/sales/SalesDetailsPage';
 
 import CheckoutPage from "../pages/public/Checkout/CheckoutPage";
 import OrderEmailConfirmationPage from "../pages/public/Checkout/OrderEmailConfirmationPage";
 import ConfirmOrderPage from '../pages/public/OrderTrackingPage/ConfirmOrderPage';
+import DashboardPage from '../pages/private/Dashboard/DashboardPage';
 export const router = createBrowserRouter([
     {
         path: "/",
@@ -58,28 +62,28 @@ export const router = createBrowserRouter([
 
             { path: "/login",
                 element: (
-                    <UnauthenticatedRoute redirectPage='/public/restaurants'>
+                    <UnauthenticatedRoute redirectPage='/dashboard'>
                         <LoginPage />
                     </UnauthenticatedRoute>
                 )
             },
             { path: "/public/login",
                 element: (
-                    <UnauthenticatedRoute redirectPage='/public/restaurants'>
+                    <UnauthenticatedRoute redirectPage='/dashboard'>
                         <LoginPage />
                     </UnauthenticatedRoute>
                 )
             },
             { path: "/register",
                 element: (
-                    <UnauthenticatedRoute redirectPage='/public/restaurants'>
+                    <UnauthenticatedRoute redirectPage='/dashboard'>
                         <RegisterPage />
                     </UnauthenticatedRoute>
                 )
             },
             { path: "/public/register",
                 element: (
-                    <UnauthenticatedRoute redirectPage='/public/restaurants'>
+                    <UnauthenticatedRoute redirectPage='/dashboard'>
                         <RegisterPage />
                     </UnauthenticatedRoute>
                 )
@@ -198,6 +202,44 @@ export const router = createBrowserRouter([
                 element: (
                     <AuthenticatedRoute redirectPage="/public/login">
                         <OrderDetailsPage />
+                    </AuthenticatedRoute>
+                ),
+            },
+
+            {
+                path: "/dashboard",
+                element: (
+                    <AuthenticatedRoute redirectPage="/public/login" > 
+                        <DashboardPage />
+                   </AuthenticatedRoute> 
+                ),
+            },
+
+
+            // Account settings page
+            {
+                path: "/settings/account",
+                element: (
+                    <AuthenticatedRoute redirectPage="/public/login">
+                        <AccountSettingsPage />
+                   </AuthenticatedRoute>
+                ),
+            },
+            // Sales management routes
+            {
+                path: "/sales",
+                element: (
+                    <AuthenticatedRoute redirectPage="/public/login">
+                        <AllSalesPage />
+                    </AuthenticatedRoute>
+                ),
+            },
+            
+            {
+                path: "/sales/:orderId",
+                element: (
+                    <AuthenticatedRoute redirectPage="/public/login">
+                        <SalesDetailsPage />
                     </AuthenticatedRoute>
                 ),
             },

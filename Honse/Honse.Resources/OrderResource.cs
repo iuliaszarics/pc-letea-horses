@@ -22,5 +22,23 @@ namespace Honse.Resources
                 .Where(o => o.RestaurantId == restaurantId)
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<Order>> GetActiveByRestaurantId(Guid restaurantId)
+        {
+            return await dbSet
+                .Where(o => o.RestaurantId == restaurantId &&
+                            o.OrderStatus != Global.Order.OrderStatus.Finished &&
+                            o.OrderStatus != Global.Order.OrderStatus.Cancelled)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Order>> GetFinishedByRestaurantId(Guid restaurantId)
+        {
+            return await dbSet
+                .Where(o => o.RestaurantId == restaurantId &&
+                            (o.OrderStatus == Global.Order.OrderStatus.Finished ||
+                             o.OrderStatus == Global.Order.OrderStatus.Cancelled))
+                .ToListAsync();
+        }
     }
 }
