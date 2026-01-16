@@ -116,7 +116,7 @@ export default function OrderTrackingPage() {
   const deliveryTime = new Date(order.orderStatus === 2 ? order.deliveryTime : order.preparationTime);
   console.log(deliveryTime);
   deliveryTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-  const statusStages = ["confirmed", "preparing", "out for delivery", "delivered"];
+  const statusStages = ["confirmed", "preparing", "out for delivery", "delivered", "cancelled"];
   const progressIndexMap = {
     0: 0,
     1: 1,
@@ -125,11 +125,12 @@ export default function OrderTrackingPage() {
     4: 4
   };
 
-console.log(statusHistory);
 
   const statusIndex = progressIndexMap[currentStatus] ?? 0;
   const progressPercent = ((statusIndex + 1) / 4) * 100;
   const statusLabel = statusStages[statusIndex];
+
+console.log(currentStatus, statusLabel);
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -234,6 +235,7 @@ console.log(statusHistory);
                 Waiting for your order to be accepted
               </p>
             ) : currentStatus === 4 ? <p className="text-4xl font-black text-[#3b82f6]">{"The order was cancelled"}</p> :
+            currentStatus === 3 ? <p className="text-3xl font-black text-[#3b82f6]">{"The order arrived. Enjoy your meal!"}</p> :
               <>    
                 <p className="text-4xl font-black text-[#3b82f6]">
                   {deliveryTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
@@ -260,7 +262,7 @@ console.log(statusHistory);
         const info = STATUS_INFO[entry.status];
         return (
           <li key={index} className="flex items-start gap-4">
-            <div className="w-6 h-6 flex items-center justify-center rounded-full bg-orange-500 text-white mt-1">
+            <div className="w-6 h-6 flex items-center justify-center rounded bg-orange-500 text-white mt-1">
               <span className="material-symbols-outlined text-base ">
                 {info.icon}
               </span>

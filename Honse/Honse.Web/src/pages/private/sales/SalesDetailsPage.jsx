@@ -164,18 +164,19 @@ export default function SalesDetailsPage() {
                                                     <div className="flex items-center gap-4 text-sm text-gray-600">
                                                         <span>Quantity: {item.quantity}</span>
                                                         <span>•</span>
-                                                        <span className="font-medium">${item.price.toFixed(2)} each</span>
+                                                        <span className="font-medium">${item.price.toFixed(2)} each {`(${(item.price * item.vat / 100)} is VAT)`}</span>
                                                     </div>
                                                 </div>
 
                                                 {/* Item Total */}
                                                 <div className="text-right">
                                                     <p className="font-bold text-gray-900">
-                                                        ${(item.price * item.quantity).toFixed(2)}
+                                                        ${((item.price - (item.price * item.vat / 100)) * item.quantity).toFixed(2)}
                                                     </p>
                                                     {item.vat > 0 && (
                                                         <p className="text-xs text-gray-500 mt-1">
-                                                            +${((item.price * item.quantity * item.vat) / 100).toFixed(2)} VAT
+                                                            +${((item.price * item.vat / 100) * item.quantity).toFixed(2)} VAT
+                                                            
                                                         </p>
                                                     )}
                                                 </div>

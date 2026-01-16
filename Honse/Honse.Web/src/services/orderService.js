@@ -399,14 +399,14 @@ async function transformOrder(backendOrder) {
         console.error("❌ Failed to parse address:", e);
         address = backendOrder.deliveryAddress || "No address provided";
     }
-    const phone = ""; // Empty for now - you need to add phone to Order table
+    const phone = backendOrder.phone; // Empty for now - you need to add phone to Order table
 
     // Calculate time ago
     const orderDate = new Date(backendOrder.timestamp+"Z");
 
     // Calculate subtotal from enriched items
-    const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const tax = items.reduce((sum, item) => sum + ((item.price * item.quantity * item.vat) / 100), 0);
+    const subtotal = items.reduce((sum, item) => sum + ((item.price - (item.price * item.vat / 100)) * item.quantity), 0);
+    const tax = items.reduce((sum, item) => sum + (item.price * item.vat / 100) * item.quantity, 0);
     const deliveryFee = 5.00;
     
     let total = backendOrder.total || backendOrder.Total;

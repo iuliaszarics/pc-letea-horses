@@ -23,15 +23,6 @@ export default function RestaurantCard({ restaurant }) {
             <div className="restaurant-info">
                 <h3 className="restaurant-name">{restaurant.name}</h3>
                 <p className="restaurant-cuisine">{restaurant.cuisineType}</p>
-                {restaurant.averageRating >= 0 && (
-                    <div className="restaurant-rating">
-                        <span className="star">⭐</span>
-                        <span className="rating-value">{restaurant.averageRating.toFixed(1)}</span>
-                        {restaurant.totalReviews >= 0 && (
-                            <span className="review-count">({restaurant.totalReviews})</span>
-                        )}
-                    </div>
-                )}
             </div>
         </div>
     );

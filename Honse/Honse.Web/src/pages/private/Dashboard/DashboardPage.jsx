@@ -117,7 +117,7 @@ export default function DashboardPage() {
     }
     : null;
 
-
+console.log(data);
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar onRestaurantChange={(id) => {

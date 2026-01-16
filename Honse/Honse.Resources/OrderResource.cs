@@ -38,6 +38,7 @@ namespace Honse.Resources
                 .Where(o => o.RestaurantId == restaurantId &&
                             (o.OrderStatus == Global.Order.OrderStatus.Finished ||
                              o.OrderStatus == Global.Order.OrderStatus.Cancelled))
+                .OrderBy(o => o.Timestamp)
                 .ToListAsync();
         }
     }

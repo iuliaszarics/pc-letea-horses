@@ -10,6 +10,8 @@ export default function CheckoutPage() {
     const { cart, updateQuantity, removeFromCart, clear } = useCart();
 
     const [error, setError] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+
     const [customer, setCustomer] = useState({
         fullName: "",
         email: "",
@@ -68,6 +70,9 @@ export default function CheckoutPage() {
         e.preventDefault();
         setError(null);
 
+        if (isLoading)
+            return;
+
         if (restaurantCart.length === 0) {
             setError("Your cart is empty.");
             return;
@@ -77,6 +82,33 @@ export default function CheckoutPage() {
             setError("Please enter your email address.");
             return;
         }
+
+        if (!customer.fullName) {
+            setError("Please enter your name.");
+            return;
+        }
+
+        if (!customer.phone) {
+            setError("Please enter your phone.");
+            return;
+        }
+
+        if (!customer.address) {
+            setError("Please enter your street.");
+            return;
+        }
+
+        if (!customer.city) {
+            setError("Please enter your city.");
+            return;
+        }
+
+        if (!customer.country) {
+            setError("Please enter your country.");
+            return;
+        }
+
+        setIsLoading(true);
 
         try {
             const payload = {
@@ -104,6 +136,7 @@ export default function CheckoutPage() {
             const res = await placeOrderAPI(payload);
             if (!res.succeeded) {
                 setError(res.errorMessage || "Failed to place order");
+                isLoading = false;
                 return;
             }
 
@@ -175,7 +208,7 @@ export default function CheckoutPage() {
                     </label>
 
                     <label>
-                        Address
+                        Street
                         <input
                             type="text"
                             name="address"
@@ -207,7 +240,7 @@ export default function CheckoutPage() {
                     <button
                         type="submit"
                         className="btn btn-primary"
-                        disabled={restaurantCart.length === 0}
+                        disabled={restaurantCart.length === 0 || isLoading}
                     >
                         Place order
                     </button>
