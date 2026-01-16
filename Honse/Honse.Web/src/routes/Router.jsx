@@ -25,6 +25,7 @@ import SalesDetailsPage from '../pages/private/sales/SalesDetailsPage';
 import CheckoutPage from "../pages/public/Checkout/CheckoutPage";
 import OrderEmailConfirmationPage from "../pages/public/Checkout/OrderEmailConfirmationPage";
 import ConfirmOrderPage from '../pages/public/OrderTrackingPage/ConfirmOrderPage';
+import DashboardPage from '../pages/private/Dashboard/DashboardPage';
 export const router = createBrowserRouter([
     {
         path: "/",
@@ -61,28 +62,28 @@ export const router = createBrowserRouter([
 
             { path: "/login",
                 element: (
-                    <UnauthenticatedRoute redirectPage='/public/restaurants'>
+                    <UnauthenticatedRoute redirectPage='/dashboard'>
                         <LoginPage />
                     </UnauthenticatedRoute>
                 )
             },
             { path: "/public/login",
                 element: (
-                    <UnauthenticatedRoute redirectPage='/public/restaurants'>
+                    <UnauthenticatedRoute redirectPage='/dashboard'>
                         <LoginPage />
                     </UnauthenticatedRoute>
                 )
             },
             { path: "/register",
                 element: (
-                    <UnauthenticatedRoute redirectPage='/public/restaurants'>
+                    <UnauthenticatedRoute redirectPage='/dashboard'>
                         <RegisterPage />
                     </UnauthenticatedRoute>
                 )
             },
             { path: "/public/register",
                 element: (
-                    <UnauthenticatedRoute redirectPage='/public/restaurants'>
+                    <UnauthenticatedRoute redirectPage='/dashboard'>
                         <RegisterPage />
                     </UnauthenticatedRoute>
                 )
@@ -204,6 +205,16 @@ export const router = createBrowserRouter([
                     </AuthenticatedRoute>
                 ),
             },
+
+            {
+                path: "/dashboard",
+                element: (
+                    <AuthenticatedRoute redirectPage="/public/login" > 
+                        <DashboardPage />
+                   </AuthenticatedRoute> 
+                ),
+            },
+
 
             // Account settings page
             {

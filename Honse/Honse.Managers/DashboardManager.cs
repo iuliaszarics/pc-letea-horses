@@ -25,7 +25,7 @@ namespace Honse.Managers
             var allOrders = await _orderResource.GetByRestaurantId(request.RestaurantId);
 
             var filteredOrders = allOrders
-                .Where(o => o.Timestamp >= request.StartDate && o.Timestamp <= request.EndDate)
+                .Where(o => o.Timestamp.Date >= request.StartDate.Date && o.Timestamp.Date <= request.EndDate.Date)
                 .ToList();
 
             var validOrders = filteredOrders

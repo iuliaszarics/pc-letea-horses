@@ -14,52 +14,52 @@ export default function OrderTrackingPage() {
   const [connection, setConnection] = useState(null);
 
   useEffect(() => {
-  const newConnection = new signalR.HubConnectionBuilder()
-    .withUrl("https://localhost:2000/api/orderinghub", {
-      skipNegotiation: true,
-      transport: signalR.HttpTransportType.WebSockets,
-    })
-    .withAutomaticReconnect()
-    .build();
+    const newConnection = new signalR.HubConnectionBuilder()
+      .withUrl("https://localhost:2000/api/orderinghub", {
+        skipNegotiation: true,
+        transport: signalR.HttpTransportType.WebSockets,
+      })
+      .withAutomaticReconnect()
+      .build();
 
-  setConnection(newConnection);
-}, []);
-
-useEffect(() =>{
-        if (!connection) 
-            return;
-
-            connection.start().then(() =>{
-                console.log("SignalR connected.");
-		
-                connection.on('PingOrderUpdated', updatedId => {
-
-                  if(updatedId === id)
-                    reloadOrder();
-                });
-              })
-            .catch(e => console.log('Connection failed: ', e))
-
-         return () => {
-    connection.stop();
-  };
-}, [connection, id]);
-
-
-async function reloadOrder() {
-  const res = await getOrderDetailsAPI(id);
-
-  if (res.succeeded) {
-    setOrder(res.data);
-  } else {
-    console.error(res.errorMessage);
-    setError(res.errorMessage);
-  }
-}
+    setConnection(newConnection);
+  }, []);
 
   useEffect(() => {
-  setLoading(true);
-  reloadOrder().finally(() => setLoading(false));
+    if (!connection)
+      return;
+
+    connection.start().then(() => {
+      console.log("SignalR connected.");
+
+      connection.on('PingOrderUpdated', updatedId => {
+
+        if (updatedId === id)
+          reloadOrder();
+      });
+    })
+      .catch(e => console.log('Connection failed: ', e))
+
+    return () => {
+      connection.stop();
+    };
+  }, [connection, id]);
+
+
+  async function reloadOrder() {
+    const res = await getOrderDetailsAPI(id);
+
+    if (res.succeeded) {
+      setOrder(res.data);
+    } else {
+      console.error(res.errorMessage);
+      setError(res.errorMessage);
+    }
+  }
+
+  useEffect(() => {
+    setLoading(true);
+    reloadOrder().finally(() => setLoading(false));
   }, [id]);
 
   const navigate = useNavigate();
@@ -84,17 +84,18 @@ async function reloadOrder() {
   }
 
   useEffect(() => {
-     if (!order) return; 
-  const deliveryTime = new Date(order.deliveryTime);
-  setMinutesRemaining(Math.max(0, Math.round((deliveryTime - new Date()) / 60000)));
+    if (!order) return;
+    const deliveryTime = new Date(order.preparationTime);
+    deliveryTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+    setMinutesRemaining(Math.max(0, Math.round((deliveryTime - new Date()) / 60000)));
 
-  const interval = setInterval(() => {
-    const newMinutes = Math.max(0, Math.round((deliveryTime - new Date()) / 60000));
-    setMinutesRemaining(newMinutes);
-  }, 60_000);
+    const interval = setInterval(() => {
+      const newMinutes = Math.max(0, Math.round((deliveryTime - new Date()) / 60000));
+      setMinutesRemaining(newMinutes);
+    }, 60_000);
 
-  return () => clearInterval(interval);
-}, [order]);
+    return () => clearInterval(interval);
+  }, [order]);
 
   if (loading) return <p className="p-10 text-lg text-gray-500">Loading...</p>;
   if (!order) return <p className="p-10 text-lg text-red-500">Order not found.</p>;
@@ -109,7 +110,8 @@ async function reloadOrder() {
   const total = subtotal + deliveryFee;
   const currentStatus = order.orderStatus;
   const statusHistory = order.statusHistory ?? [];
-  const deliveryTime = new Date(order.deliveryTime);
+  const deliveryTime = new Date(order.preparationTime);
+  deliveryTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
   const statusStages = ["confirmed", "preparing", "out for delivery", "delivered"];
   const progressIndexMap = {
     0: 0,
@@ -217,47 +219,57 @@ async function reloadOrder() {
           {/* ETA */}
           <div className="bg-white p-6 rounded-xl border border-[#e7d9cf] shadow-sm">
             <h2 className="text-lg font-bold mb-1">Estimated Delivery</h2>
-            <p className="text-4xl font-black text-[#3b82f6]">
-              {deliveryTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-            </p>
-            <p className="text-gray-600 mt-1">
-              Arriving in {minutesRemaining} minutes
-            </p>
+
+            {order.orderStatus === 0 ? (
+               <p className="text-3xl font-black text-[#3b82f6]">
+                Waiting for your order to be accepted
+              </p>
+            ) : (
+              <>
+                <p className="text-4xl font-black text-[#3b82f6]">
+                  {deliveryTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                </p>
+                <p className="text-gray-600 mt-1">
+                  Arriving in {minutesRemaining} minutes
+                </p>
+              </>
+            )}
           </div>
 
-         <div className="bg-card-background-light rounded-xl p-6 shadow-sm border border-border-light">
-  <h2 className="text-lg font-bold text-text-light mb-4">
-    Order History
-  </h2>
 
-  <ul className="space-y-4">
-    {statusHistory
-      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-      .map((entry, index) => {
-        const info = STATUS_INFO[entry.status];
-        return (
-          <li key={index} className="flex items-start gap-4">
-            <div className="w-6 h-6 flex items-center justify-center rounded-full bg-orange-500 text-white mt-1">
-              <span className="material-symbols-outlined text-base ">
-                {info.icon}
-              </span>
-            </div>
-            <div className="flex-1">
-              <p className="font-medium text-text-light">
-                {info.label}
-              </p>
-              <p className="text-sm text-secondary-text-light">
-                {new Date(entry.timestamp).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
+          <div className="bg-card-background-light rounded-xl p-6 shadow-sm border border-border-light">
+            <h2 className="text-lg font-bold text-text-light mb-4">
+              Order History
+            </h2>
+
+            <ul className="space-y-4">
+              {statusHistory
+                .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+                .map((entry, index) => {
+                  const info = STATUS_INFO[entry.status];
+                  return (
+                    <li key={index} className="flex items-start gap-4">
+                      <div className="w-6 h-6 flex items-center justify-center rounded-full bg-orange-500 text-white mt-1">
+                        <span className="material-symbols-outlined text-base ">
+                          {info.icon}
+                        </span>
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-medium text-text-light">
+                          {info.label}
+                        </p>
+                        <p className="text-sm text-secondary-text-light">
+                          {new Date(entry.timestamp).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </p>
+                      </div>
+                    </li>
+                  );
                 })}
-              </p>
-            </div>
-          </li>
-        );
-      })}
-  </ul>
-</div>
+            </ul>
+          </div>
 
           {/* Customer Details */}
           <div className="rounded-xl border border-gray-200/50 bg-white shadow-sm">

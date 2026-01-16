@@ -48,7 +48,7 @@ export const UserProvider = ({children}) => {
         setUsername(result?.username);
         setLoggedStatus(true);
 
-        navigate('/products');
+        navigate('/dashboard');
     }
 
     const loginUser = async (username, password) => {
@@ -68,7 +68,7 @@ export const UserProvider = ({children}) => {
         setUsername(result?.username);
         setLoggedStatus(true);
 
-        navigate('/products');
+        navigate('/dashboard');
 
     }
 
