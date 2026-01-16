@@ -41,7 +41,7 @@ namespace Honse.Managers
                 .ToList();
 
             var validOrders = filteredOrders
-                .Where(o => o.OrderStatus != OrderStatus.Cancelled && o.OrderStatus != OrderStatus.New)
+                .Where(o => o.OrderStatus == Global.Order.OrderStatus.Finished)
                 .ToList();
 
             var response = new DashboardStatsResponse
@@ -57,7 +57,7 @@ namespace Honse.Managers
             if (isSameDay)
             {
                 var hourlyData = validOrders
-                    .GroupBy(o => o.Timestamp.Hour)
+                    .GroupBy(o => o.Timestamp.ToLocalTime().Hour)
                     .ToDictionary(g => g.Key, g => g.Count());
 
                 for (int i = 0; i < 24; i++)

@@ -66,7 +66,7 @@ namespace Honse.Managers
 
             // 3. Process
             // The engine updates 'domainOrder' logic
-            orderProcessorEngine.ProcessOrder(
+            domainOrder = orderProcessorEngine.ProcessOrder(
                 domainOrder, 
                 request.NextStatus, 
                 request.PreparationTimeMinutes, 
@@ -98,6 +98,8 @@ namespace Honse.Managers
                 Timestamp = newHistoryItem.Timestamp, // FIX: Use 'Timestamp' instead of 'Date'
                 Notes = newHistoryItem.Notes
             });
+
+            trackedEntity.DeliveryTime = domainOrder.DeliveryTime;
 
             // 5. Save Changes
             await orderResource.SaveChanges();

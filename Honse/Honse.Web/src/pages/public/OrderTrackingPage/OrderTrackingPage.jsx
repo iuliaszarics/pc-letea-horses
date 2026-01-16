@@ -50,6 +50,10 @@ export default function OrderTrackingPage() {
     const res = await getOrderDetailsAPI(id);
 
     if (res.succeeded) {
+      
+      res.data.preparationTime += "Z";
+      res.data.deliveryTime += "Z";
+
       setOrder(res.data);
     } else {
       console.error(res.errorMessage);
@@ -85,7 +89,7 @@ export default function OrderTrackingPage() {
 
   useEffect(() => {
     if (!order) return;
-    const deliveryTime = new Date(order.preparationTime);
+    const deliveryTime = new Date(order.orderStatus === 2 ? order.deliveryTime : order.preparationTime);
     deliveryTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
     setMinutesRemaining(Math.max(0, Math.round((deliveryTime - new Date()) / 60000)));
 
@@ -109,7 +113,8 @@ export default function OrderTrackingPage() {
   const total = subtotal + deliveryFee;
   const currentStatus = order.orderStatus;
   const statusHistory = order.statusHistory ?? [];
-  const deliveryTime = new Date(order.preparationTime);
+  const deliveryTime = new Date(order.orderStatus === 2 ? order.deliveryTime : order.preparationTime);
+  console.log(deliveryTime);
   deliveryTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
   const statusStages = ["confirmed", "preparing", "out for delivery", "delivered"];
   const progressIndexMap = {
