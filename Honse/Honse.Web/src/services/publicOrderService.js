@@ -106,18 +106,16 @@ export async function confirmOrderAPI(id) {
     }
 }
 
-// Place an order (creates confirmation token and sends email)
 export async function placeOrderAPI(payload) {
     try {
         const res = await api.post(`/api/public/orders/place`, payload);
-        // backend returns { tokenId, message }
+
         return successData(res.data, { tokenId: res.data?.tokenId });
     } catch (err) {
         return failure(parseError(err, "Failed to place order"));
     }
 }
 
-// Validate order before placing (optional step)
 export async function validateOrderAPI(payload) {
     try {
         const res = await api.post(`/api/public/orders/validate`, payload);

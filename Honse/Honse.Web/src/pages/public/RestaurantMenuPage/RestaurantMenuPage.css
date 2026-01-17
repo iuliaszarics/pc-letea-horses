@@ -18,7 +18,7 @@
   font-weight: 600;
 }
 
-/* Header */
+
 .header {
   position: relative;
   width: 100%;
@@ -52,7 +52,6 @@
   opacity: 0.9;
 }
 
-/* Layout */
 .menu-layout {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -62,7 +61,6 @@
   padding: 0 20px;
 }
 
-/* Menu Categories */
 .menu-category h2 {
   border-bottom: 2px solid #f0f0f0;
   padding-bottom: 6px;
@@ -128,7 +126,6 @@
   font-weight: 500;
 }
 
-/* Order Summary */
 .order-summary {
   background: #fff6f0;
   border-radius: 12px;

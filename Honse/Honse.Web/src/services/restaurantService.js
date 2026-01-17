@@ -3,13 +3,11 @@ import axios from "axios";
 const RAW_BASE = process.env.REACT_APP_API_URL || "https://localhost:2000";
 const BASE_URL = RAW_BASE.replace(/\/+$/, "");
 
-// Create a separate axios instance for public endpoints (no auth required)
 export const publicApi = axios.create({
   baseURL: BASE_URL,
   headers: { "Content-Type": "application/json" },
 });
 
-// Keep the authenticated API for private endpoints
 export const api = axios.create({
   baseURL: BASE_URL,
   headers: { "Content-Type": "application/json" },
@@ -42,9 +40,6 @@ function successData(data, extra = {}) {
   return { succeeded: true, data, ...extra };
 }
 
-// PUBLIC ENDPOINTS - No authentication required
-
-// Get all restaurants with filtering (PUBLIC)
 export async function getPublicRestaurantsAPI({
   searchKey,
   cuisineType,
@@ -94,9 +89,6 @@ export async function getPublicRestaurantsMenu(restaurantId) {
   }
 }
 
-// AUTHENTICATED ENDPOINTS - Require authentication
-
-// Get all restaurants with filtering (AUTHENTICATED - for restaurant owner)
 export async function getRestaurantsAPI({
   searchKey,
   cuisineType,
@@ -129,7 +121,6 @@ export async function getRestaurantsAPI({
   }
 }
 
-// Get all restaurants without pagination (AUTHENTICATED)
 export async function getAllRestaurantsAPI() {
   try {
     const res = await api.get("/api/restaurants/all");
@@ -139,7 +130,6 @@ export async function getAllRestaurantsAPI() {
   }
 }
 
-// Get restaurant by ID (AUTHENTICATED)
 export async function getRestaurantByIdAPI(id) {
   try {
     const res = await api.get(`/api/restaurants/${id}`);
@@ -149,7 +139,7 @@ export async function getRestaurantByIdAPI(id) {
   }
 }
 
-// Add new restaurant (AUTHENTICATED)
+
 export async function addRestaurantAPI(restaurant) {
   try {
     const res = await api.post("/api/restaurants", restaurant);
@@ -159,7 +149,7 @@ export async function addRestaurantAPI(restaurant) {
   }
 }
 
-// Update restaurant (AUTHENTICATED)
+
 export async function updateRestaurantAPI(id, restaurant) {
   try {
     const res = await api.put(`/api/restaurants/${id}`, restaurant);
@@ -169,7 +159,6 @@ export async function updateRestaurantAPI(id, restaurant) {
   }
 }
 
-// Delete restaurant (AUTHENTICATED)
 export async function deleteRestaurantAPI(id) {
     try {
         const res = await api.delete(`/api/restaurants/${id}`);

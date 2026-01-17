@@ -65,7 +65,6 @@ export async function getConfigurationsAPI({ userId, searchKey = "", pageNumber 
 
 export async function getConfigurationByIdAPI(id) {
   try {
-    // Backend doesn't have GET by ID endpoint, so fetch all and filter
     const res = await api.get("/api/configurations");
     const configurations = Array.isArray(res.data) ? res.data : [];
     const config = configurations.find((c) => String(c.id) === String(id));
@@ -107,7 +106,7 @@ export async function getCategoriesByConfigurationAPI(configurationId) {
   }
 }
 
-// Convenience: get all configurations without pagination
+
 export async function getAllConfigurationsAPI() {
   try {
     const res = await api.get("/api/configurations");
@@ -117,7 +116,6 @@ export async function getAllConfigurationsAPI() {
   }
 }
 
-// Add configuration
 export async function addConfigurationAPI(payload) {
   try {
     const res = await api.post("/api/configurations", payload);
@@ -127,7 +125,6 @@ export async function addConfigurationAPI(payload) {
   }
 }
 
-// Update configuration
 export async function updateConfigurationAPI(id, payload) {
   try {
     const res = await api.put(`/api/configurations/${id}`, payload);
@@ -137,13 +134,11 @@ export async function updateConfigurationAPI(id, payload) {
   }
 }
 
-// Delete configuration
 export async function deleteConfigurationAPI(id) {
   try {
     const res = await api.delete(`/api/configurations/${id}`);
     return successData(res.data);
   } catch (err) {
-    // Surface dependency errors from backend if any
     return failure(parseError(err, "Failed to delete configuration"));
   }
 }

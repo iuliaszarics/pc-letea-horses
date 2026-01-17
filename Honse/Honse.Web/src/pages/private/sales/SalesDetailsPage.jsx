@@ -27,7 +27,7 @@ export default function SalesDetailsPage() {
             if (result.succeeded) {
                 const orderData = result.data;
                 
-                // Verify this is a completed order
+                
                 if (orderData.status !== OrderStatus.Finished && orderData.status !== OrderStatus.Cancelled) {
                     setError("This order is not completed yet. Please check the Orders page.");
                     setOrder(null);
@@ -117,7 +117,6 @@ export default function SalesDetailsPage() {
                     </div>
 
                     <div className="grid grid-cols-3 gap-6">
-                        {/* Left Column - Order Items */}
                         <div className="col-span-2 space-y-6">
                             {/* Order Items Card */}
                             <div className="bg-white rounded-xl shadow-sm p-6">
@@ -187,7 +186,6 @@ export default function SalesDetailsPage() {
                             </div>
                         </div>
 
-                        {/* Right Column - Customer & Payment Info */}
                         <div className="space-y-6">
                             {/* Customer Information */}
                             <div className="bg-white rounded-xl shadow-sm p-6">
@@ -248,7 +246,7 @@ export default function SalesDetailsPage() {
                                 </div>
                             </div>
 
-                            {/* Order Timeline */}
+                            {/*Timeline */}
                             <div className="bg-white rounded-xl shadow-sm p-6">
                                 <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
                                     <span className="material-symbols-outlined text-gray-600">schedule</span>

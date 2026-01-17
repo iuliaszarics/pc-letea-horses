@@ -45,7 +45,6 @@ export default function AddRestaurantPage() {
           }
         }
       } catch (err) {
-        // ignore
       }
 
       if (!id) {

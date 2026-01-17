@@ -10,13 +10,12 @@ import {
 } from "../../../services/orderService";
 import "./AllSalesPage.css";
 
-// Helper component to show date formatting
 function FormattedDate({ timestamp }) {
     if (!timestamp) return "Unknown";
     
     const orderDate = new Date(timestamp);
     
-    // Check if date is valid
+    
     if (isNaN(orderDate.getTime())) {
         return "Unknown";
     }
@@ -34,7 +33,7 @@ export default function AllSalesPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
-    const [statusFilter, setStatusFilter] = useState("all"); // all, delivered, cancelled
+    const [statusFilter, setStatusFilter] = useState("all"); 
     const [dateRange, setDateRange] = useState({ start: "", end: "" });
     const [restaurantId, setRestaurantId] = useState(localStorage.getItem("restaurantId"));
 
@@ -54,15 +53,13 @@ export default function AllSalesPage() {
             });
 
             if (result.succeeded) {
-                // Filter to show only completed orders (Finished = 3, Cancelled = -1)
+                // Finished = 3, Cancelled = -1
                 const completedOrders = (result.data.orders || []).filter(order => 
                     order.status === OrderStatus.Finished || order.status === OrderStatus.Cancelled
                 );
                 
-                // Apply additional filters
                 let filteredOrders = completedOrders;
-                
-                // Search filter (client-side)
+
                 if (searchQuery && searchQuery.trim() !== "") {
                     const query = searchQuery.toLowerCase().trim();
                     filteredOrders = filteredOrders.filter(order => {
@@ -72,14 +69,12 @@ export default function AllSalesPage() {
                     });
                 }
                 
-                // Status filter
                 if (statusFilter === "delivered") {
                     filteredOrders = filteredOrders.filter(order => order.status === OrderStatus.Finished);
                 } else if (statusFilter === "cancelled") {
                     filteredOrders = filteredOrders.filter(order => order.status === OrderStatus.Cancelled);
                 }
-                
-                // Date range filter
+
                 if (dateRange.start) {
                     const startDate = new Date(dateRange.start);
                     filteredOrders = filteredOrders.filter(order => 
@@ -109,7 +104,6 @@ export default function AllSalesPage() {
         }
     }, [restaurantId, searchQuery, statusFilter, dateRange]);
 
-    // Debounce search - only fetch after user stops typing for 500ms
     useEffect(() => {
         const timeoutId = setTimeout(() => {
             fetchSalesData();
@@ -118,7 +112,6 @@ export default function AllSalesPage() {
         return () => clearTimeout(timeoutId);
     }, [searchQuery, fetchSalesData]);
 
-    // Immediate fetch when filters change (no debounce for filters)
     useEffect(() => {
         fetchSalesData();
     }, [statusFilter, dateRange]);
@@ -132,7 +125,7 @@ export default function AllSalesPage() {
     };
 
     const handleExportData = () => {
-        // Simple CSV export
+        
         const headers = ["Order ID", "Order Number", "Customer", "Date", "Total", "Payment Status", "Order Status"];
         const csvRows = [
             headers.join(","),
@@ -142,7 +135,7 @@ export default function AllSalesPage() {
                 order.customerName,
                 new Date(order.timestamp).toLocaleDateString(),
                 `$${order.total.toFixed(2)}`,
-                "Paid", // Assuming all completed orders are paid
+                "Paid", 
                 getStatusLabel(order.status)
             ].join(","))
         ];
@@ -157,7 +150,6 @@ export default function AllSalesPage() {
         window.URL.revokeObjectURL(url);
     };
 
-    // Calculate statistics
     const totalRevenue = orders.filter(o => o.status === OrderStatus.Finished).reduce((sum, order) => sum + order.total, 0);
     const deliveredCount = orders.filter(o => o.status === OrderStatus.Finished).length;
     const cancelledCount = orders.filter(o => o.status === OrderStatus.Cancelled).length;
@@ -369,7 +361,7 @@ export default function AllSalesPage() {
                                 </table>
                             </div>
                             
-                            {/* Pagination info */}
+                            {/* Pagination */}
                             <div className="px-6 py-4 bg-gray-50 border-t text-sm text-gray-600">
                                 Showing {orders.length} order{orders.length !== 1 ? 's' : ''}
                             </div>

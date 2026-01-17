@@ -21,7 +21,7 @@ function TimeAgo({ timestamp }) {
             if (!timestamp) return "Unknown";
             
             const orderDate = new Date(timestamp+"Z");
-            // Check if date is valid
+            
             if (isNaN(orderDate.getTime())) {
                 return "Unknown";
             }
@@ -38,10 +38,10 @@ function TimeAgo({ timestamp }) {
             return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
         }
 
-        // Initial calculation
+        
         setTimeAgo(calculateTimeAgo());
 
-        // Update every minute
+        
         const interval = setInterval(() => {
             setTimeAgo(calculateTimeAgo());
         }, 60000);
@@ -79,7 +79,7 @@ export default function AllOrdersPage() {
             });
 
             if (result.succeeded) {
-                // Filter to show only active orders (exclude Finished and Cancelled)
+                // exclude finished and cancelled
                 const activeOrders = (result.data.orders || []).filter(order => 
                     order.status !== OrderStatus.Finished && order.status !== OrderStatus.Cancelled
                 );
@@ -98,7 +98,7 @@ export default function AllOrdersPage() {
         }
     }, [restaurantId, searchQuery]);
 
-    // Fetch single order and update/add to list
+
     const fetchAndUpdateOrder = useCallback(async (orderId) => {
         if (!restaurantId) return;
 
@@ -113,13 +113,13 @@ export default function AllOrdersPage() {
                     const existingIndex = prevOrders.findIndex(o => o.id === orderId);
                     
                     if (existingIndex !== -1) {
-                        // Update existing order
+                        
                         console.log(`✅ Updated order ${orderId} in list`);
                         const newOrders = [...prevOrders];
                         newOrders[existingIndex] = updatedOrder;
                         return newOrders;
                     } else {
-                        // Add new order (if it belongs to this restaurant)
+                        
                         if (updatedOrder.restaurantId === restaurantId) {
                             console.log(`✅ Added new order ${orderId} to list`);
                             return [updatedOrder, ...prevOrders];
@@ -133,7 +133,7 @@ export default function AllOrdersPage() {
         }
     }, [restaurantId]);
 
-    // Initialize SignalR connection
+
     useEffect(() => {
         const newConnection = new signalR.HubConnectionBuilder()
             .withUrl(`https://localhost:2000/api/orderinghub`, {
@@ -152,7 +152,7 @@ export default function AllOrdersPage() {
         };
     }, []);
 
-    // Setup SignalR event listeners
+ 
     useEffect(() => {
         if (connection) {
             connection.start()
@@ -184,7 +184,6 @@ export default function AllOrdersPage() {
         };
     }, [connection, fetchAndUpdateOrder]);
 
-    // Debounce search - only fetch after user stops typing for 500ms
     useEffect(() => {
         const timeoutId = setTimeout(() => {
             fetchOrders();
@@ -294,7 +293,7 @@ export default function AllOrdersPage() {
                             {searchQuery ? "No orders found matching your search" : "No orders found"}
                         </div>
                     ) : viewMode === "kanban" ? (
-                        /* Kanban View - Only show active statuses */
+                        /* only show active statuses */
                         <div className="kanban-container">
                             {[OrderStatus.New, OrderStatus.Accepted, OrderStatus.Delivery].map((status) => {
                                 const statusOrders = getOrdersByStatus(status);

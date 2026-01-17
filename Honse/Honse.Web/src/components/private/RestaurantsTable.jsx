@@ -13,7 +13,7 @@ export default function RestaurantsTable({ restaurants = [], setRestaurants }) {
 
     const updated = { ...rest, isEnabled: !rest.isEnabled };
 
-    // optimistic update
+    
     setRestaurants((prev) => prev.map((r) => (r.id === restaurantId ? updated : r)));
 
     const result = await updateRestaurantAPI(restaurantId, updated);

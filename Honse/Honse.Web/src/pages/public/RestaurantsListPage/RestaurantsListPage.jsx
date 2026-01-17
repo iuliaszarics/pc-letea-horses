@@ -34,7 +34,6 @@ export default function RestaurantsListPage() {
                 setTotalCount(result.totalCount || 0);
                 setError("");
                 
-                // Restore focus to search input after fetch
                 if (searchInputRef.current && document.activeElement !== searchInputRef.current) {
                     setTimeout(() => {
                         searchInputRef.current?.focus();
@@ -55,7 +54,6 @@ export default function RestaurantsListPage() {
         }
     }, [pageNumber, pageSize, searchQuery]);
 
-    // Debounce search - only fetch after user stops typing for 500ms
     useEffect(() => {
         const timeoutId = setTimeout(() => {
             fetchRestaurants();
@@ -66,7 +64,7 @@ export default function RestaurantsListPage() {
 
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
-        setPageNumber(1); // Reset to first page on search
+        setPageNumber(1); 
     };
 
     if (loading && restaurants.length === 0) {

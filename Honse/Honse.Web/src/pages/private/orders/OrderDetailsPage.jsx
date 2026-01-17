@@ -45,7 +45,7 @@ export default function OrderDetailsPage() {
         }
     }, [restaurantId, orderId]);
 
-    // Initialize SignalR connection
+  
     useEffect(() => {
         const newConnection = new signalR.HubConnectionBuilder()
             .withUrl(`https://localhost:2000/api/orderinghub`, {
@@ -64,19 +64,19 @@ export default function OrderDetailsPage() {
         };
     }, []);
 
-    // Setup SignalR event listeners
+
     useEffect(() => {
         if (connection && orderId) {
             connection.start()
                 .then(() => {
                     console.log('✅ SignalR Connected in Order Details');
 
-                    // When an order is updated - check if it's THIS order
+                    // check if it's THIS order
                     connection.on('PingOrderUpdated', (updatedOrderId) => {
                         console.log(`🔔 Order updated signal received: ${updatedOrderId}`);
                         console.log(`📍 Current order ID: ${orderId}`);
                         
-                        // Only refresh if the updated order is the one we're viewing
+                        
                         if (updatedOrderId === orderId) {
                             console.log(`🔄 Refreshing current order details`);
                             fetchOrderDetails();
@@ -97,7 +97,6 @@ export default function OrderDetailsPage() {
         };
     }, [connection, orderId, fetchOrderDetails]);
 
-    // Initial fetch
     useEffect(() => {
         fetchOrderDetails();
     }, [fetchOrderDetails]);
@@ -115,7 +114,6 @@ export default function OrderDetailsPage() {
             });
 
             if (result.succeeded) {
-                // Don't manually update state - let SignalR handle it
                 console.log("✅ Order status update sent, waiting for SignalR notification...");
             } else {
                 alert(result.errorMessage || "Failed to update order status");
@@ -326,7 +324,6 @@ export default function OrderDetailsPage() {
                             </div>
                         </div>
 
-                        {/* Customer Details & Order Summary */}
                         <div className="space-y-6">
                             {/* Customer Details */}
                             <div className="bg-white rounded-xl shadow-sm p-6">

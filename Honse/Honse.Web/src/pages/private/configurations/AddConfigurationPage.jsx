@@ -99,7 +99,7 @@ export default function AddConfigurationPage() {
       const userId = token ? jwtDecode(token).sub : undefined;
 
       const payload = {
-        ...(id && { id }), // Include id for updates
+        ...(id && { id }), 
         name: configuration.name,
         userId,
         categoryIds: selectedCategoryIds && selectedCategoryIds.length > 0 ? selectedCategoryIds : [],

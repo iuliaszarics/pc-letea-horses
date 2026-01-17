@@ -207,7 +207,7 @@ console.log(data);
                       return;
                     }
 
-                    // Commit temporary dates to actual state
+                    
                     setStartDate(tempStartDate);
                     setEndDate(tempEndDate);
                   }}
@@ -222,7 +222,7 @@ console.log(data);
                 className={`flex h-9 items-center justify-center px-4 rounded-md ${range === 'customRange' ? 'bg-blue-600 text-white' : 'hover:bg-gray-200 '}`}
                 onClick={() => {
                   setRange('customRange');
-                  setTempStartDate(startDate); // Reset temporary dates to current range
+                  setTempStartDate(startDate); 
                   setTempEndDate(endDate);
                 }}
               >
@@ -252,7 +252,7 @@ console.log(data);
             ))}
           </div>
 
-          {/* Charts Section */}
+        
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
             {/* Line chart */}
             <div className="lg:col-span-2 p-6 bg-white  border border-gray-200  rounded-xl">
@@ -260,7 +260,7 @@ console.log(data);
               <Line data={lineChartData} />
             </div>
 
-            {/* Doughnut chart */}
+            {/* Donut chart */}
             <div className="flex flex-col p-6 bg-white  border border-gray-200  rounded-xl">
               <p className="text-lg font-semibold mb-4">Sales by Category</p>
               <div className="flex justify-center items-center h-48 mb-4">
@@ -280,7 +280,7 @@ console.log(data);
             </div>
           </div>
 
-          {/* Top Selling Products Table */}
+          {/* Top Products */}
           <div className="p-6 bg-white  border border-gray-200  rounded-xl">
             <h3 className="text-lg font-semibold mb-4">Top Selling Products</h3>
             <div className="overflow-x-auto">

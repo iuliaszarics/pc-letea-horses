@@ -58,7 +58,7 @@ export const router = createBrowserRouter([
             // Email confirmation page
             {path: "/order/confirm-email", element: <OrderEmailConfirmationPage />},
 
-            // UNAUTHENTICATED PAGES - you can access them only if you aren't logged in
+            // UNAUTHENTICATED PAGES
 
             { path: "/login",
                 element: (
@@ -101,7 +101,7 @@ export const router = createBrowserRouter([
                 )
             },
 
-            // PRIVATE PAGES - you can access them only if you are logged in
+            // PRIVATE PAGES
 
 
              {
