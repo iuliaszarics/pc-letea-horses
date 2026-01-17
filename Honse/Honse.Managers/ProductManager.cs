@@ -43,7 +43,6 @@ namespace Honse.Managers
                     Id = categoryId,
                     Name = request.CategoryName,
                     UserId = request.UserId,
-                    //RestaurantId = request.RestaurantId
                 });
 
                 product.CategoryId = categoryId;
@@ -107,17 +106,10 @@ namespace Honse.Managers
                     Id = categoryId,
                     Name = request.CategoryName,
                     UserId = request.UserId,
-                    //RestaurantId = request.RestaurantId
                 });
 
                 product.CategoryId = categoryId;
             }
-            //else if (productCategory.RestaurantId == null)
-            //{
-            //    productCategory.RestaurantId = request.RestaurantId;
-
-            //    await productCategoryResource.Update(productCategory.Id, request.UserId, productCategory);
-            //}
 
             product = await productResource.Update(request.Id, request.UserId, product);
             product.Category = productCategory;

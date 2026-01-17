@@ -54,18 +54,15 @@ namespace Honse.Managers
 
         public async Task<Global.Order.Order> ProcessOrder(OrderProcessRequest request)
         {
-            // 1. Fetch the LIVE, TRACKED entity
             var trackedEntity = await orderResource.GetById(request.Id, request.UserId)
                 ?? throw new InvalidOperationException("Order not found");
 
             if (trackedEntity.RestaurantId != request.RestaurantId)
                 throw new UnauthorizedAccessException("Order does not belong to this restaurant");
 
-            // 2. Create a copy for the Engine
             var domainOrder = trackedEntity.DeepCopyTo<Global.Order.Order>();
 
             // 3. Process
-            // The engine updates 'domainOrder' logic
             domainOrder = orderProcessorEngine.ProcessOrder(
                 domainOrder, 
                 request.NextStatus, 
@@ -73,35 +70,28 @@ namespace Honse.Managers
                 request.StatusNotes
             );
 
-            // 4. SYNC BACK: Map properties manually
-            
-            // FIX 1: Use 'OrderStatus' (not Status)
-            // Your error confirmed 'Status' doesn't exist, so it must match the Entity name.
+            // We have to map the properties manually back to the entity from the db
+            // due to how Entity framework handles JSON Lists
+
             trackedEntity.OrderStatus = domainOrder.OrderStatus;
 
-            // FIX 2: Handle Preparation Time
-            // Your error confirmed 'PreparationTimeMinutes' doesn't exist on the Order object.
-            // We use the value from the REQUEST instead to calculate the new time.
             if (request.PreparationTimeMinutes > 0)
             {
                 trackedEntity.PreparationTime = DateTime.UtcNow.AddMinutes(request.PreparationTimeMinutes);
             }
 
-            // FIX 3 & 4: Fix Namespace and Property Names for History
             var newHistoryItem = domainOrder.StatusHistory.Last();
 
-            // We simply use 'new OrderStatusHistory' without the 'Entities.' prefix.
-            // Since your Order entity uses this class, the compiler already knows what it is.
             trackedEntity.StatusHistory.Add(new Global.Order.OrderStatusHistory 
             {
                 Status = newHistoryItem.Status,
-                Timestamp = newHistoryItem.Timestamp, // FIX: Use 'Timestamp' instead of 'Date'
+                Timestamp = newHistoryItem.Timestamp, 
                 Notes = newHistoryItem.Notes
             });
 
             trackedEntity.DeliveryTime = domainOrder.DeliveryTime;
 
-            // 5. Save Changes
+            // Save changes
             await orderResource.SaveChanges();
 
             await hubContext.Clients.All.SendAsync("PingOrderUpdated", trackedEntity.Id);

@@ -38,7 +38,6 @@ namespace Honse.Managers
 
             restaurant.Id = Guid.NewGuid();
 
-            // set the ConfigurationId from req
             restaurant.ConfigurationId = request.ConfigurationId;
 
             restaurant = await restaurantResource.Add(restaurant);
@@ -92,7 +91,6 @@ namespace Honse.Managers
             var now = TimeOnly.FromDateTime(DateTime.Now);
             foreach (var restaurant in result.Result)
             {
-                // Simple calculation: openingTime < closingTime (no overnight hours)
                 restaurant.IsOpen = restaurant.OpeningTime <= now && 
                                    now < restaurant.ClosingTime;
             }
@@ -104,7 +102,6 @@ namespace Honse.Managers
         {
             restaurantValidationEngine.ValidateCreateRestaurant(request.DeepCopyTo<Engines.Common.CreateRestaurant>());
 
-            // Get existing restaurant without tracking to preserve rating fields
             var existingRestaurant = await restaurantResource.GetByIdNoTracking(request.Id, request.UserId);
 
             if (existingRestaurant == null)
@@ -112,7 +109,6 @@ namespace Honse.Managers
 
             var restaurant = request.DeepCopyTo<Resources.Interfaces.Entities.Restaurant>();
 
-            // assign the new configuration id
             if(request.ConfigurationId.HasValue)
             {
                 restaurant.ConfigurationId = request.ConfigurationId.Value;
@@ -132,7 +128,6 @@ namespace Honse.Managers
 
         public async Task<Interfaces.RestaurantMenu> GetPublicRestaurantMenu(Guid restaurantId)
         {
-            // Get restaurant without userId check (public access)
             var restaurant = await restaurantResource.GetByIdPublic(restaurantId);
 
             if (restaurant == null)
@@ -166,7 +161,6 @@ namespace Honse.Managers
                 Image = restaurant.Image,
                 CuisineType = restaurant.CuisineType,
 
-                // new mapping
                 Configuration = restaurant.Configuration
             };
 

@@ -56,7 +56,7 @@ namespace Honse.Services.Email
                 {
                     Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
                 }
-                throw; // Re-throw after logging
+                throw;
             }
         }
     }
